@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Net;
 
 namespace NRAdmanWebApplicationNet10.Models
 {
@@ -10,58 +11,48 @@ namespace NRAdmanWebApplicationNet10.Models
         [Column("radacctid")]
         public long RadAcctId { get; set; }
 
-        [Required, MaxLength(64)]
         [Column("acctsessionid")]
-        public string AcctSessionId { get; set; } = string.Empty;
+        public string AcctSessionId { get; set; } = "";
 
-        [Required, MaxLength(32)]
         [Column("acctuniqueid")]
-        public string AcctUniqueId { get; set; } = string.Empty;
+        public string AcctUniqueId { get; set; } = "";
 
-        [Required, MaxLength(64)]
         [Column("username")]
-        public string Username { get; set; } = string.Empty;
+        public string? UserName { get; set; }
 
-        [MaxLength(64)]
         [Column("realm")]
-        public string? Realm { get; set; } = string.Empty;
+        public string? Realm { get; set; }
 
-        [Required, MaxLength(15)]
         [Column("nasipaddress")]
-        public string NasIpAddress { get; set; } = string.Empty;
+        public IPAddress NasIpAddress { get; set; } = IPAddress.None;
 
-        [MaxLength(32)]
         [Column("nasportid")]
         public string? NasPortId { get; set; }
 
-        [MaxLength(32)]
         [Column("nasporttype")]
         public string? NasPortType { get; set; }
 
         [Column("acctstarttime")]
-        public DateTime? AcctStartTime { get; set; }
+        public DateTimeOffset? AcctStartTime { get; set; }
 
         [Column("acctupdatetime")]
-        public DateTime? AcctUpdateTime { get; set; }
+        public DateTimeOffset? AcctUpdateTime { get; set; }
 
         [Column("acctstoptime")]
-        public DateTime? AcctStopTime { get; set; }
+        public DateTimeOffset? AcctStopTime { get; set; }
 
         [Column("acctinterval")]
-        public int? AcctInterval { get; set; }
+        public long? AcctInterval { get; set; }
 
         [Column("acctsessiontime")]
-        public uint? AcctSessionTime { get; set; }
+        public long? AcctSessionTime { get; set; }
 
-        [MaxLength(32)]
         [Column("acctauthentic")]
         public string? AcctAuthentic { get; set; }
 
-        [MaxLength(128)]
         [Column("connectinfo_start")]
         public string? ConnectInfoStart { get; set; }
 
-        [MaxLength(128)]
         [Column("connectinfo_stop")]
         public string? ConnectInfoStop { get; set; }
 
@@ -71,47 +62,24 @@ namespace NRAdmanWebApplicationNet10.Models
         [Column("acctoutputoctets")]
         public long? AcctOutputOctets { get; set; }
 
-        [Required, MaxLength(50)]
         [Column("calledstationid")]
-        public string CalledStationId { get; set; } = string.Empty;
+        public string? CalledStationId { get; set; }
 
-        [Required, MaxLength(50)]
         [Column("callingstationid")]
-        public string CallingStationId { get; set; } = string.Empty;
+        public string? CallingStationId { get; set; }
 
-        [Required, MaxLength(32)]
         [Column("acctterminatecause")]
-        public string AcctTerminateCause { get; set; } = string.Empty;
+        public string? AcctTerminateCause { get; set; }
 
-        [MaxLength(32)]
         [Column("servicetype")]
         public string? ServiceType { get; set; }
 
-        [MaxLength(32)]
         [Column("framedprotocol")]
         public string? FramedProtocol { get; set; }
 
-        [Required, MaxLength(15)]
         [Column("framedipaddress")]
-        public string FramedIpAddress { get; set; } = string.Empty;
+        public IPAddress? FramedIpAddress { get; set; }
 
-        [Required, MaxLength(45)]
-        [Column("framedipv6address")]
-        public string FramedIpv6Address { get; set; } = string.Empty;
-
-        [Required, MaxLength(45)]
-        [Column("framedipv6prefix")]
-        public string FramedIpv6Prefix { get; set; } = string.Empty;
-
-        [Required, MaxLength(44)]
-        [Column("framedinterfaceid")]
-        public string FramedInterfaceId { get; set; } = string.Empty;
-
-        [Required, MaxLength(45)]
-        [Column("delegatedipv6prefix")]
-        public string DelegatedIpv6Prefix { get; set; } = string.Empty;
-
-        [MaxLength(64)]
         [Column("class")]
         public string? Class { get; set; }
     }

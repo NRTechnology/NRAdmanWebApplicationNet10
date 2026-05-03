@@ -14,7 +14,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 if (!string.IsNullOrEmpty(connectionString))
 {
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseMySQL(connectionString));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 }
 
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
@@ -25,6 +25,18 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
     .AddDefaultTokenProviders();
 
 var app = builder.Build();
+
+// Run database migration if the configuration value "RunMigration" is set to true.
+var runMigration = app.Configuration.GetValue<bool>("RunMigration");
+if (runMigration)
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        db.Database.Migrate();
+    }
+}
+
 
 // Create a service scope to get an AspnetCoreMvcFullContext instance using DI and seed the database.
 using (var scope = app.Services.CreateScope())

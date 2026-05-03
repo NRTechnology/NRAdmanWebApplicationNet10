@@ -8,18 +8,16 @@ namespace NRAdmanWebApplicationNet10.Models
     {
         [Key]
         [Column("id")]
-        public uint Id { get; set; }
+        public int Id { get; set; }
 
-        [Required, MaxLength(64)]
         [Column("username")]
-        public string Username { get; set; } = string.Empty;
+        public string UserName { get; set; } = "";
 
-        [Required, MaxLength(64)]
         [Column("groupname")]
-        public string GroupName { get; set; } = string.Empty;
+        public string GroupName { get; set; } = "";
 
         [Column("priority")]
-        public int Priority { get; set; } = 1;
+        public int Priority { get; set; }
     }
 
 }
