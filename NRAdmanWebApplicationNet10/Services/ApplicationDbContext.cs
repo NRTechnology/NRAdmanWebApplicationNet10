@@ -8,12 +8,20 @@ namespace NRAdmanWebApplicationNet10.Services
         : IdentityDbContext<ApplicationUser>(dbContextOptions)
     {
         public DbSet<RadCheck> RadChecks => Set<RadCheck>();
+
         public DbSet<RadReply> RadReplies => Set<RadReply>();
+
         public DbSet<RadGroupCheck> RadGroupChecks => Set<RadGroupCheck>();
+
         public DbSet<RadGroupReply> RadGroupReplies => Set<RadGroupReply>();
+
         public DbSet<RadUserGroup> RadUserGroups => Set<RadUserGroup>();
+
         public DbSet<RadAcct> RadAccts => Set<RadAcct>();
+
         public DbSet<Nas> Nas => Set<Nas>();
+
+        public DbSet<LoginAttempt> LoginAttempts => Set<LoginAttempt>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

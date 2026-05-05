@@ -2,8 +2,23 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NRAdmanWebApplicationNet10.Services;
 using NRAdmanWebApplicationNet10.Data;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((context, services, serilogConfiguration) => serilogConfiguration
+    .ReadFrom.Configuration(context.Configuration)
+    .Enrich.FromLogContext()
+    .Enrich.WithProperty("ApplicationName", "NRAdmanWebApplicationNet10")
+    .Enrich.WithProperty("Environment", context.HostingEnvironment.EnvironmentName)
+    .WriteTo.Console()
+    .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day)
+    .MinimumLevel.Error()
+);
+
+// Anti-brute-force: memory cache + service
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<IAntiBruteForceService, AntiBruteForceService>();
 
 builder.Services.AddHttpContextAccessor();
 // Add services to the container.
@@ -64,7 +79,8 @@ app.MapControllerRoute(
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
+    //pattern: "{controller=Home}/{action=Index}/{id?}")
+    pattern: "{controller=User}/{action=Index}/{id?}")
     .WithStaticAssets();
 
 app.Run();
