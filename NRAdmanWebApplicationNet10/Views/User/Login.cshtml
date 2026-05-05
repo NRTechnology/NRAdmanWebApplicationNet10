@@ -2,7 +2,7 @@
     Layout = "_BlankLayout";
     ViewData["Title"] = "Login Basic - Pages";
 }
-@model NRAdmanWebApplicationNet10.ViewModel.LoginViewModel
+@model NRAdmanWebApplicationNet10.ViewModels.LoginViewModel
 
 @section VendorStyles {
     <link rel="stylesheet" href="~/assets/vendor/libs/&#64;form-validation/form-validation.css" />
@@ -42,8 +42,8 @@
                     <form id="formAuthentication" class="mb-4" action="@Url.Action("Login", "User")" method="POST">
                         @Html.AntiForgeryToken()
                         <div class="mb-6 form-control-validation">
-                            <label for="email" class="form-label">Email or Username</label>
-                            <input type="text" asp-for="Username" class="form-control" id="email" name="email-username" placeholder="Enter your email or username" autofocus />
+                            <label for="username" class="form-label">Email or Username</label>
+                            <input type="text" asp-for="Username" class="form-control" id="username" name="username" placeholder="Enter your email or username" autofocus />
                         </div>
                         <div class="mb-6 form-password-toggle form-control-validation">
                             <label class="form-label" for="password">Password</label>

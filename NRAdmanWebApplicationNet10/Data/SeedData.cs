@@ -14,7 +14,7 @@ namespace NRAdmanWebApplicationNet10.Data
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             string[] roleNames =
             [
-                "Administrator", "Keuangan"
+                "Administrator", "Operator", "Finance", "Technician", "Auditor", "Customer"
             ];
 
             foreach (var roleName in roleNames)
@@ -65,7 +65,7 @@ namespace NRAdmanWebApplicationNet10.Data
                 if (createKeuanganUser.Succeeded)
                 {
                     //here we tie the new user to the role
-                    await userManager.AddToRoleAsync(keuanganUser, "Keuangan");
+                    await userManager.AddToRoleAsync(keuanganUser, "Finance");
                 }
             }
 

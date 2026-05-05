@@ -2,9 +2,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using NRAdmanWebApplicationNet10.Helpers;
 using NRAdmanWebApplicationNet10.Models;
 using NRAdmanWebApplicationNet10.Services;
-using NRAdmanWebApplicationNet10.ViewModel;
+using NRAdmanWebApplicationNet10.ViewModels;
 using Serilog.Core;
 
 namespace NRAdmanWebApplicationNet10.Controllers
@@ -42,7 +43,7 @@ namespace NRAdmanWebApplicationNet10.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> LoginWith2Fa(string twoFactorCode, bool rememberMe, string returnUrl = null)
+        public async Task<IActionResult> LoginWith2Fa(string twoFactorCode, bool rememberMe, string? returnUrl = null)
         {
             try
             {
@@ -128,11 +129,11 @@ namespace NRAdmanWebApplicationNet10.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+                    var remoteIp = HttpContext.Connection.RemoteIpAddress?.ToString();
                     // Check IP block before attempting sign-in
-                    if (await antiBruteForce.IsBlockedAsync(ip))
+                    if (remoteIp != null && await antiBruteForce.IsBlockedAsync(remoteIp))
                     {
-                        logger.LogWarning("Blocked login attempt from IP {Ip}", ip);
+                        logger.LogWarning("Blocked login attempt from IP {Ip}", remoteIp);
                         throw new Exception("Too many failed attempts from your IP. Try again later.");
                     }
 
@@ -147,7 +148,7 @@ namespace NRAdmanWebApplicationNet10.Controllers
                         applicationDbContext.LoginAttempts.Add(new LoginAttempt
                         {
                             UserId = foundUser?.Id,
-                            IpAddress = ip,
+                            IpAddress = remoteIp,
                             AttemptType = "Password",
                             Success = true,
                             Details = "Success"
@@ -155,7 +156,7 @@ namespace NRAdmanWebApplicationNet10.Controllers
                         await applicationDbContext.SaveChangesAsync();
 
                         // reset any failure counters for this IP on successful login
-                        await antiBruteForce.ResetFailuresAsync(ip);
+                        if (remoteIp != null) await antiBruteForce.ResetFailuresAsync(remoteIp);
 
                         if (foundUser is { UserName: not null })
                         {
@@ -191,7 +192,7 @@ namespace NRAdmanWebApplicationNet10.Controllers
                     applicationDbContext.LoginAttempts.Add(new LoginAttempt
                     {
                         UserId = foundUser?.Id,
-                        IpAddress = ip,
+                        IpAddress = remoteIp,
                         AttemptType = "Password",
                         Success = false,
                         Details = reason
@@ -199,7 +200,7 @@ namespace NRAdmanWebApplicationNet10.Controllers
                     await applicationDbContext.SaveChangesAsync();
 
                     // Record failure to anti-brute-force
-                    await antiBruteForce.RecordFailureAsync(ip);
+                    if (remoteIp != null) await antiBruteForce.RecordFailureAsync(remoteIp);
 
                     if (result.IsLockedOut)
                     {
@@ -225,7 +226,7 @@ namespace NRAdmanWebApplicationNet10.Controllers
             }
             catch (Exception exception)
             {
-                TempData["error"] = exception.Message;
+                ToastHelper.Error(TempData, exception.Message);
                 logger.LogError(exception, "Login failed for user {Username}", model.Username);
                 return View("Login");
             }

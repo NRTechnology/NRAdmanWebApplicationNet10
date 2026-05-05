@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NRAdmanWebApplicationNet10.ViewModel
+namespace NRAdmanWebApplicationNet10.ViewModels
 {
     public class LoginViewModel
     {

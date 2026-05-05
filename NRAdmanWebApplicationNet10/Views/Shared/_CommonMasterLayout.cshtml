@@ -1,6 +1,6 @@
 @{
   @* using this variables to load front pages assets *@
-  bool isFront = ViewData["isFront"] is bool isFrontValue ? isFrontValue : false;
+  var isFront = ViewData["isFront"] is bool isFrontValue ? isFrontValue : false;
   ViewData["main"] = isFront ? "front-" : "";
   ViewData["frontVar"] = isFront ? "Front" : "";
   @* Compact/Fluid class *@
@@ -23,9 +23,9 @@
   <meta name="robots" content="noindex, nofollow" />
 
   @{
-    string title = ViewData["title"] as string ?? "";
-    string appName = TempData.Peek("appName") as string ?? "";
-    string productPage = TempData.Peek("productPage") as string ?? "";
+    var title = ViewData["title"] as string ?? "";
+    var appName = TempData.Peek("appName") as string ?? "";
+    var productPage = TempData.Peek("productPage") as string ?? "";
     }
   <title>@title | @appName - Asp.Net Core MVC Admin Template</title>
   <meta name="description" content="" />
@@ -33,17 +33,17 @@
   <!-- Canonical SEO -->
   <link rel="canonical" href='@productPage'>
   <!-- Favicon -->
-  <link rel="icon" type="image/x-icon" href="~/img/favicon/favicon.ico" />
+  <link rel="icon" type="image/x-icon" href="~/assets/img/favicon/favicon.ico" />
 
   <!-- Core Styles -->
   @await Html.PartialAsync("Sections/_Styles" + ViewData["frontVar"])
 
 
   <!-- Vendor Styles -->
-  @RenderSection("VendorStyles", required: false)
+  @await RenderSectionAsync("VendorStyles", required: false)
 
   <!-- Page Styles -->
-  @RenderSection("PageStyles", required: false)
+  @await RenderSectionAsync("PageStyles", required: false)
 
   <!-- Include Scripts for customizer, helper, analytics, config -->
   @await Html.PartialAsync("Sections/_ScriptsIncludes" + ViewData["frontVar"])
@@ -58,12 +58,14 @@
   @await Html.PartialAsync("Sections/_Scripts" + ViewData["frontVar"])
 
   <!-- Vendor Scripts -->
-  @RenderSection("VendorScripts", required: false)
+  @await RenderSectionAsync("VendorScripts", required: false)
 
   <script src='~/assets/js/@ViewData["main"]main.js'></script>
 
   <!-- Page Scripts-->
-  @RenderSection("PageScripts", required: false)
-</body>
+  @await RenderSectionAsync("PageScripts", required: false)
+  
+    <partial name="_Toast" />
+  </body>
 
 </html>

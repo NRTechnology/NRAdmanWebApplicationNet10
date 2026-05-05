@@ -1,0 +1,87 @@
+﻿@if (TempData["ToastMessage"] != null)
+{
+    var type = TempData["ToastType"]?.ToString()?.ToLower() ?? "info";
+
+    string bgClass;
+    string title;
+    string icon;
+
+    switch (type)
+    {
+        case "success":
+            bgClass = "bg-success text-white";
+            title = "Berhasil";
+            icon = "tabler-check";
+            break;
+
+        case "error":
+            bgClass = "bg-danger text-white";
+            title = "Error";
+            icon = "tabler-x";
+            break;
+
+        case "warning":
+            bgClass = "bg-warning text-dark";
+            title = "Peringatan";
+            icon = "tabler-alert-triangle";
+            break;
+
+        default:
+            bgClass = "bg-info text-white";
+            title = "Informasi";
+            icon = "tabler-info-circle";
+            break;
+    }
+
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index:9999;">
+
+        <div id="globalToast"
+             class="bs-toast toast toast-ex animate__animated animate__fadeInRight animate__faster my-2 @bgClass"
+             role="alert"
+             aria-live="assertive"
+             aria-atomic="true"
+             data-bs-delay="3000">
+
+            <div class="toast-header @bgClass border-0">
+                <i class="icon-base ti @icon icon-xs me-2"></i>
+
+                <div class="me-auto fw-medium">@title</div>
+                <small class="text-muted d-flex align-items-center gap-1">
+                    <i class="icon-base ti tabler-clock icon-xs"></i>
+                    sekarang
+                </small>
+
+                <button type="button"
+                        class="btn-close @(type == "warning" ? "" : "btn-close-white")"
+                        data-bs-dismiss="toast"
+                        aria-label="Close"></button>
+            </div>
+
+            <div class="toast-body">
+                @TempData["ToastMessage"]
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const el = document.getElementById("globalToast");
+
+            if (el && typeof bootstrap !== "undefined") {
+                const toast = new bootstrap.Toast(el, {
+                    delay: 3000,
+                    autohide: true
+                });
+
+                toast.show();
+
+                 // sebelum toast hilang → ubah animasi
+                el.addEventListener("hide.bs.toast", function () {
+                    el.classList.remove("animate__fadeInRight");
+                    el.classList.add("animate__fadeOutRight");
+                });
+            }
+        });
+    </script>
+}
