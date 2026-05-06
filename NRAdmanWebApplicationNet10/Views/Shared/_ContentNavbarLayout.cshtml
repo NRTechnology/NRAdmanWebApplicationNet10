@@ -24,14 +24,13 @@
   ViewData["containerNav"] = (ViewData["containerNav"] ?? "container-xxl");
 }
 
-@section VendorStyles{ @RenderSection("VendorStyles", required: false) }
+@section VendorStyles{ @await RenderSectionAsync("VendorStyles", required: false) }
 
-@section PageStyles{ @RenderSection("PageStyles", required: false) }
+@section PageStyles{ @await RenderSectionAsync("PageStyles", required: false) }
 
-@section VendorScripts{ @RenderSection("VendorScripts", required: false) }
+@section VendorScripts{ @await RenderSectionAsync("VendorScripts", required: false) }
 
-@section PageScripts{ @RenderSection("PageScripts", required: false) }
-
+@section PageScripts{ @await RenderSectionAsync("PageScripts", required: false) }
 @{
   bool isMenu = ViewData["isMenu"] != null && Convert.ToBoolean(ViewData["isMenu"]);
 }
@@ -41,7 +40,15 @@
 
     @if (isMenu)
     {
-      @await Html.PartialAsync("Sections/Menu/_VerticalMenu")
+        if (User.Identity is { IsAuthenticated: true } && User.IsInRole("Administrator"))
+        {
+            @await Html.PartialAsync("Sections/Menu/_VerticalMenuAdministrator")
+        }
+        else
+        {
+            @await Html.PartialAsync("Sections/Menu/_VerticalMenu")
+        }
+      
     }
 
     <!-- Layout page -->

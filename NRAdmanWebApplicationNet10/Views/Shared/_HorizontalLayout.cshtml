@@ -23,13 +23,13 @@
 }
 
 
-@section VendorStyles{ @RenderSection("VendorStyles", required: false)}
+@section VendorStyles{ @await RenderSectionAsync("VendorStyles", required: false)}
 
-@section PageStyles{ @RenderSection("PageStyles", required: false)}
+@section PageStyles{ @await RenderSectionAsync("PageStyles", required: false)}
 
-@section VendorScripts{ @RenderSection("VendorScripts", required: false)}
+@section VendorScripts{ @await RenderSectionAsync("VendorScripts", required: false)}
 
-@section PageScripts{ @RenderSection("PageScripts", required: false)}
+@section PageScripts{ @await RenderSectionAsync("PageScripts", required: false)}
 
 <div class='layout-wrapper layout-navbar-full layout-horizontal layout-without-menu'>
   <div class='layout-container'>
