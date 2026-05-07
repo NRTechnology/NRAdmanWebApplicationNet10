@@ -35,5 +35,14 @@ namespace NRAdmanWebApplicationNet10.Models
 
         [Column("description")]
         public string? Description { get; set; }
+
+        [Column("routertype")] 
+        public EnumRouterType RouterType { get; set; }
+
+        [Column("routerusername")]
+        public string Username { get; set; }
+
+        [Column("routerpassword")]
+        public string Password { get; set; }
     }
 }

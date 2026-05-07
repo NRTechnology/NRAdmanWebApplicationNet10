@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using NRAdmanWebApplicationNet10.Models;
+using System.Security.Cryptography;
 
 namespace NRAdmanWebApplicationNet10.Services
 {
@@ -25,7 +26,13 @@ namespace NRAdmanWebApplicationNet10.Services
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);            
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Nas>(entity =>
+            {
+                entity.ToTable("nas");
+                entity.HasIndex(e => e.NasName, "NasName_index_unique").IsUnique();
+            });
         }
     }
 }

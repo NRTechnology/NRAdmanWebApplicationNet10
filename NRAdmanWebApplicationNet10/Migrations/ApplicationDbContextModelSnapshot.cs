@@ -210,9 +210,18 @@ namespace NRAdmanWebApplicationNet10.Migrations
                         .HasColumnType("text")
                         .HasColumnName("nasname");
 
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("routerpassword");
+
                     b.Property<int?>("Ports")
                         .HasColumnType("integer")
                         .HasColumnName("ports");
+
+                    b.Property<int>("RouterType")
+                        .HasColumnType("integer")
+                        .HasColumnName("routertype");
 
                     b.Property<string>("Secret")
                         .IsRequired()
@@ -233,9 +242,17 @@ namespace NRAdmanWebApplicationNet10.Migrations
                         .HasColumnType("text")
                         .HasColumnName("type");
 
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("routerusername");
+
                     b.HasKey("Id");
 
-                    b.ToTable("nas");
+                    b.HasIndex(new[] { "NasName" }, "NasName_index_unique")
+                        .IsUnique();
+
+                    b.ToTable("nas", (string)null);
                 });
 
             modelBuilder.Entity("NRAdmanWebApplicationNet10.Models.RadAcct", b =>

@@ -154,11 +154,156 @@
     </li>
 
     <li class='menu-item@(currentPage.StartsWith("/Transactions") ? " active" : "")'>
-      <a asp-controller="Transactions" asp-action="Index" class="menu-link">
-        <i class="menu-icon icon-base ti tabler-database"></i>
-        <div data-i18n="Transactions (CRUD)">Transactions (CRUD)</div>
-      </a>
+        <a asp-controller="Transactions" asp-action="Index" class="menu-link">
+            <i class="menu-icon icon-base ti tabler-database"></i>
+            <div data-i18n="Transactions (CRUD)">Transactions (CRUD)</div>
+        </a>
     </li>
+    
+        <!-- System -->
+        <li class="menu-header small">
+            <span class="menu-header-text" data-i18n="Sytem">System</span>
+        </li>
+        <!-- Settings menu start -->
+        <li class='menu-item@(currentPage.StartsWith("/Ecommerce") ? " active open" : "")'>
+            <a href='javascript:void(0);' class='menu-link menu-toggle'>
+                <i class="menu-icon icon-base ti tabler-shopping-cart"></i>
+                <div data-i18n="Settings">Settings</div>
+            </a>
+            <ul class="menu-sub">
+                <li class='menu-item@(currentPage == "/Ecommerce/Dashboard" ? " active" : "")'>
+                        <a asp-area="Administrator" asp-controller="SettingsNas" asp-action="Index" class="menu-link">
+                        <div data-i18n="NAS">NAS</div>
+                    </a>
+                </li>
+                <li class='menu-item@(currentPage.StartsWith("/Ecommerce/Product") ? " active open" : "")'>
+                    <a href="javascript:void(0);" class="menu-link menu-toggle">
+                        <div data-i18n="Products">Products</div>
+                    </a>
+                    <ul class="menu-sub">
+                        <li class='menu-item@(currentPage == "/Ecommerce/ProductList" ? " active" : "")'>
+                            <a asp-controller="Ecommerce" asp-action="ProductList" class='menu-link'>
+                                <div data-i18n="Product List">Product List</div>
+                            </a>
+                        </li>
+                        <li class='menu-item@(currentPage == "/Ecommerce/ProductAdd" ? " active" : "")'>
+                            <a asp-controller="Ecommerce" asp-action="ProductAdd" class='menu-link'>
+                                <div data-i18n="Add Product">Add Product</div>
+                            </a>
+                        </li>
+                        <li class='menu-item@(currentPage == "/Ecommerce/ProductCategoryList" ? " active" : "")'>
+                            <a asp-controller="Ecommerce" asp-action="ProductCategoryList" class='menu-link'>
+                                <div data-i18n="Category List">Category List</div>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class='menu-item@(currentPage.StartsWith("/Ecommerce/Order") ? " active open" : "")'>
+                    <a href='javascript:void(0);' class='menu-link menu-toggle'>
+                        <div data-i18n="Order">Order</div>
+                    </a>
+                    <ul class="menu-sub">
+                        <li class='menu-item@(currentPage == "/Ecommerce/OrderList" ? " active" : "")'>
+                            <a asp-controller="Ecommerce" asp-action="OrderList" class='menu-link'>
+                                <div data-i18n="Order List">Order List</div>
+                            </a>
+                        </li>
+                        <li class='menu-item@(currentPage == "/Ecommerce/OrderDetails" ? " active" : "")'>
+                            <a asp-controller="Ecommerce" asp-action="OrderDetails" class='menu-link'>
+                                <div data-i18n="Order Details">Order Details</div>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class='menu-item@(currentPage.StartsWith("/Ecommerce/Customer") ? " active open" : "")'>
+                    <a href="javascript:void(0);" class="menu-link menu-toggle">
+                        <div data-i18n="Customer">Customer</div>
+                    </a>
+                    <ul class="menu-sub">
+                        <li class='menu-item@(currentPage == "/Ecommerce/CustomerAll" ? " active" : "")'>
+                            <a asp-controller="Ecommerce" asp-action="CustomerAll" class='menu-link'>
+                                <div data-i18n="All Customer">All Customers</div>
+                            </a>
+                        </li>
+                        <li class='menu-item@(currentPage.StartsWith("/Ecommerce/CustomerDetails") ? " active open" : "")'>
+                            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                                <div data-i18n="Customer Details">Customer Details</div>
+                            </a>
+                            <ul class="menu-sub">
+                                <li class='menu-item@(currentPage == "/Ecommerce/CustomerDetailsOverview" ? " active" : "")'>
+                                    <a asp-controller="Ecommerce" asp-action="CustomerDetailsOverview" class='menu-link'>
+                                        <div data-i18n="Overview">Overview</div>
+                                    </a>
+                                </li>
+                                <li class='menu-item@(currentPage == "/Ecommerce/CustomerDetailsSecurity" ? " active" : "")'>
+                                    <a asp-controller="Ecommerce" asp-action="CustomerDetailsSecurity" class='menu-link'>
+                                        <div data-i18n="Security">Security</div>
+                                    </a>
+                                </li>
+                                <li class='menu-item@(currentPage == "/Ecommerce/CustomerDetailsBilling" ? " active" : "")'>
+                                    <a asp-controller="Ecommerce" asp-action="CustomerDetailsBilling" class='menu-link'>
+                                        <div data-i18n="Address & Billing">Address & Billing</div>
+                                    </a>
+                                </li>
+                                <li class='menu-item@(currentPage == "/Ecommerce/CustomerDetailsNotifications" ? " active" : "")'>
+                                    <a asp-controller="Ecommerce" asp-action="CustomerDetailsNotifications" class='menu-link'>
+                                        <div data-i18n="Notifications">Notifications</div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li class='menu-item@(currentPage == "/Ecommerce/Reviews" ? " active" : "")'>
+                    <a asp-controller="Ecommerce" asp-action="Reviews" class='menu-link'>
+                        <div data-i18n="Manage Reviews">Manage Reviews</div>
+                    </a>
+                </li>
+                <li class='menu-item@(currentPage == "/Ecommerce/Referrals" ? " active" : "")'>
+                    <a asp-controller="Ecommerce" asp-action="Referrals" class='menu-link'>
+                        <div data-i18n="Referrals">Referrals</div>
+                    </a>
+                </li>
+                <li class='menu-item@(currentPage.StartsWith("/Ecommerce/Settings") ? " active open" : "")'>
+                    <a href="javascript:void(0);" class="menu-link menu-toggle">
+                        <div data-i18n="Settings">Settings</div>
+                    </a>
+                    <ul class="menu-sub">
+                        <li class='menu-item@(currentPage == "/Ecommerce/SettingsStoreDetails" ? " active" : "")'>
+                            <a asp-controller="Ecommerce" asp-action="SettingsStoreDetails" class='menu-link'>
+                                <div data-i18n="Store Details">Store Details</div>
+                            </a>
+                        </li>
+                        <li class='menu-item@(currentPage == "/Ecommerce/SettingsPayments" ? " active" : "")'>
+                            <a asp-controller="Ecommerce" asp-action='SettingsPayments' class='menu-link'>
+                                <div data-i18n="Payments">Payments</div>
+                            </a>
+                        </li>
+                        <li class='menu-item@(currentPage == "/Ecommerce/SettingsCheckout" ? " active" : "")'>
+                            <a asp-controller="Ecommerce" asp-action='SettingsCheckout' class='menu-link'>
+                                <div data-i18n="Checkout">Checkout</div>
+                            </a>
+                        </li>
+                        <li class='menu-item@(currentPage == "/Ecommerce/SettingsShipping" ? " active" : "")'>
+                            <a asp-controller="Ecommerce" asp-action='SettingsShipping' class='menu-link'>
+                                <div data-i18n="Shipping & Delivery">Shipping & Delivery</div>
+                            </a>
+                        </li>
+                        <li class='menu-item@(currentPage == "/Ecommerce/SettingsLocations" ? " active" : "")'>
+                            <a asp-controller="Ecommerce" asp-action='SettingsLocations' class='menu-link'>
+                                <div data-i18n="Locations">Locations</div>
+                            </a>
+                        </li>
+                        <li class='menu-item@(currentPage == "/Ecommerce/SettingsNotifications" ? " active" : "")'>
+                            <a asp-controller="Ecommerce" asp-action='SettingsNotifications' class='menu-link'>
+                                <div data-i18n="Notifications">Notifications</div>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        <!-- e-commerce-app menu end -->
 
     <!-- Apps & Pages -->
     <li class="menu-header small">

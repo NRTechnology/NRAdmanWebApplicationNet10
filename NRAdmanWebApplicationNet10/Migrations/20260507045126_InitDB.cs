@@ -55,6 +55,23 @@ namespace NRAdmanWebApplicationNet10.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "LoginAttempts",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<string>(type: "text", nullable: true),
+                    IpAddress = table.Column<string>(type: "text", nullable: true),
+                    AttemptedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Success = table.Column<bool>(type: "boolean", nullable: false),
+                    AttemptType = table.Column<string>(type: "text", nullable: true),
+                    Details = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LoginAttempts", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "nas",
                 columns: table => new
                 {
@@ -67,7 +84,10 @@ namespace NRAdmanWebApplicationNet10.Migrations
                     secret = table.Column<string>(type: "text", nullable: false),
                     server = table.Column<string>(type: "text", nullable: true),
                     community = table.Column<string>(type: "text", nullable: true),
-                    description = table.Column<string>(type: "text", nullable: true)
+                    description = table.Column<string>(type: "text", nullable: true),
+                    routertype = table.Column<int>(type: "integer", nullable: false),
+                    routerusername = table.Column<string>(type: "text", nullable: false),
+                    routerpassword = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -331,6 +351,12 @@ namespace NRAdmanWebApplicationNet10.Migrations
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "NasName_index_unique",
+                table: "nas",
+                column: "nasname",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -350,6 +376,9 @@ namespace NRAdmanWebApplicationNet10.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "LoginAttempts");
 
             migrationBuilder.DropTable(
                 name: "nas");

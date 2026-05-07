@@ -1,0 +1,126 @@
+﻿@{
+    ViewData["Title"] = "Setting NAS - Administrator";
+}
+
+@section VendorStyles {
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/flatpickr/flatpickr.css" />
+}
+
+@section VendorScripts {
+    <script src="~/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+    @*<script src="~/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.js"></script>*@
+    <!-- Flat Picker -->
+    <script src="~/assets/vendor/libs/moment/moment.js"></script>
+    <script src="~/assets/vendor/libs/flatpickr/flatpickr.js"></script>
+}
+
+@section PageScripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const table = new DataTable(document.querySelector('#datatable'), {
+                ajax: {
+                    url: '@Url.Action("GetNasData", "SettingsNas", new { area = "Administrator" })',
+                    dataSrc: ''
+                  },
+                  layout: {
+                  topStart: {
+                    rowClass: 'row mx-3 my-0 justify-content-between',
+                    features: [
+                      {
+                        pageLength: {
+                          menu: [7, 10, 25, 50, 100],
+                          text: 'Show_MENU_entries'
+                        }
+                      }
+                    ]
+                  },
+                  topEnd: {
+                    search: {
+                      placeholder: ''
+                    }
+                  },
+                  bottomStart: {
+                    rowClass: 'row mx-3 justify-content-between',
+                    features: ['info']
+                  },
+                  bottomEnd: 'paging'
+                },
+                language: {
+                  paginate: {
+                    next: '<i class="icon-base ti tabler-chevron-right scaleX-n1-rtl icon-18px"></i>',
+                    previous: '<i class="icon-base ti tabler-chevron-left scaleX-n1-rtl icon-18px"></i>',
+                    first: '<i class="icon-base ti tabler-chevrons-left scaleX-n1-rtl icon-18px"></i>',
+                    last: '<i class="icon-base ti tabler-chevrons-right scaleX-n1-rtl icon-18px"></i>'
+                  }
+                },
+                columns: [
+                    { data: 'id', title: 'ID' },
+                    { data: 'nasName', title: 'NAS Name' },
+                    { data: 'shortName', title: 'Short Name' },
+                    { data: 'type', title: 'Type' },
+                    { data: 'ports', title: 'Port' },
+                    { data: 'server', title: 'Server' },
+                    { data: 'community', title: 'SNMP Community' },
+                    { data: 'description', title: 'Description' },
+                    { data: 'routerType', title: 'Router Type' },
+                    { data: 'username', title: 'Username' },
+                    { data: 'id', title: 'Actions', orderable: false, render: function(data, type, row) {
+                        return `<a href="/Administrator/SettingNas/Edit/${data}" class="btn btn-sm btn-primary">Edit</a> <a href="/Administrator/SettingNas/Delete/${data}" class="btn btn-sm btn-danger">Delete</a>`;
+                    }}
+                ],
+                responsive: true
+            });
+        });
+    </script>
+}
+
+<div class="card">
+
+    <!-- HEADER -->
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2 border-bottom">
+        <h5 class="mb-0">List NAS</h5>
+
+        <a asp-area="Administrator"
+           asp-controller="SettingsNas"
+           asp-action="Create"
+           class="btn btn-primary">
+
+            <span class="d-flex align-items-center gap-2">
+                <i class="icon-base ti tabler-plus icon-sm"></i>
+                <span class="d-none d-sm-inline-block">
+                    Add New Record
+                </span>
+            </span>
+
+        </a>
+    </div>
+
+    <!-- TABLE -->
+    <div class="card-datatable table-responsive">
+        <table id="datatable"
+               class="datatables-ajax table table-bordered table-striped">
+
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>NAS Name</th>
+                <th>Short Name</th>
+                <th>Type</th>
+                <th>Port</th>
+                <th>Server</th>
+                <th>SNMP Community</th>
+                <th>Description</th>
+                <th>Router Type</th>
+                <th>Username</th>
+                <th width="120">Actions</th>
+            </tr>
+            </thead>
+
+            <tbody></tbody>
+
+        </table>
+    </div>
+
+</div>

@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NRAdmanWebApplicationNet10.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260503055001_InitDB")]
+    [Migration("20260507045126_InitDB")]
     partial class InitDB
     {
         /// <inheritdoc />
@@ -162,6 +162,35 @@ namespace NRAdmanWebApplicationNet10.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("NRAdmanWebApplicationNet10.Models.LoginAttempt", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AttemptType")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("AttemptedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Details")
+                        .HasColumnType("text");
+
+                    b.Property<string>("IpAddress")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("Success")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LoginAttempts");
+                });
+
             modelBuilder.Entity("NRAdmanWebApplicationNet10.Models.Nas", b =>
                 {
                     b.Property<int>("Id")
@@ -184,9 +213,18 @@ namespace NRAdmanWebApplicationNet10.Migrations
                         .HasColumnType("text")
                         .HasColumnName("nasname");
 
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("routerpassword");
+
                     b.Property<int?>("Ports")
                         .HasColumnType("integer")
                         .HasColumnName("ports");
+
+                    b.Property<int>("RouterType")
+                        .HasColumnType("integer")
+                        .HasColumnName("routertype");
 
                     b.Property<string>("Secret")
                         .IsRequired()
@@ -207,9 +245,17 @@ namespace NRAdmanWebApplicationNet10.Migrations
                         .HasColumnType("text")
                         .HasColumnName("type");
 
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("routerusername");
+
                     b.HasKey("Id");
 
-                    b.ToTable("nas");
+                    b.HasIndex(new[] { "NasName" }, "NasName_index_unique")
+                        .IsUnique();
+
+                    b.ToTable("nas", (string)null);
                 });
 
             modelBuilder.Entity("NRAdmanWebApplicationNet10.Models.RadAcct", b =>
