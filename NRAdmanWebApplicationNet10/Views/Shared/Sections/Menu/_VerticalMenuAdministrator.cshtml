@@ -9,17 +9,17 @@
 
   @* ! Hide app brand if navbar-full *@
   <div class='app-brand demo @((@ViewData["navbarFull"] != null && Convert.ToBoolean(@ViewData["navbarFull"])) ? "d-xl-none" : "")'>
-    <a asp-controller="Dashboards" asp-action="Index" class="app-brand-link">
-      <span class="app-brand-logo demo">
-        @await Html.PartialAsync("../_Partials/_Macros")
-      </span>
-      <span class="app-brand-text demo menu-text fw-bold ms-3">@TempData.Peek("appName")</span>
-    </a>
+      <a asp-controller="Dashboards" asp-action="Index" class="app-brand-link">
+          <span class="app-brand-logo demo">
+              @await Html.PartialAsync("../_Partials/_Macros")
+          </span>
+          <span class="app-brand-text demo menu-text fw-bold ms-3">@TempData.Peek("appName")</span>
+      </a>
 
-    <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
-      <i class="icon-base ti menu-toggle-icon d-none d-xl-block"></i>
-      <i class="icon-base ti tabler-x d-block d-xl-none"></i>
-    </a>
+      <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
+          <i class="icon-base ti menu-toggle-icon d-none d-xl-block"></i>
+          <i class="icon-base ti tabler-x d-block d-xl-none"></i>
+      </a>
   </div>
 
   <div class="menu-inner-shadow"></div>

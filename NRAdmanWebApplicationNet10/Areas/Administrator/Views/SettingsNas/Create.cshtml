@@ -1,0 +1,144 @@
+@model NRAdmanWebApplicationNet10.ViewModels.Nas
+
+@{
+    ViewData["Title"] = "Create NAS";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h5>Create NAS</h5>
+    </div>
+    <div class="card-body">
+        <form asp-action="Create" method="post" id="form-data">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="NasName" class="form-label"></label>
+                <input asp-for="NasName" class="form-control" />
+                <span asp-validation-for="NasName" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="ShortName" class="form-label"></label>
+                <input asp-for="ShortName" class="form-control" />
+                <span asp-validation-for="ShortName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Type" class="form-label"></label>
+                <input asp-for="Type" class="form-control" />
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Ports" class="form-label"></label>
+                <input asp-for="Ports" type="number" class="form-control" />
+                <span asp-validation-for="Ports" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Secret" class="form-label"></label>
+                <input asp-for="Secret" class="form-control" />
+                <span asp-validation-for="Secret" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Server" class="form-label"></label>
+                <input asp-for="Server" class="form-control" />
+                <span asp-validation-for="Server" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Community" class="form-label"></label>
+                <input asp-for="Community" class="form-control" />
+                <span asp-validation-for="Community" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label"></label>
+                <textarea asp-for="Description" class="form-control"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="RouterType" class="form-label"></label>
+                <select asp-for="RouterType" class="form-select" asp-items="Html.GetEnumSelectList<NRAdmanWebApplicationNet10.Models.EnumRouterType>()"></select>
+                <span asp-validation-for="RouterType" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Username" class="form-label"></label>
+                <input asp-for="Username" class="form-control" />
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label"></label>
+                <input asp-for="Password" type="password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <a asp-action="Index" class="btn btn-secondary me-2">Cancel</a>
+                <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section VendorScripts {
+    <script src="~/assets/vendor/libs/jquery-validate/jquery.validate.min.js"></script>
+    <script src="~/assets/vendor/libs/jquery-validate/additional-methods.min.js"></script>
+    <script src="~/assets/vendor/libs/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+}
+
+@section PageScripts {
+    <script src="~/assets/vendor/libs/cleave/cleave.js"></script>
+    @*<script src="~/assets/vendor/libs/cleave/cleave-phone.js"></script>*@
+    @*<script src="~/assets/js/forms-validation.js"></script>*@
+    <script>
+        $(function() {
+            // configure validator to show bootstrap styles and not ignore hidden fields
+            $.validator.setDefaults({
+                ignore: [],
+                errorClass: 'text-danger',
+                errorElement: 'span',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+
+            // parse unobtrusive attributes and attach validation
+            var form = $('#form-data');
+            if (typeof $.validator !== 'undefined' && typeof $.validator.unobtrusive !== 'undefined') {
+                $.validator.unobtrusive.parse(form);
+            } else {
+                // fallback: init validate manually
+                form.validate();
+            }
+
+            // remote validation: check NasName uniqueness via AJAX
+            var nasInput = form.find('[name="NasName"]');
+            nasInput.on('blur', function() {
+                var val = $(this).val();
+                if (!val) return;
+                $.getJSON('@Url.Action("IsNasNameUnique", "SettingsNas", new { area = "Administrator" })', { nasName: val })
+                    .done(function(resp) {
+                        // resp = { isUnique: true }
+                        var span = nasInput.next('span.field-validation-valid, span.field-validation-error');
+                        if (!resp.isUnique) {
+                            span.text('NAS Name sudah ada.');
+                            nasInput.addClass('is-invalid');
+                        } else {
+                            span.text('');
+                            nasInput.removeClass('is-invalid');
+                        }
+                    });
+            });
+        });
+    </script>
+}
+

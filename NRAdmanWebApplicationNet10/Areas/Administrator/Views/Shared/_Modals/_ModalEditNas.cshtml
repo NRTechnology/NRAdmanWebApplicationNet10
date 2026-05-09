@@ -1,0 +1,88 @@
+@model NRAdmanWebApplicationNet10.ViewModels.Nas
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasEditNas" aria-labelledby="offcanvasEditNasLabel">
+    <div class="offcanvas-header">
+        <h5 id="offcanvasEditNasLabel" class="offcanvas-title">Edit NAS</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <form asp-action="Edit" method="post" id="form-edit-nas-modal">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <input type="hidden" asp-for="Id" />
+
+            <div class="mb-3">
+                <label asp-for="NasName" class="form-label"></label>
+                <input asp-for="NasName" class="form-control" />
+                <span asp-validation-for="NasName" class="text-danger"></span>
+                <span class="form-text">Pastikan NAS Name unik.</span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ShortName" class="form-label"></label>
+                <input asp-for="ShortName" class="form-control" />
+                <span asp-validation-for="ShortName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Type" class="form-label"></label>
+                <input asp-for="Type" class="form-control" />
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Ports" class="form-label"></label>
+                <input asp-for="Ports" type="number" class="form-control" />
+                <span asp-validation-for="Ports" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Secret" class="form-label"></label>
+                <input asp-for="Secret" class="form-control" />
+                <span asp-validation-for="Secret" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Server" class="form-label"></label>
+                <input asp-for="Server" class="form-control" />
+                <span asp-validation-for="Server" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Community" class="form-label"></label>
+                <input asp-for="Community" class="form-control" />
+                <span asp-validation-for="Community" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label"></label>
+                <textarea asp-for="Description" class="form-control"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="RouterType" class="form-label"></label>
+                <select asp-for="RouterType" class="form-select" asp-items="Html.GetEnumSelectList<NRAdmanWebApplicationNet10.Models.EnumRouterType>()"></select>
+                <span asp-validation-for="RouterType" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Username" class="form-label"></label>
+                <input asp-for="Username" class="form-control" />
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label"></label>
+                <input asp-for="Password" type="password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">Cancel</button>
+                <button type="submit" class="btn btn-primary">Update</button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -7,23 +7,23 @@ namespace NRAdmanWebApplicationNet10.ViewModels
     public class Nas
     {
         [ScaffoldColumn(false)]
-        public Guid Id { get; set; }
-
-        [Required]
-        [Display(Name = "Nama Desa")]
-        public string Nama { get; set; } = string.Empty;
-        
+        public int Id { get; set; }
         
         [Required]
         [Display(Name = "NAS Name")]
+        [MaxLength(19)]
+        [StringLength(19, MinimumLength = 7, ErrorMessage = "NAS format tidak valid")]
         public string NasName { get; set; } = "";
         
         [Required]
         [Display(Name = "Short Name")]
+        [MaxLength(100)]
+        [StringLength(100, MinimumLength = 5, ErrorMessage = "Short Name format tidak valid")]
         public string ShortName { get; set; } = "";
         
         [Required]
         [Display(Name = "Type")]
+        [MaxLength(20)]
         public string Type { get; set; } = "other";
 
         [Required] 
@@ -32,17 +32,21 @@ namespace NRAdmanWebApplicationNet10.ViewModels
         
         [Required]
         [Display(Name = "Secret")]
+        [MaxLength(20)]
         public string Secret { get; set; } = "";
         
         
         [Display(Name = "Server")]
+        [MaxLength(100)]
         public string? Server { get; set; }
         
         [Display(Name = "SNMP Community")]
+        [MaxLength(100)]
         public string? Community { get; set; }
 
         
         [Display(Name = "Description")]
+        [MaxLength(255)]
         public string? Description { get; set; }
 
 
@@ -52,10 +56,12 @@ namespace NRAdmanWebApplicationNet10.ViewModels
 
         [Required]
         [Display(Name = "Router Username")]
+        [MaxLength(100)]
         public string Username { get; set; } = string.Empty;
 
         [Required]
         [Display(Name = "Router Password")]
+        [MaxLength(100)]
         public string Password { get; set; } = string.Empty;
 
     }
