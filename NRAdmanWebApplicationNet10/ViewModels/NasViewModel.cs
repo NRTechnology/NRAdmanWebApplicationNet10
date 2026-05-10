@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NRAdmanWebApplicationNet10.ViewModels
 {
-    public class Nas
+    public class NasViewModel
     {
         [ScaffoldColumn(false)]
         public int Id { get; set; }

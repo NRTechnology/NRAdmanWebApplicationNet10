@@ -1,4 +1,4 @@
-@model NRAdmanWebApplicationNet10.ViewModels.Nas
+@model NRAdmanWebApplicationNet10.ViewModels.NasViewModel
 
 <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasCreateNas" aria-labelledby="offcanvasCreateNasLabel">
     <div class="offcanvas-header">
@@ -6,79 +6,80 @@
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
-        <form asp-action="Create" method="post" id="form-create-nas">
+        <form id="form-create-nas">
             @Html.AntiForgeryToken()
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <div class="text-danger mb-3" id="form-create-error-summary"></div>
 
             <div class="mb-3">
-                <label asp-for="NasName" class="form-label"></label>
-                <input asp-for="NasName" class="form-control" />
-                <span asp-validation-for="NasName" class="text-danger"></span>
-            </div>
-
-            <div class="mb-3">
-                <label></label>
+                <label for="createNasName" class="form-label">NAS Name</label>
+                <input type="text" id="createNasName" name="NasName" class="form-control" value="@Model.NasName" />
+                <span class="text-danger" id="error-createNasName"></span>
                 <span class="form-text">Pastikan NAS Name unik.</span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="ShortName" class="form-label"></label>
-                <input asp-for="ShortName" class="form-control" />
-                <span asp-validation-for="ShortName" class="text-danger"></span>
+                <label for="createShortName" class="form-label">Short Name</label>
+                <input type="text" id="createShortName" name="ShortName" class="form-control" value="@Model.ShortName" />
+                <span class="text-danger" id="error-createShortName"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="Type" class="form-label"></label>
-                <input asp-for="Type" class="form-control" />
-                <span asp-validation-for="Type" class="text-danger"></span>
+                <label for="createType" class="form-label">Type</label>
+                <input type="text" id="createType" name="Type" class="form-control" value="@Model.Type" />
+                <span class="text-danger" id="error-createType"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="Ports" class="form-label"></label>
-                <input asp-for="Ports" type="number" class="form-control" />
-                <span asp-validation-for="Ports" class="text-danger"></span>
+                <label for="createPorts" class="form-label">Ports</label>
+                <input type="number" id="createPorts" name="Ports" class="form-control" value="@Model.Ports" />
+                <span class="text-danger" id="error-createPorts"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="Secret" class="form-label"></label>
-                <input asp-for="Secret" class="form-control" />
-                <span asp-validation-for="Secret" class="text-danger"></span>
+                <label for="createSecret" class="form-label">Secret</label>
+                <input type="text" id="createSecret" name="Secret" class="form-control" value="@Model.Secret" />
+                <span class="text-danger" id="error-createSecret"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="Server" class="form-label"></label>
-                <input asp-for="Server" class="form-control" />
-                <span asp-validation-for="Server" class="text-danger"></span>
+                <label for="createServer" class="form-label">Server</label>
+                <input type="text" id="createServer" name="Server" class="form-control" value="@Model.Server" />
+                <span class="text-danger" id="error-createServer"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="Community" class="form-label"></label>
-                <input asp-for="Community" class="form-control" />
-                <span asp-validation-for="Community" class="text-danger"></span>
+                <label for="createCommunity" class="form-label">Community</label>
+                <input type="text" id="createCommunity" name="Community" class="form-control" value="@Model.Community" />
+                <span class="text-danger" id="error-createCommunity"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="Description" class="form-label"></label>
-                <textarea asp-for="Description" class="form-control"></textarea>
-                <span asp-validation-for="Description" class="text-danger"></span>
+                <label for="createDescription" class="form-label">Description</label>
+                <textarea id="createDescription" name="Description" class="form-control">@Model.Description</textarea>
+                <span class="text-danger" id="error-createDescription"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="RouterType" class="form-label"></label>
-                <select asp-for="RouterType" class="form-select" asp-items="Html.GetEnumSelectList<NRAdmanWebApplicationNet10.Models.EnumRouterType>()"></select>
-                <span asp-validation-for="RouterType" class="text-danger"></span>
+                <label for="createRouterType" class="form-label">Router Type</label>
+                <select id="createRouterType" name="RouterType" class="form-select">
+                    @foreach (var item in Html.GetEnumSelectList<NRAdmanWebApplicationNet10.Models.EnumRouterType>())
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+                <span class="text-danger" id="error-createRouterType"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="Username" class="form-label"></label>
-                <input asp-for="Username" class="form-control" />
-                <span asp-validation-for="Username" class="text-danger"></span>
+                <label for="createUsername" class="form-label">Username</label>
+                <input type="text" id="createUsername" name="Username" class="form-control" value="@Model.Username" />
+                <span class="text-danger" id="error-createUsername"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="Password" class="form-label"></label>
-                <input asp-for="Password" type="password" class="form-control" />
-                <span asp-validation-for="Password" class="text-danger"></span>
+                <label for="createPassword" class="form-label">Password</label>
+                <input type="password" id="createPassword" name="Password" class="form-control" value="@Model.Password" />
+                <span class="text-danger" id="error-createPassword"></span>
             </div>
 
             <div class="d-flex justify-content-end gap-2">
@@ -88,3 +89,48 @@
         </form>
     </div>
 </div>
+
+@section PageScripts {
+    <script>
+        $(function() {
+            $('#form-create-nas').on('submit', function(e) {
+                e.preventDefault();
+
+                var form = $(this);
+                var formData = form.serialize();
+
+                $.ajax({
+                    url: '@Url.Action("CreateNas", "SettingsNas", new { area = "Administrator" })',
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        if (response.success) {
+                            // Close offcanvas
+                            var offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasCreateNas'));
+                            if (offcanvas) offcanvas.hide();
+
+                            // Show success message
+                            alert(response.message);
+
+                            // Reload DataTable
+                            if (window.dataTable && window.dataTable.ajax) {
+                                window.dataTable.ajax.reload();
+                            }
+
+                            // Reset form
+                            form[0].reset();
+                            $('#form-create-error-summary').html('');
+                        } else {
+                            // Show error message
+                            $('#form-create-error-summary').html(response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        $('#form-create-error-summary').html('Terjadi kesalahan. Silakan coba lagi.');
+                        console.error('Error:', error);
+                    }
+                });
+            });
+        });
+    </script>
+}

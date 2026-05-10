@@ -27,8 +27,10 @@
 
 @section PageScripts {
     <script>
+        var dataTable;
+
         document.addEventListener('DOMContentLoaded', function() {
-            const table = new DataTable(document.querySelector('#datatable'), {
+            dataTable = new DataTable(document.querySelector('#datatable'), {
                 ajax: {
                     url: '@Url.Action("GetJsonResult", "SettingsNas", new { area = "Administrator" })',
                     dataSrc: ''
@@ -76,10 +78,50 @@
                     { data: 'routerType', title: 'Router Type' },
                     { data: 'username', title: 'Username' },
                     { data: 'id', title: 'Actions', orderable: false, render: function(data, type, row) {
-                        return `<a href="/Administrator/SettingNas/Edit/${data}" class="btn btn-sm btn-primary">Edit</a> <a href="/Administrator/SettingNas/Delete/${data}" class="btn btn-sm btn-danger">Delete</a>`;
+                        return `<button class="btn btn-sm btn-primary btn-edit-nas" data-id="${data}" data-bs-toggle="offcanvas" data-bs-target="#offcanvasEditNas" style="margin-right: 5px;">Edit</button>
+                                <button class="btn btn-sm btn-danger btn-delete-nas" data-id="${data}">Delete</button>`;
                     }}
                 ],
                 responsive: true
+            });
+
+            // Store dataTable reference globally for use in modal
+            window.dataTable = dataTable;
+
+            // Handle Edit button click
+            $(document).on('click', '.btn-edit-nas', function() {
+                var nasId = $(this).data('id');
+                $.get('@Url.Action("EditModal", "SettingsNas", new { area = "Administrator" })?' + $.param({ id: nasId }), function(data) {
+                    $('#editModalContainer').html(data);
+                    var offcanvas = new bootstrap.Offcanvas(document.getElementById('offcanvasEditNas'));
+                    offcanvas.show();
+                });
+            });
+
+            // Handle Delete button click
+            $(document).on('click', '.btn-delete-nas', function() {
+                var nasId = $(this).data('id');
+                if (confirm('Apakah Anda yakin ingin menghapus NAS ini?')) {
+                    $.ajax({
+                        url: '@Url.Action("DeleteNas", "SettingsNas", new { area = "Administrator" })/' + nasId,
+                        type: 'POST',
+                        headers: {
+                            'X-CSRF-Token': $('[name="__RequestVerificationToken"]').val()
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                alert(response.message);
+                                dataTable.ajax.reload();
+                            } else {
+                                alert('Error: ' + response.message);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            alert('Terjadi kesalahan saat menghapus data.');
+                            console.error('Error:', error);
+                        }
+                    });
+                }
             });
         });
     </script>
@@ -126,8 +168,9 @@
         </table>
     </div>
 </div>
-    <!-- Modal untuk Create NAS -->
-    @await Html.PartialAsync("../Shared/_Modals/_ModalCreateNas", new NRAdmanWebApplicationNet10.ViewModels.Nas())
 
- 
-    
+<!-- Container untuk Edit Modal -->
+<div id="editModalContainer"></div>
+
+<!-- Modal untuk Create NAS -->
+@await Html.PartialAsync("../Shared/_Modals/_ModalCreateNas", new NRAdmanWebApplicationNet10.ViewModels.NasViewModel())
