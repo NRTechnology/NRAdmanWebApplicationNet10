@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <Folder Include="Areas\Administrator\Pages\Accounting\" />
+    <Folder Include="Areas\Administrator\Views\Shared\_Modals\" />
   </ItemGroup>
 
 </Project>

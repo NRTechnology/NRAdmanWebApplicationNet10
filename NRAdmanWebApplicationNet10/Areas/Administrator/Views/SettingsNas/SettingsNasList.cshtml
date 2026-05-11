@@ -11,12 +11,7 @@
 @section VendorScripts {
     <script src="~/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
     @*<script src="~/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.js"></script>*@
-    <!-- Flat Picker -->
-    <script src="~/assets/vendor/libs/moment/moment.js"></script>
-    <script src="~/assets/vendor/libs/flatpickr/flatpickr.js"></script>
-    
-    <script src="~/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
-    @*<script src="~/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.js"></script>*@
+
     <!-- Flat Picker -->
     <script src="~/assets/vendor/libs/moment/moment.js"></script>
     <script src="~/assets/vendor/libs/flatpickr/flatpickr.js"></script>
@@ -83,46 +78,7 @@
                     }}
                 ],
                 responsive: true
-            });
-
-            // Store dataTable reference globally for use in modal
-            window.dataTable = dataTable;
-
-            // Handle Edit button click
-            $(document).on('click', '.btn-edit-nas', function() {
-                var nasId = $(this).data('id');
-                $.get('@Url.Action("EditModal", "SettingsNas", new { area = "Administrator" })?' + $.param({ id: nasId }), function(data) {
-                    $('#editModalContainer').html(data);
-                    var offcanvas = new bootstrap.Offcanvas(document.getElementById('offcanvasEditNas'));
-                    offcanvas.show();
-                });
-            });
-
-            // Handle Delete button click
-            $(document).on('click', '.btn-delete-nas', function() {
-                var nasId = $(this).data('id');
-                if (confirm('Apakah Anda yakin ingin menghapus NAS ini?')) {
-                    $.ajax({
-                        url: '@Url.Action("DeleteNas", "SettingsNas", new { area = "Administrator" })/' + nasId,
-                        type: 'POST',
-                        headers: {
-                            'X-CSRF-Token': $('[name="__RequestVerificationToken"]').val()
-                        },
-                        success: function(response) {
-                            if (response.success) {
-                                alert(response.message);
-                                dataTable.ajax.reload();
-                            } else {
-                                alert('Error: ' + response.message);
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            alert('Terjadi kesalahan saat menghapus data.');
-                            console.error('Error:', error);
-                        }
-                    });
-                }
-            });
+            });           
         });
     </script>
 }
@@ -168,9 +124,3 @@
         </table>
     </div>
 </div>
-
-<!-- Container untuk Edit Modal -->
-<div id="editModalContainer"></div>
-
-<!-- Modal untuk Create NAS -->
-@await Html.PartialAsync("../Shared/_Modals/_ModalCreateNas", new NRAdmanWebApplicationNet10.ViewModels.NasViewModel())
