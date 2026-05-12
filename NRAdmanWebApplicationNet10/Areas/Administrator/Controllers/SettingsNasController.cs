@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NRAdmanWebApplicationNet10.Services;
+using NRAdmanWebApplicationNet10.Models;
+using NRAdmanWebApplicationNet10.ViewModels;
 
 namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
 {
@@ -46,20 +48,137 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
             return Json(data);
         }
 
-        [HttpPost]
-        public IActionResult CheckNasNameUnique(string nasName, int id = 0)
+        [HttpGet]
+        public IActionResult CreateModal()
         {
-            if (string.IsNullOrWhiteSpace(nasName))
+            var viewModel = new NasViewModel();
+            return PartialView("../Shared/_Modals/_ModalCreateNas", viewModel);
+        }
+
+        [HttpGet]
+        public IActionResult EditModal(int id)
+        {
+            var nas = applicationDbContext.Nas.FirstOrDefault(n => n.Id == id);
+            if (nas == null)
             {
-                return Json(new { isUnique = false });
+                return NotFound();
             }
 
-            // exclude current record if editing
-            var exists = id > 0 
-                ? applicationDbContext.Nas.Any(n => n.NasName == nasName && n.Id != id)
-                : applicationDbContext.Nas.Any(n => n.NasName == nasName);
+            var viewModel = new NasViewModel
+            {
+                Id = nas.Id,
+                NasName = nas.NasName,
+                ShortName = nas.ShortName,
+                Type = nas.Type,
+                Ports = nas.Ports,
+                Secret = nas.Secret,
+                Server = nas.Server,
+                Community = nas.Community,
+                Description = nas.Description,
+                RouterType = nas.RouterType,
+                Username = nas.Username,
+                Password = nas.Password
+            };
 
-            return Json(new { isUnique = !exists });
+            return PartialView("../Shared/_Modals/_ModalEditNas", viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CreateNas(NasViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
+                return Json(new { success = false, message = "Validasi gagal.", errors = errors.Select(e => e.ErrorMessage) });
+            }
+
+            // server-side unique check for NasName
+            if (applicationDbContext.Nas.Any(n => n.NasName == model.NasName))
+            {
+                return Json(new { success = false, message = "NAS Name sudah ada." });
+            }
+
+            try
+            {
+                var entity = new Nas
+                {
+                    NasName = model.NasName,
+                    ShortName = model.ShortName,
+                    Type = model.Type,
+                    Ports = model.Ports,
+                    Secret = model.Secret,
+                    Server = model.Server,
+                    Community = model.Community,
+                    Description = model.Description,
+                    RouterType = model.RouterType,
+                    Username = model.Username,
+                    Password = model.Password
+                };
+
+                applicationDbContext.Nas.Add(entity);
+                applicationDbContext.SaveChanges();
+
+                return Json(new { success = true, message = "NAS berhasil ditambahkan." });
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Gagal menyimpan NAS");
+                return Json(new { success = false, message = "Gagal menyimpan data NAS. Silakan coba lagi." });
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UpdateNas(int id, NasViewModel model)
+        {
+            if (id != model.Id)
+            {
+                return Json(new { success = false, message = "ID tidak sesuai." });
+            }
+
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
+                return Json(new { success = false, message = "Validasi gagal.", errors = errors.Select(e => e.ErrorMessage) });
+            }
+
+            // server-side unique check for NasName (exclude current record)
+            if (applicationDbContext.Nas.Any(n => n.NasName == model.NasName && n.Id != id))
+            {
+                return Json(new { success = false, message = "NAS Name sudah ada." });
+            }
+
+            try
+            {
+                var entity = applicationDbContext.Nas.FirstOrDefault(n => n.Id == id);
+                if (entity == null)
+                {
+                    return Json(new { success = false, message = "Data NAS tidak ditemukan." });
+                }
+
+                entity.NasName = model.NasName;
+                entity.ShortName = model.ShortName;
+                entity.Type = model.Type;
+                entity.Ports = model.Ports;
+                entity.Secret = model.Secret;
+                entity.Server = model.Server;
+                entity.Community = model.Community;
+                entity.Description = model.Description;
+                entity.RouterType = model.RouterType;
+                entity.Username = model.Username;
+                entity.Password = model.Password;
+
+                applicationDbContext.Nas.Update(entity);
+                applicationDbContext.SaveChanges();
+
+                return Json(new { success = true, message = "NAS berhasil diperbarui." });
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Gagal memperbarui NAS");
+                return Json(new { success = false, message = "Gagal memperbarui data NAS. Silakan coba lagi." });
+            }
         }
 
         [HttpPost]

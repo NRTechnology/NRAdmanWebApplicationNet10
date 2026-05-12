@@ -1,0 +1,129 @@
+@model NRAdmanWebApplicationNet10.ViewModels.NasViewModel
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasCreateNas" aria-labelledby="offcanvasCreateNasLabel">
+    <div class="offcanvas-header">
+        <h5 id="offcanvasCreateNasLabel" class="offcanvas-title">Create NAS</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <form id="form-create-nas">
+            @Html.AntiForgeryToken()
+            <div class="text-danger mb-3" id="form-create-error-summary"></div>
+
+            <div class="mb-3">
+                <label for="createNasName" class="form-label">NAS Name</label>
+                <input asp-for="NasName" type="text" id="createNasName" name="NasName" class="form-control" />
+                <span class="text-danger" id="error-createNasName"></span>
+                <span class="form-text">Pastikan NAS Name unik.</span>
+            </div>
+
+            <div class="mb-3">
+                <label for="createShortName" class="form-label">Short Name</label>
+                <input asp-for="ShortName" type="text" id="createShortName" name="ShortName" class="form-control" />
+                <span class="text-danger" id="error-createShortName"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="createType" class="form-label">Type</label>
+                <input asp-for="Type" type="text" id="createType" name="Type" class="form-control" />
+                <span class="text-danger" id="error-createType"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="createPorts" class="form-label">Ports</label>
+                <input asp-for="Ports" type="number" id="createPorts" name="Ports" class="form-control" />
+                <span class="text-danger" id="error-createPorts"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="createSecret" class="form-label">Secret</label>
+                <input asp-for="Secret" type="text" id="createSecret" name="Secret" class="form-control" />
+                <span class="text-danger" id="error-createSecret"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="createServer" class="form-label">Server</label>
+                <input asp-for="Server" type="text" id="createServer" name="Server" class="form-control" />
+                <span class="text-danger" id="error-createServer"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="createCommunity" class="form-label">Community</label>
+                <input asp-for="Community" type="text" id="createCommunity" name="Community" class="form-control" />
+                <span class="text-danger" id="error-createCommunity"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="createDescription" class="form-label">Description</label>
+                <textarea asp-for="Description" id="createDescription" name="Description" class="form-control"></textarea>
+                <span class="text-danger" id="error-createDescription"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="createRouterType" class="form-label">Router Type</label>
+                <select id="createRouterType" class="form-select" asp-for="RouterType" asp-items="Html.GetEnumSelectList<NRAdmanWebApplicationNet10.Models.EnumRouterType>()"></select>
+                <span class="text-danger" id="error-createRouterType"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="createUsername" class="form-label">Username</label>
+                <input asp-for="Username" type="text" id="createUsername" name="Username" class="form-control" />
+                <span class="text-danger" id="error-createUsername"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="createPassword" class="form-label">Password</label>
+                <input asp-for="Password" type="password" id="createPassword" name="Password" class="form-control" />
+                <span class="text-danger" id="error-createPassword"></span>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">Cancel</button>
+                <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $(function() {
+        $('#form-create-nas').on('submit', function(e) {
+            e.preventDefault();
+
+            var form = $(this);
+            var formData = form.serialize();
+
+            $.ajax({
+                url: '@Url.Action("CreateNas", "SettingsNas", new { area = "Administrator" })',
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    if (response.success) {
+                        // Show success toast
+                        ToastHelper.success(response.message);
+
+                        // Close offcanvas
+                        var offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasCreateNas'));
+                        if (offcanvas) offcanvas.hide();
+
+                        // Reload DataTable
+                        if (window.dataTable && window.dataTable.ajax) {
+                            window.dataTable.ajax.reload();
+                        }
+
+                        // Reset form
+                        form[0].reset();
+                        $('#form-create-error-summary').html('');
+                    } else {
+                        // Show error toast
+                        ToastHelper.error(response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    ToastHelper.error('Terjadi kesalahan. Silakan coba lagi.');
+                    console.error('Error:', error);
+                }
+            });
+        });
+    });
+</script>
