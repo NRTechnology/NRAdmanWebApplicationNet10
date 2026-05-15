@@ -165,15 +165,20 @@
             <span class="menu-header-text" data-i18n="Sytem">System</span>
         </li>
         <!-- Settings menu start -->
-        <li class='menu-item@(currentPage.StartsWith("/Ecommerce") ? " active open" : "")'>
+        <li class='menu-item@(currentPage.StartsWith("/Administrator") ? " active open" : "")'>
             <a href='javascript:void(0);' class='menu-link menu-toggle'>
                 <i class="menu-icon icon-base ti tabler-shopping-cart"></i>
                 <div data-i18n="Settings">Settings</div>
             </a>
             <ul class="menu-sub">
-                <li class='menu-item@(currentPage == "/Ecommerce/Dashboard" ? " active" : "")'>
-                        <a asp-area="Administrator" asp-controller="SettingsNas" asp-action="Index" class="menu-link">
+                <li class='menu-item@(currentPage == "/Administrator/SettingsNas" ? " active" : "")'>
+                    <a asp-area="Administrator" asp-controller="SettingsNas" asp-action="Index" class="menu-link">
                         <div data-i18n="NAS">NAS</div>
+                    </a>
+                </li>
+                <li class='menu-item@(currentPage == "/Administrator/SettingsUser" ? " active" : "")'>
+                    <a asp-area="Administrator" asp-controller="SettingsUser" asp-action="Index" class="menu-link">
+                        <div data-i18n="User">User</div>
                     </a>
                 </li>
                 <li class='menu-item@(currentPage.StartsWith("/Ecommerce/Product") ? " active open" : "")'>

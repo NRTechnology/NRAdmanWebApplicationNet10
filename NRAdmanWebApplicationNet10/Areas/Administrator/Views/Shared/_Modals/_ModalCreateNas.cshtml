@@ -94,7 +94,7 @@
             var formData = form.serialize();
 
             $.ajax({
-                url: '@Url.Action("CreateNas", "SettingsNas", new { area = "Administrator" })',
+                url: '@Url.Action("Create", "SettingsNas", new { area = "Administrator" })',
                 type: 'POST',
                 data: formData,
                 success: function(response) {

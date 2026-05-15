@@ -85,7 +85,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CreateNas(NasViewModel model)
+        public IActionResult Create(NasViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -130,7 +130,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateNas(int id, NasViewModel model)
+        public IActionResult Update(int id, NasViewModel model)
         {
             if (id != model.Id)
             {
@@ -182,7 +182,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
         }
 
         [HttpPost]
-        public IActionResult DeleteNas(int id)
+        public IActionResult Delete(int id)
         {
             try
             {

@@ -24,6 +24,14 @@ namespace NRAdmanWebApplicationNet10.Services
 
         public DbSet<LoginAttempt> LoginAttempts => Set<LoginAttempt>();
 
+        public DbSet<Package> Packages => Set<Package>();
+
+        public DbSet<Voucher> Vouchers => Set<Voucher>();
+
+        public DbSet<Transaction> Transactions => Set<Transaction>();
+
+        public DbSet<Customer> Customers => Set<Customer>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

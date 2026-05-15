@@ -12,24 +12,30 @@ namespace NRAdmanWebApplicationNet10.Models
         public long RadAcctId { get; set; }
 
         [Column("acctsessionid")]
+        [StringLength(64)]
         public string AcctSessionId { get; set; } = "";
 
         [Column("acctuniqueid")]
+        [StringLength(32)]
         public string AcctUniqueId { get; set; } = "";
 
         [Column("username")]
+        [StringLength(64)]
         public string? UserName { get; set; }
 
         [Column("realm")]
+        [StringLength(64)]
         public string? Realm { get; set; }
 
         [Column("nasipaddress")]
         public IPAddress NasIpAddress { get; set; } = IPAddress.None;
 
         [Column("nasportid")]
+        [StringLength(15)]
         public string? NasPortId { get; set; }
 
         [Column("nasporttype")]
+        [StringLength(32)]
         public string? NasPortType { get; set; }
 
         [Column("acctstarttime")]
@@ -48,12 +54,15 @@ namespace NRAdmanWebApplicationNet10.Models
         public long? AcctSessionTime { get; set; }
 
         [Column("acctauthentic")]
+        [StringLength(32)]
         public string? AcctAuthentic { get; set; }
 
         [Column("connectinfo_start")]
+        [StringLength(50)]
         public string? ConnectInfoStart { get; set; }
 
         [Column("connectinfo_stop")]
+        [StringLength(50)]
         public string? ConnectInfoStop { get; set; }
 
         [Column("acctinputoctets")]
@@ -63,24 +72,30 @@ namespace NRAdmanWebApplicationNet10.Models
         public long? AcctOutputOctets { get; set; }
 
         [Column("calledstationid")]
+        [StringLength(50)]
         public string? CalledStationId { get; set; }
 
         [Column("callingstationid")]
+        [StringLength(50)]
         public string? CallingStationId { get; set; }
 
         [Column("acctterminatecause")]
+        [StringLength(32)]
         public string? AcctTerminateCause { get; set; }
 
         [Column("servicetype")]
+        [StringLength(32)]
         public string? ServiceType { get; set; }
 
         [Column("framedprotocol")]
+        [StringLength(32)]
         public string? FramedProtocol { get; set; }
 
         [Column("framedipaddress")]
         public IPAddress? FramedIpAddress { get; set; }
 
         [Column("class")]
+        [StringLength(64)]
         public string? Class { get; set; }
     }
 }

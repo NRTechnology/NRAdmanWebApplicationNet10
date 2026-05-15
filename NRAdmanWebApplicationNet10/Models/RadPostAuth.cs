@@ -14,7 +14,7 @@ namespace NRAdmanWebApplicationNet10.Models
         [Column("username")]
         public string Username { get; set; } = string.Empty;
 
-        [Required, MaxLength(64)]
+        [Required, MaxLength(128)]
         [Column("pass")]
         public string Pass { get; set; } = string.Empty;
 

@@ -103,7 +103,7 @@
                 var nasId = $('#modalNasId').val();
 
                 $.ajax({
-                    url: '@Url.Action("UpdateNas", "SettingsNas", new { area = "Administrator" })/' + nasId,
+                    url: '@Url.Action("Update", "SettingsNas", new { area = "Administrator" })/' + nasId,
                     type: 'POST',
                     data: formData,
                     success: function(response) {
