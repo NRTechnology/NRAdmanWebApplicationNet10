@@ -1,0 +1,148 @@
+@model NRAdmanWebApplicationNet10.ViewModels.ApplicationUserViewModel
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasEditUser" aria-labelledby="offcanvasEditUserLabel">
+    <div class="offcanvas-header">
+        <h5 id="offcanvasEditUserLabel" class="offcanvas-title">Edit User</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <form id="form-edit-user">
+            @Html.AntiForgeryToken()
+            <div class="text-danger mb-3" id="form-edit-error-summary"></div>
+
+            <input type="hidden" id="editUserId" name="Id" value="@Model.Id" />
+
+            <div class="mb-3">
+                <label for="editUserName" class="form-label">Username</label>
+                <input asp-for="UserName" type="text" id="editUserName" name="UserName" class="form-control" required readonly />
+                <span class="text-danger" id="error-editUserName"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="editEmail" class="form-label">Email</label>
+                <input asp-for="Email" type="email" id="editEmail" name="Email" class="form-control" />
+                <span class="text-danger" id="error-editEmail"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="editPhoneNumber" class="form-label">Phone Number</label>
+                <input asp-for="PhoneNumber" type="tel" id="editPhoneNumber" name="PhoneNumber" class="form-control" />
+                <span class="text-danger" id="error-editPhoneNumber"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="editPassword" class="form-label">New Password</label>
+                <input asp-for="Password" type="password" id="editPassword" name="Password" class="form-control" />
+                <span class="text-danger" id="error-editPassword"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="editConfirmPassword" class="form-label">Confirm New Password</label>
+                <input asp-for="ConfirmPassword" type="password" id="editConfirmPassword" name="ConfirmPassword" class="form-control" />
+                <span class="text-danger" id="error-editConfirmPassword"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="editEmailConfirmed" class="form-label">
+                    <input asp-for="EmailConfirmed" type="checkbox" id="editEmailConfirmed" name="EmailConfirmed" />
+                    Email Confirmed
+                </label>
+            </div>
+
+            <div class="mb-3">
+                <label for="editPhoneNumberConfirmed" class="form-label">
+                    <input asp-for="PhoneNumberConfirmed" type="checkbox" id="editPhoneNumberConfirmed" name="PhoneNumberConfirmed" />
+                    Phone Number Confirmed
+                </label>
+            </div>
+
+            <div class="mb-3">
+                <label for="editTwoFactorEnabled" class="form-label">
+                    <input asp-for="TwoFactorEnabled" type="checkbox" id="editTwoFactorEnabled" name="TwoFactorEnabled" />
+                    Two Factor Authentication Enabled
+                </label>
+            </div>
+
+            <div class="mb-3">
+                <label for="editRoles" class="form-label">Roles</label>
+                <select asp-for="Roles" id="editRoles" name="Roles" class="form-select" multiple>
+                    @if (ViewBag.AvailableRoles != null)
+                    {
+                        @foreach (var role in ViewBag.AvailableRoles)
+                        {
+                            if (Model.Roles.Contains(role))
+                            {
+                                <option value="@role" selected="selected">@role</option>
+                            }
+                            else
+                            {
+                                <option value="@role">@role</option>
+                            }
+                        }
+                    }
+                </select>
+                <small class="form-text">Hold Ctrl to select multiple roles</small>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">Cancel</button>
+                <button type="submit" class="btn btn-primary">Update</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $(function() {
+        $('#form-edit-user').on('submit', function(e) {
+            e.preventDefault();
+
+            var form = $(this);
+            var userId = $('#editUserId').val();
+            var formData = new FormData(form[0]);
+
+            // Get selected roles
+            var selectedRoles = $('#editRoles').val() || [];
+            // Remove existing Roles entries from formData
+            formData.delete('Roles');
+            // Add selected roles
+            selectedRoles.forEach(function(role) {
+                formData.append('Roles', role);
+            });
+
+            $.ajax({
+                url: '@Url.Action("Update", "SettingsUser", new { area = "Administrator" })/' + userId,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        // Show success toast
+                        ToastHelper.success(response.message);
+
+                        // Close offcanvas
+                        var offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasEditUser'));
+                        if (offcanvas) offcanvas.hide();
+
+                        // Reload DataTable
+                        if (window.dataTable && window.dataTable.ajax) {
+                            window.dataTable.ajax.reload();
+                        }
+
+                        // Reset form
+                        form[0].reset();
+                        $('#form-edit-error-summary').html('');
+                    } else {
+                        // Show error toast
+                        ToastHelper.error(response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    ToastHelper.error('Terjadi kesalahan. Silakan coba lagi.');
+                    console.error('Error:', error);
+                }
+            });
+        });
+    });
+</script>

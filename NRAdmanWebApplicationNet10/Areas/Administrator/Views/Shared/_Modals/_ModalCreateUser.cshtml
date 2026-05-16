@@ -1,0 +1,128 @@
+@model NRAdmanWebApplicationNet10.ViewModels.ApplicationUserViewModel
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasCreateUser" aria-labelledby="offcanvasCreateUserLabel">
+    <div class="offcanvas-header">
+        <h5 id="offcanvasCreateUserLabel" class="offcanvas-title">Create User</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <form id="form-create-user">
+            @Html.AntiForgeryToken()
+            <div class="text-danger mb-3" id="form-create-error-summary"></div>
+
+            <div class="mb-3">
+                <label for="createUserName" class="form-label">Username</label>
+                <input asp-for="UserName" type="text" id="createUserName" name="UserName" class="form-control" required />
+                <span class="text-danger" id="error-createUserName"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="createEmail" class="form-label">Email</label>
+                <input asp-for="Email" type="email" id="createEmail" name="Email" class="form-control" />
+                <span class="text-danger" id="error-createEmail"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="createPhoneNumber" class="form-label">Phone Number</label>
+                <input asp-for="PhoneNumber" type="tel" id="createPhoneNumber" name="PhoneNumber" class="form-control" />
+                <span class="text-danger" id="error-createPhoneNumber"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="createPassword" class="form-label">Password</label>
+                <input asp-for="Password" type="password" id="createPassword" name="Password" class="form-control" required />
+                <span class="text-danger" id="error-createPassword"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="createConfirmPassword" class="form-label">Confirm Password</label>
+                <input asp-for="ConfirmPassword" type="password" id="createConfirmPassword" name="ConfirmPassword" class="form-control" required />
+                <span class="text-danger" id="error-createConfirmPassword"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="createEmailConfirmed" class="form-label">
+                    <input asp-for="EmailConfirmed" type="checkbox" id="createEmailConfirmed" name="EmailConfirmed" />
+                    Email Confirmed
+                </label>
+            </div>
+
+            <div class="mb-3">
+                <label for="createTwoFactorEnabled" class="form-label">
+                    <input asp-for="TwoFactorEnabled" type="checkbox" id="createTwoFactorEnabled" name="TwoFactorEnabled" />
+                    Two Factor Authentication Enabled
+                </label>
+            </div>
+
+            <div class="mb-3">
+                <label for="createRoles" class="form-label">Roles</label>
+                <select id="createRoles" name="Roles" class="form-select" multiple>
+                    @if (ViewBag.AvailableRoles != null)
+                    {
+                        @foreach (var role in ViewBag.AvailableRoles)
+                        {
+                            <option value="@role">@role</option>
+                        }
+                    }
+                </select>
+                <small class="form-text">Hold Ctrl to select multiple roles</small>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">Cancel</button>
+                <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $(function() {
+        $('#form-create-user').on('submit', function(e) {
+            e.preventDefault();
+
+            var form = $(this);
+            var formData = new FormData(form[0]);
+
+            // Get selected roles
+            var selectedRoles = $('#createRoles').val() || [];
+            selectedRoles.forEach(function(role) {
+                formData.append('Roles', role);
+            });
+
+            $.ajax({
+                url: '@Url.Action("Create", "SettingsUser", new { area = "Administrator" })',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        // Show success toast
+                        ToastHelper.success(response.message);
+
+                        // Close offcanvas
+                        var offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasCreateUser'));
+                        if (offcanvas) offcanvas.hide();
+
+                        // Reload DataTable
+                        if (window.dataTable && window.dataTable.ajax) {
+                            window.dataTable.ajax.reload();
+                        }
+
+                        // Reset form
+                        form[0].reset();
+                        $('#form-create-error-summary').html('');
+                    } else {
+                        // Show error toast
+                        ToastHelper.error(response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    ToastHelper.error('Terjadi kesalahan. Silakan coba lagi.');
+                    console.error('Error:', error);
+                }
+            });
+        });
+    });
+</script>

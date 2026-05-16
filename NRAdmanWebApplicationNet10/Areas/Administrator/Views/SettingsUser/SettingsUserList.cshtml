@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Setting User - Administrator";
+    ViewData["Title"] = "Settings User - Administrator";
 }
 
 @section VendorStyles {
@@ -8,10 +8,19 @@
     <link rel="stylesheet" href="~/assets/vendor/libs/flatpickr/flatpickr.css" />
 }
 
+@section PageStyles {
+    <style>
+        /* Style for selected options in multi-select */
+        select[multiple] option:checked {
+            background: linear-gradient(#0d6efd 0%, #0d6efd 100%);
+            background-color: #0d6efd !important;
+            color: white !important;
+        }
+    </style>
+}
+
 @section VendorScripts {
     <script src="~/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
-    @*<script src="~/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.js"></script>*@
-
     <!-- Flat Picker -->
     <script src="~/assets/vendor/libs/moment/moment.js"></script>
     <script src="~/assets/vendor/libs/flatpickr/flatpickr.js"></script>
@@ -27,54 +36,61 @@
         document.addEventListener('DOMContentLoaded', function() {
             dataTable = new DataTable(document.querySelector('#datatable'), {
                 ajax: {
-                    url: '@Url.Action("GetJsonResult", "SettingsNas", new { area = "Administrator" })',
+                    url: '@Url.Action("GetJsonResult", "SettingsUser", new { area = "Administrator" })',
                     dataSrc: ''
-                  },
-                  layout: {
-                  topStart: {
-                    rowClass: 'row mx-3 my-0 justify-content-between',
-                    features: [
-                      {
-                        pageLength: {
-                          menu: [7, 10, 25, 50, 100],
-                          text: 'Show_MENU_entries'
+                },
+                layout: {
+                    topStart: {
+                        rowClass: 'row mx-3 my-0 justify-content-between',
+                        features: [
+                            {
+                                pageLength: {
+                                    menu: [7, 10, 25, 50, 100],
+                                    text: 'Show_MENU_entries'
+                                }
+                            }
+                        ]
+                    },
+                    topEnd: {
+                        search: {
+                            placeholder: ''
                         }
-                      }
-                    ]
-                  },
-                  topEnd: {
-                    search: {
-                      placeholder: ''
-                    }
-                  },
-                  bottomStart: {
-                    rowClass: 'row mx-3 justify-content-between',
-                    features: ['info']
-                  },
-                  bottomEnd: 'paging'
+                    },
+                    bottomStart: {
+                        rowClass: 'row mx-3 justify-content-between',
+                        features: ['info']
+                    },
+                    bottomEnd: 'paging'
                 },
                 language: {
-                  paginate: {
-                    next: '<i class="icon-base ti tabler-chevron-right scaleX-n1-rtl icon-18px"></i>',
-                    previous: '<i class="icon-base ti tabler-chevron-left scaleX-n1-rtl icon-18px"></i>',
-                    first: '<i class="icon-base ti tabler-chevrons-left scaleX-n1-rtl icon-18px"></i>',
-                    last: '<i class="icon-base ti tabler-chevrons-right scaleX-n1-rtl icon-18px"></i>'
-                  }
+                    paginate: {
+                        next: '<i class="icon-base ti tabler-chevron-right scaleX-n1-rtl icon-18px"></i>',
+                        previous: '<i class="icon-base ti tabler-chevron-left scaleX-n1-rtl icon-18px"></i>',
+                        first: '<i class="icon-base ti tabler-chevrons-left scaleX-n1-rtl icon-18px"></i>',
+                        last: '<i class="icon-base ti tabler-chevrons-right scaleX-n1-rtl icon-18px"></i>'
+                    }
                 },
-                columns: [
-                    { data: 'id', title: 'ID' },
-                    { data: 'nasName', title: 'NAS Name' },
-                    { data: 'shortName', title: 'Short Name' },
-                    { data: 'type', title: 'Type' },
-                    { data: 'ports', title: 'Port' },
-                    { data: 'server', title: 'Server' },
-                    { data: 'community', title: 'SNMP Community' },
-                    { data: 'description', title: 'Description' },
-                    { data: 'routerType', title: 'Router Type' },
-                    { data: 'username', title: 'Username' },
+                columns: [                    
+                    { data: 'userName', title: 'Username' },
+                    { data: 'email', title: 'Email' },
+                    { data: 'phoneNumber', title: 'Phone Number' },
+                    { data: 'emailConfirmed', title: 'Email Verified', render: function(data) {
+                        return data ? '<span class="badge bg-success">Yes</span>' : '<span class="badge bg-secondary">No</span>';
+                    }},
+                    { data: 'twoFactorEnabled', title: '2FA', render: function(data) {
+                        return data ? '<span class="badge bg-success">Enabled</span>' : '<span class="badge bg-secondary">Disabled</span>';
+                    }},
+                    { data: 'isLocked', title: 'Status', render: function(data) {
+                        return data ? '<span class="badge bg-danger">Locked</span>' : '<span class="badge bg-success">Active</span>';
+                    }},
                     { data: 'id', title: 'Actions', orderable: false, render: function(data, type, row) {
-                        return `<button class="btn btn-sm btn-primary btn-edit-nas" data-id="${data}" data-bs-toggle="offcanvas" data-bs-target="#offcanvasEditNas" style="margin-right: 5px;">Edit</button>
-                                <button class="btn btn-sm btn-danger btn-delete-nas" data-id="${data}">Delete</button>`;
+                        let lockBtn = row.isLocked 
+                            ? `<button class="btn btn-sm btn-warning btn-unlock-user" data-id="${data}" title="Unlock User">Unlock</button>`
+                            : `<button class="btn btn-sm btn-warning btn-lock-user" data-id="${data}" title="Lock User">Lock</button>`;
+
+                        return `<button class="btn btn-sm btn-primary btn-edit-user" data-id="${data}" data-bs-toggle="offcanvas" data-bs-target="#offcanvasEditUser" style="margin-right: 5px;">Edit</button>
+                                ${lockBtn}
+                                <button class="btn btn-sm btn-danger btn-delete-user" data-id="${data}">Delete</button>`;
                     }}
                 ],
                 responsive: true
@@ -84,46 +100,67 @@
             window.dataTable = dataTable;
 
             // Handle Add New button click
-            $(document).on('click', '#btn-add-nas', function() {
-                $.get('@Url.Action("CreateModal", "SettingsNas", new { area = "Administrator" })', function(html) {
+            $(document).on('click', '#btn-add-user', function() {
+                $.get('@Url.Action("CreateModal", "SettingsUser", new { area = "Administrator" })', function(html) {
                     $('#createModalContainer').html(html);
-                    var offcanvas = new bootstrap.Offcanvas(document.getElementById('offcanvasCreateNas'));
+                    var offcanvas = new bootstrap.Offcanvas(document.getElementById('offcanvasCreateUser'));
                     offcanvas.show();
                 });
             });
 
             // Handle Edit button click
-            $(document).on('click', '.btn-edit-nas', function() {
-                var nasId = $(this).data('id');
-                $.get('@Url.Action("EditModal", "SettingsNas", new { area = "Administrator" })?' + $.param({ id: nasId }), function(html) {
+            $(document).on('click', '.btn-edit-user', function() {
+                var userId = $(this).data('id');
+                $.get('@Url.Action("EditModal", "SettingsUser", new { area = "Administrator" })?' + $.param({ id: userId }), function(html) {
                     $('#editModalContainer').html(html);
-                    var offcanvas = new bootstrap.Offcanvas(document.getElementById('offcanvasEditNas'));
+                    var offcanvas = new bootstrap.Offcanvas(document.getElementById('offcanvasEditUser'));
                     offcanvas.show();
                 });
             });
 
+            // Handle Lock/Unlock button click
+            $(document).on('click', '.btn-lock-user, .btn-unlock-user', function() {
+                var userId = $(this).data('id');
+                $.ajax({
+                    url: '@Url.Action("LockUnlock", "SettingsUser", new { area = "Administrator" })/' + userId,
+                    type: 'POST',
+                    headers: {
+                        'X-CSRF-Token': $('[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            ToastHelper.success(response.message);
+                            dataTable.ajax.reload();
+                        } else {
+                            ToastHelper.error('Error: ' + response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        ToastHelper.error('Terjadi kesalahan saat mengubah status user.');
+                        console.error('Error:', error);
+                    }
+                });
+            });
+
             // Handle Delete button click
-            $(document).on('click', '.btn-delete-nas', function() {
-                var nasId = $(this).data('id');
-                if (confirm('Apakah Anda yakin ingin menghapus NAS ini?')) {
+            $(document).on('click', '.btn-delete-user', function() {
+                var userId = $(this).data('id');
+                if (confirm('Apakah Anda yakin ingin menghapus user ini?')) {
                     $.ajax({
-                        url: '@Url.Action("Delete", "SettingsNas", new { area = "Administrator" })/' + nasId,
+                        url: '@Url.Action("Delete", "SettingsUser", new { area = "Administrator" })/' + userId,
                         type: 'POST',
                         headers: {
                             'X-CSRF-Token': $('[name="__RequestVerificationToken"]').val()
                         },
                         success: function(response) {
                             if (response.success) {
-                                //alert(response.message);
                                 ToastHelper.success(response.message);
                                 dataTable.ajax.reload();
                             } else {
-                                //alert('Error: ' + response.message);
                                 ToastHelper.error('Error: ' + response.message);
                             }
                         },
                         error: function(xhr, status, error) {
-                            //alert('Terjadi kesalahan saat menghapus data.');
                             ToastHelper.error('Terjadi kesalahan saat menghapus data.');
                             console.error('Error:', error);
                         }
@@ -137,13 +174,13 @@
 <div class="card">
     <!-- HEADER -->
     <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2 border-bottom">
-        <h5 class="mb-0">List NAS</h5>
+        <h5 class="mb-0">List User</h5>
 
-        <button type="button" class="btn btn-primary" id="btn-add-nas">
+        <button type="button" class="btn btn-primary" id="btn-add-user">
             <span class="d-flex align-items-center gap-2">
                 <i class="icon-base ti tabler-plus icon-sm"></i>
                 <span class="d-none d-sm-inline-block">
-                    Add New Record
+                    Add New User
                 </span>
             </span>
         </button>
@@ -155,19 +192,15 @@
                class="datatables-ajax table table-bordered table-striped">
 
             <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>NAS Name</th>
-                    <th>Short Name</th>
-                    <th>Type</th>
-                    <th>Port</th>
-                    <th>Server</th>
-                    <th>SNMP Community</th>
-                    <th>Description</th>
-                    <th>Router Type</th>
-                    <th>Username</th>
-                    <th width="120">Actions</th>
-                </tr>
+            <tr>                
+                <th>Username</th>
+                <th>Email</th>
+                <th>Phone Number</th>
+                <th>Email Verified</th>
+                <th>2FA</th>
+                <th>Status</th>
+                <th width="250">Actions</th>
+            </tr>
             </thead>
 
             <tbody></tbody>
