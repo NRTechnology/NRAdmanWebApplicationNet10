@@ -22,6 +22,8 @@ namespace NRAdmanWebApplicationNet10.Services
 
         public DbSet<Nas> Nas => Set<Nas>();
 
+        public DbSet<MikrotikSimpleQueue> MikrotikSimpleQueues => Set<MikrotikSimpleQueue>();
+
         public DbSet<LoginAttempt> LoginAttempts => Set<LoginAttempt>();
 
         public DbSet<Package> Packages => Set<Package>();
@@ -40,6 +42,16 @@ namespace NRAdmanWebApplicationNet10.Services
             {
                 entity.ToTable("nas");
                 entity.HasIndex(e => e.NasName, "NasName_index_unique").IsUnique();
+            });
+
+            modelBuilder.Entity<MikrotikSimpleQueue>(entity =>
+            {
+                entity.ToTable("mikrotik_simple_queues");
+                entity.HasOne(e => e.Nas)
+                    .WithMany()
+                    .HasForeignKey(e => e.NasId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                entity.HasIndex(e => new { e.NasId, e.QueueName }, "idx_nas_queue_name").IsUnique();
             });
         }
     }

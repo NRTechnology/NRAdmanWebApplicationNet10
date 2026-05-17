@@ -188,10 +188,18 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 return Json(new { success = false, message = "ID tidak sesuai." });
             }
 
+            // Remove password validation if password is empty (optional on edit)
+            if (string.IsNullOrEmpty(model.Password))
+            {
+                ModelState.Remove("Password");
+                ModelState.Remove("ConfirmPassword");
+            }
+
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors);
-                return Json(new { success = false, message = "Validasi gagal.", errors = errors.Select(e => e.ErrorMessage) });
+                var errorList = errors.Select(e => e.ErrorMessage).ToList();
+                return Json(new { success = false, message = "Validasi gagal.", errors = errorList });
             }
 
             try
@@ -222,7 +230,6 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                     }
                 }
 
-                //user.UserName = model.UserName;
                 user.Email = model.Email;
                 user.PhoneNumber = model.PhoneNumber;
                 user.EmailConfirmed = model.EmailConfirmed;
@@ -233,12 +240,23 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 // Update password if provided
                 if (!string.IsNullOrEmpty(model.Password))
                 {
+                    // Validate password meets requirements
+                    var passwordValidator = new PasswordValidator<ApplicationUser>();
+                    var passwordValidationResult = await passwordValidator.ValidateAsync(
+                        userManager, user, model.Password);
+
+                    if (!passwordValidationResult.Succeeded)
+                    {
+                        var passwordErrors = passwordValidationResult.Errors.Select(e => e.Description).ToList();
+                        return Json(new { success = false, message = "Password tidak memenuhi persyaratan keamanan.", errors = passwordErrors });
+                    }
+
                     var token = await userManager.GeneratePasswordResetTokenAsync(user);
                     var passwordResult = await userManager.ResetPasswordAsync(user, token, model.Password);
                     if (!passwordResult.Succeeded)
                     {
-                        var errors = passwordResult.Errors.Select(e => e.Description).ToList();
-                        return Json(new { success = false, message = "Gagal mengubah password.", errors = errors });
+                        var passwordErrors = passwordResult.Errors.Select(e => e.Description).ToList();
+                        return Json(new { success = false, message = "Gagal mengubah password.", errors = passwordErrors });
                     }
                 }
 

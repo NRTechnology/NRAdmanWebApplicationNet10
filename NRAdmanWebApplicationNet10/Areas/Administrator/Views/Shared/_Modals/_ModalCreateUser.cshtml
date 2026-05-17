@@ -113,16 +113,64 @@
                         // Reset form
                         form[0].reset();
                         $('#form-create-error-summary').html('');
+                        clearFieldErrors();
                     } else {
-                        // Show error toast
-                        ToastHelper.error(response.message);
+                        // Show error toast with detailed message
+                        let errorMessage = response.message;
+                        if (response.errors && response.errors.length > 0) {
+                            ToastHelper.error(response.errors.join('\n'));
+                            displayFieldErrors(response.errors);
+                        } else {
+                            ToastHelper.error(errorMessage);
+                        }
                     }
                 },
                 error: function(xhr, status, error) {
-                    ToastHelper.error('Terjadi kesalahan. Silakan coba lagi.');
+                    let errorMessage = 'Terjadi kesalahan. Silakan coba lagi.';
+                    try {
+                        var response = JSON.parse(xhr.responseText);
+                        if (response.message) {
+                            errorMessage = response.message;
+                        }
+                        if (response.errors && response.errors.length > 0) {
+                            errorMessage += '\n' + response.errors.join('\n');
+                        }
+                    } catch (e) {
+                        // Response is not JSON
+                    }
+                    ToastHelper.error(errorMessage);
                     console.error('Error:', error);
                 }
             });
         });
+
+        function clearFieldErrors() {
+            $('#form-create-user .text-danger').html('');
+            $('#form-create-user .form-control').removeClass('is-invalid');
+            $('#form-create-user .form-select').removeClass('is-invalid');
+        }
+
+        function displayFieldErrors(errors) {
+            clearFieldErrors();
+
+            errors.forEach(function(error) {
+                // Try to match error to field
+                if (error.toLowerCase().includes('username')) {
+                    $('#error-createUserName').html(error);
+                    $('#createUserName').addClass('is-invalid');
+                } else if (error.toLowerCase().includes('email')) {
+                    $('#error-createEmail').html(error);
+                    $('#createEmail').addClass('is-invalid');
+                } else if (error.toLowerCase().includes('phone')) {
+                    $('#error-createPhoneNumber').html(error);
+                    $('#createPhoneNumber').addClass('is-invalid');
+                } else if (error.toLowerCase().includes('password')) {
+                    $('#error-createPassword').html(error);
+                    $('#createPassword').addClass('is-invalid');
+                    $('#error-createConfirmPassword').html(error);
+                    $('#createConfirmPassword').addClass('is-invalid');
+                }
+            });
+        }
     });
 </script>
