@@ -1,0 +1,182 @@
+@model NRAdmanWebApplicationNet10.ViewModels.MikrotikSimpleQueueViewModel
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasEditRouterQueue" aria-labelledby="offcanvasEditRouterQueueLabel">
+    <div class="offcanvas-header">
+        <h5 id="offcanvasEditRouterQueueLabel" class="offcanvas-title">Edit Router Queue</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <form id="form-edit-queue-modal">
+            @Html.AntiForgeryToken()
+            <div class="text-danger mb-3" id="form-error-summary"></div>
+
+            <input type="hidden" id="modalQueueId" name="Id" value="@Model.Id" />
+
+            <div class="mb-3">
+                <label for="nasId" class="form-label">NAS</label>
+                <select id="nasId" name="NasId" class="form-select">
+                    <option value="">-- Pilih NAS --</option>
+                    @foreach (var nas in (List<dynamic>)ViewBag.NasOptions ?? new List<dynamic>())
+                    {
+                        <option value="@nas.id" selected="@(nas.id == Model.NasId)">@nas.nasName</option>
+                    }
+                </select>
+                <span class="text-danger" id="error-nasId"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="queueName" class="form-label">Queue Name</label>
+                <input asp-for="QueueName" type="text" id="queueName" name="QueueName" class="form-control" />
+                <span class="text-danger" id="error-queueName"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="targetAddress" class="form-label">Target Address (IP/Subnet)</label>
+                <input asp-for="TargetAddress" type="text" id="targetAddress" name="TargetAddress" class="form-control" placeholder="192.168.1.0/24" />
+                <span class="text-danger" id="error-targetAddress"></span>
+                <small class="form-text">Format: 192.168.1.100 atau 192.168.1.0/24</small>
+            </div>
+
+            <div class="mb-3">
+                <label for="parent" class="form-label">Parent Queue (Optional)</label>
+                <input asp-for="Parent" type="text" id="parent" name="Parent" class="form-control" />
+                <span class="text-danger" id="error-parent"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="maxLimit" class="form-label">Max Limit (bps)</label>
+                    <input asp-for="MaxLimit" type="number" id="maxLimit" name="MaxLimit" class="form-control" placeholder="1000000" />
+                    <span class="text-danger" id="error-maxLimit"></span>
+                    <small class="form-text">Contoh: 1000000 = 1 Mbps</small>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="burstLimit" class="form-label">Burst Limit (bps)</label>
+                    <input asp-for="BurstLimit" type="number" id="burstLimit" name="BurstLimit" class="form-control" />
+                    <span class="text-danger" id="error-burstLimit"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="burstThreshold" class="form-label">Burst Threshold (bps)</label>
+                    <input asp-for="BurstThreshold" type="number" id="burstThreshold" name="BurstThreshold" class="form-control" />
+                    <span class="text-danger" id="error-burstThreshold"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="burstTime" class="form-label">Burst Time (seconds)</label>
+                    <input asp-for="BurstTime" type="number" id="burstTime" name="BurstTime" class="form-control" />
+                    <span class="text-danger" id="error-burstTime"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="priority" class="form-label">Priority</label>
+                    <select id="priority" name="Priority" class="form-select">
+                        <option value="0" selected="@(Model.Priority == 0)">0 - Highest</option>
+                        <option value="1" selected="@(Model.Priority == 1)">1</option>
+                        <option value="2" selected="@(Model.Priority == 2)">2</option>
+                        <option value="3" selected="@(Model.Priority == 3)">3</option>
+                        <option value="4" selected="@(Model.Priority == 4)">4</option>
+                        <option value="5" selected="@(Model.Priority == 5)">5</option>
+                        <option value="6" selected="@(Model.Priority == 6)">6</option>
+                        <option value="7" selected="@(Model.Priority == 7)">7</option>
+                        <option value="8" selected="@(Model.Priority == 8)">8 - Default</option>
+                        <option value="9" selected="@(Model.Priority == 9)">9</option>
+                        <option value="10" selected="@(Model.Priority == 10)">10</option>
+                        <option value="11" selected="@(Model.Priority == 11)">11</option>
+                        <option value="12" selected="@(Model.Priority == 12)">12</option>
+                        <option value="13" selected="@(Model.Priority == 13)">13</option>
+                        <option value="14" selected="@(Model.Priority == 14)">14</option>
+                        <option value="15" selected="@(Model.Priority == 15)">15</option>
+                        <option value="16" selected="@(Model.Priority == 16)">16 - Lowest</option>
+                    </select>
+                    <span class="text-danger" id="error-priority"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="packetMark" class="form-label">Packet Mark (Optional)</label>
+                    <input asp-for="PacketMark" type="text" id="packetMark" name="PacketMark" class="form-control" />
+                    <span class="text-danger" id="error-packetMark"></span>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="comment" class="form-label">Comment (Optional)</label>
+                <textarea asp-for="Comment" id="comment" name="Comment" class="form-control" rows="3"></textarea>
+                <span class="text-danger" id="error-comment"></span>
+            </div>
+
+            <div class="mb-3 form-check">
+                <input type="checkbox" asp-for="Disabled" id="disabled" name="Disabled" class="form-check-input" />
+                <label class="form-check-label" for="disabled">Disable Queue</label>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">Cancel</button>
+                <button type="submit" class="btn btn-primary">Update</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function clearFieldErrors() {
+        $('[id^="error-"]').text('').closest('.mb-3, .row').find('input, textarea, select').removeClass('is-invalid');
+        $('#form-error-summary').html('');
+    }
+
+    function displayFieldErrors(errors) {
+        errors.forEach(function(error) {
+            var fieldId = 'error-' + error.field;
+            var inputField = $('#' + error.field);
+            if (inputField.length > 0) {
+                inputField.addClass('is-invalid');
+                $('#' + fieldId).text(error.message);
+            }
+        });
+    }
+
+    $(function() {
+        $('#form-edit-queue-modal').on('submit', function(e) {
+            e.preventDefault();
+            clearFieldErrors();
+
+            var form = $(this);
+            var formData = form.serialize();
+            var queueId = $('#modalQueueId').val();
+
+            $.ajax({
+                url: '@Url.Action("Update", "RouterQueue", new { area = "Administrator" })/' + queueId,
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    if (response.success) {
+                        ToastHelper.success(response.message);
+                        var offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasEditRouterQueue'));
+                        if (offcanvas) offcanvas.hide();
+
+                        if (window.dataTable && window.dataTable.ajax) {
+                            window.dataTable.ajax.reload();
+                        }
+
+                        form[0].reset();
+                    } else {
+                        if (response.errors && response.errors.length > 0) {
+                            ToastHelper.error(response.errors.join('\n'));
+                        } else {
+                            ToastHelper.error(response.message);
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    ToastHelper.error('Terjadi kesalahan. Silakan coba lagi.');
+                    console.error('Error:', error);
+                }
+            });
+        });
+    });
+</script>

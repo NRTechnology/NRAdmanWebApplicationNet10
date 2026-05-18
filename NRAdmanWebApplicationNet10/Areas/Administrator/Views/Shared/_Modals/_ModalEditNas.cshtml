@@ -94,9 +94,26 @@
 
 
     <script>
+        function clearFieldErrors() {
+            $('[id^="error-"]').text('').closest('.mb-3').find('input, textarea, select').removeClass('is-invalid');
+            $('#form-error-summary').html('');
+        }
+
+        function displayFieldErrors(errors) {
+            errors.forEach(function(error) {
+                var fieldId = 'error-' + error.field;
+                var inputField = $('#' + error.field);
+                if (inputField.length > 0) {
+                    inputField.addClass('is-invalid');
+                    $('#' + fieldId).text(error.message);
+                }
+            });
+        }
+
         $(function() {
             $('#form-edit-nas-modal').on('submit', function(e) {
                 e.preventDefault();
+                clearFieldErrors();
 
                 var form = $(this);
                 var formData = form.serialize();
@@ -108,25 +125,22 @@
                     data: formData,
                     success: function(response) {
                         if (response.success) {
-                        // Show success message
-                        ToastHelper.success(response.message);
-                            // Close offcanvas
+                            ToastHelper.success(response.message);
                             var offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasEditNas'));
                             if (offcanvas) offcanvas.hide();
 
-                            // Show success message
-                            //alert(response.message);
-
-                            // Reload DataTable
                             if (window.dataTable && window.dataTable.ajax) {
                                 window.dataTable.ajax.reload();
                             }
 
-                            // Reset form
                             form[0].reset();
                         } else {
-                            // Show error message
-                            ToastHelper.error(response.message);
+                            // Display detailed error messages
+                            if (response.errors && response.errors.length > 0) {
+                                ToastHelper.error(response.errors.join('\n'));
+                            } else {
+                                ToastHelper.error(response.message);
+                            }
                         }
                     },
                     error: function(xhr, status, error) {

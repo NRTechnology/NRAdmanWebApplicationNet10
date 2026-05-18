@@ -1,0 +1,194 @@
+@{
+    ViewData["Title"] = "Router Queue Management - Administrator";
+}
+
+@section VendorStyles {
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/flatpickr/flatpickr.css" />
+}
+
+@section VendorScripts {
+    <script src="~/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+
+    <!-- Flat Picker -->
+    <script src="~/assets/vendor/libs/moment/moment.js"></script>
+    <script src="~/assets/vendor/libs/flatpickr/flatpickr.js"></script>
+    <script src="~/assets/vendor/libs/jquery-validate/jquery.validate.min.js"></script>
+    <script src="~/assets/vendor/libs/jquery-validate/additional-methods.min.js"></script>
+    <script src="~/assets/vendor/libs/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+}
+
+@section PageScripts {
+    <script>
+        var dataTable;
+
+        // Helper function to format bytes to human-readable format
+        function formatBandwidth(bytes) {
+            if (!bytes) return '-';
+            const units = ['bps', 'Kbps', 'Mbps', 'Gbps'];
+            let size = bytes;
+            let unitIndex = 0;
+            while (size >= 1000 && unitIndex < units.length - 1) {
+                size /= 1000;
+                unitIndex++;
+            }
+            return size.toFixed(2) + ' ' + units[unitIndex];
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            dataTable = new DataTable(document.querySelector('#datatable'), {
+                ajax: {
+                    url: '@Url.Action("GetJsonResult", "RouterQueue", new { area = "Administrator" })',
+                    dataSrc: ''
+                },
+                layout: {
+                    topStart: {
+                        rowClass: 'row mx-3 my-0 justify-content-between',
+                        features: [
+                            {
+                                pageLength: {
+                                    menu: [7, 10, 25, 50, 100],
+                                    text: 'Show_MENU_entries'
+                                }
+                            }
+                        ]
+                    },
+                    topEnd: {
+                        search: {
+                            placeholder: ''
+                        }
+                    },
+                    bottomStart: {
+                        rowClass: 'row mx-3 justify-content-between',
+                        features: ['info']
+                    },
+                    bottomEnd: 'paging'
+                },
+                language: {
+                    paginate: {
+                        next: '<i class="icon-base ti tabler-chevron-right scaleX-n1-rtl icon-18px"></i>',
+                        previous: '<i class="icon-base ti tabler-chevron-left scaleX-n1-rtl icon-18px"></i>',
+                        first: '<i class="icon-base ti tabler-chevrons-left scaleX-n1-rtl icon-18px"></i>',
+                        last: '<i class="icon-base ti tabler-chevrons-right scaleX-n1-rtl icon-18px"></i>'
+                    }
+                },
+                columns: [
+                    { data: 'id', title: 'ID', width: '5%' },
+                    { data: 'nasName', title: 'NAS Name', width: '10%' },
+                    { data: 'queueName', title: 'Queue Name', width: '12%' },
+                    { data: 'targetAddress', title: 'Target Address', width: '12%' },
+                    { 
+                        data: 'maxLimit', 
+                        title: 'Max Limit', 
+                        width: '10%',
+                        render: function(data) { return formatBandwidth(data); }
+                    },
+                    { data: 'priority', title: 'Priority', width: '8%' },
+                    { 
+                        data: 'disabled', 
+                        title: 'Status', 
+                        width: '8%',
+                        render: function(data) { return data ? '<span class="badge bg-danger">Disabled</span>' : '<span class="badge bg-success">Active</span>'; }
+                    },
+                    { 
+                        data: 'createdAt', 
+                        title: 'Created', 
+                        width: '12%',
+                        render: function(data) { return new Date(data).toLocaleDateString('id-ID'); }
+                    },
+                    { 
+                        data: 'id', 
+                        title: 'Actions', 
+                        orderable: false, 
+                        width: '15%',
+                        render: function(data, type, row) {
+                            return `<button class="btn btn-sm btn-primary btn-edit-queue" data-id="${data}" data-bs-toggle="offcanvas" data-bs-target="#offcanvasEditRouterQueue" style="margin-right: 5px;">Edit</button>
+                                    <button class="btn btn-sm btn-danger btn-delete-queue" data-id="${data}">Delete</button>`;
+                        }
+                    }
+                ],
+                responsive: true
+            });
+
+            // Store dataTable reference globally for use in modal
+            window.dataTable = dataTable;
+
+            // Handle Add New button click
+            $(document).on('click', '#btn-add-queue', function() {
+                $.get('@Url.Action("CreateModal", "RouterQueue", new { area = "Administrator" })', function(html) {
+                    $('#createModalContainer').html(html);
+                    var offcanvas = new bootstrap.Offcanvas(document.getElementById('offcanvasCreateRouterQueue'));
+                    offcanvas.show();
+                });
+            });
+
+            // Handle Edit button click
+            $(document).on('click', '.btn-edit-queue', function() {
+                var queueId = $(this).data('id');
+                $.get('@Url.Action("EditModal", "RouterQueue", new { area = "Administrator" })?' + $.param({ id: queueId }), function(html) {
+                    $('#editModalContainer').html(html);
+                    var offcanvas = new bootstrap.Offcanvas(document.getElementById('offcanvasEditRouterQueue'));
+                    offcanvas.show();
+                });
+            });
+
+            // Handle Delete button click
+            $(document).on('click', '.btn-delete-queue', function() {
+                var queueId = $(this).data('id');
+                if (confirm('Apakah Anda yakin ingin menghapus Queue ini?')) {
+                    $.ajax({
+                        url: '@Url.Action("Delete", "RouterQueue", new { area = "Administrator" })/' + queueId,
+                        type: 'POST',
+                        headers: {
+                            'X-CSRF-Token': $('[name="__RequestVerificationToken"]').val()
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                ToastHelper.success(response.message);
+                                dataTable.ajax.reload();
+                            } else {
+                                ToastHelper.error('Error: ' + response.message);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            ToastHelper.error('Terjadi kesalahan saat menghapus data.');
+                            console.error('Error:', error);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}
+
+<div class="card">
+    <!-- HEADER -->
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2 border-bottom">
+        <h5 class="mb-0">Router Queue Management</h5>
+
+        <button type="button" class="btn btn-primary" id="btn-add-queue">
+            <span class="d-flex align-items-center gap-2">
+                <i class="icon-base ti tabler-plus icon-sm"></i>
+                <span class="d-none d-sm-inline-block">
+                    Add New Queue
+                </span>
+            </span>
+        </button>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-responsive">
+        <table id="datatable" class="table table-striped table-sm">
+            <thead>
+                <tr>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<div id="createModalContainer"></div>
+<div id="editModalContainer"></div>

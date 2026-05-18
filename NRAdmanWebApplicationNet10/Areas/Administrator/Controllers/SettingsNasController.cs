@@ -90,7 +90,8 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors);
-                return Json(new { success = false, message = "Validasi gagal.", errors = errors.Select(e => e.ErrorMessage) });
+                var errorList = errors.Select(e => e.ErrorMessage).ToList();
+                return Json(new { success = false, message = "Validasi gagal.", errors = errorList });
             }
 
             // server-side unique check for NasName
@@ -119,11 +120,12 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 applicationDbContext.Nas.Add(entity);
                 applicationDbContext.SaveChanges();
 
+                logger.LogInformation("NAS {NasName} berhasil dibuat oleh {AdminUser}", model.NasName, User.Identity?.Name);
                 return Json(new { success = true, message = "NAS berhasil ditambahkan." });
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Gagal menyimpan NAS");
+                logger.LogError(ex, "Gagal menyimpan NAS {NasName}", model.NasName);
                 return Json(new { success = false, message = "Gagal menyimpan data NAS. Silakan coba lagi." });
             }
         }
@@ -140,7 +142,8 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors);
-                return Json(new { success = false, message = "Validasi gagal.", errors = errors.Select(e => e.ErrorMessage) });
+                var errorList = errors.Select(e => e.ErrorMessage).ToList();
+                return Json(new { success = false, message = "Validasi gagal.", errors = errorList });
             }
 
             // server-side unique check for NasName (exclude current record)
@@ -172,11 +175,12 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 applicationDbContext.Nas.Update(entity);
                 applicationDbContext.SaveChanges();
 
+                logger.LogInformation("NAS {NasName} berhasil diperbarui oleh {AdminUser}", model.NasName, User.Identity?.Name);
                 return Json(new { success = true, message = "NAS berhasil diperbarui." });
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Gagal memperbarui NAS");
+                logger.LogError(ex, "Gagal memperbarui NAS {NasId}", id);
                 return Json(new { success = false, message = "Gagal memperbarui data NAS. Silakan coba lagi." });
             }
         }

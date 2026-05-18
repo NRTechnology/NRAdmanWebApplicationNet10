@@ -1,0 +1,181 @@
+@model NRAdmanWebApplicationNet10.ViewModels.MikrotikSimpleQueueViewModel
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasCreateRouterQueue" aria-labelledby="offcanvasCreateRouterQueueLabel">
+    <div class="offcanvas-header">
+        <h5 id="offcanvasCreateRouterQueueLabel" class="offcanvas-title">Create Router Queue</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <form id="form-create-queue">
+            @Html.AntiForgeryToken()
+            <div class="text-danger mb-3" id="form-create-error-summary"></div>
+
+            <div class="mb-3">
+                <label for="createNasId" class="form-label">NAS</label>
+                <select id="createNasId" name="NasId" class="form-select">
+                    <option value="">-- Pilih NAS --</option>
+                    @foreach (var nas in (List<dynamic>)ViewBag.NasOptions ?? new List<dynamic>())
+                    {
+                        <option value="@nas.id">@nas.nasName</option>
+                    }
+                </select>
+                <span class="text-danger" id="error-createNasId"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="createQueueName" class="form-label">Queue Name</label>
+                <input asp-for="QueueName" type="text" id="createQueueName" name="QueueName" class="form-control" />
+                <span class="text-danger" id="error-createQueueName"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="createTargetAddress" class="form-label">Target Address (IP/Subnet)</label>
+                <input asp-for="TargetAddress" type="text" id="createTargetAddress" name="TargetAddress" class="form-control" placeholder="192.168.1.0/24" />
+                <span class="text-danger" id="error-createTargetAddress"></span>
+                <small class="form-text">Format: 192.168.1.100 atau 192.168.1.0/24</small>
+            </div>
+
+            <div class="mb-3">
+                <label for="createParent" class="form-label">Parent Queue (Optional)</label>
+                <input asp-for="Parent" type="text" id="createParent" name="Parent" class="form-control" />
+                <span class="text-danger" id="error-createParent"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="createMaxLimit" class="form-label">Max Limit (bps)</label>
+                    <input asp-for="MaxLimit" type="number" id="createMaxLimit" name="MaxLimit" class="form-control" placeholder="1000000" />
+                    <span class="text-danger" id="error-createMaxLimit"></span>
+                    <small class="form-text">Contoh: 1000000 = 1 Mbps</small>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="createBurstLimit" class="form-label">Burst Limit (bps)</label>
+                    <input asp-for="BurstLimit" type="number" id="createBurstLimit" name="BurstLimit" class="form-control" />
+                    <span class="text-danger" id="error-createBurstLimit"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="createBurstThreshold" class="form-label">Burst Threshold (bps)</label>
+                    <input asp-for="BurstThreshold" type="number" id="createBurstThreshold" name="BurstThreshold" class="form-control" />
+                    <span class="text-danger" id="error-createBurstThreshold"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="createBurstTime" class="form-label">Burst Time (seconds)</label>
+                    <input asp-for="BurstTime" type="number" id="createBurstTime" name="BurstTime" class="form-control" />
+                    <span class="text-danger" id="error-createBurstTime"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="createPriority" class="form-label">Priority</label>
+                    <select id="createPriority" name="Priority" class="form-select">
+                        <option value="0">0 - Highest</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8" selected>8 - Default</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16 - Lowest</option>
+                    </select>
+                    <span class="text-danger" id="error-createPriority"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="createPacketMark" class="form-label">Packet Mark (Optional)</label>
+                    <input asp-for="PacketMark" type="text" id="createPacketMark" name="PacketMark" class="form-control" />
+                    <span class="text-danger" id="error-createPacketMark"></span>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="createComment" class="form-label">Comment (Optional)</label>
+                <textarea asp-for="Comment" id="createComment" name="Comment" class="form-control" rows="3"></textarea>
+                <span class="text-danger" id="error-createComment"></span>
+            </div>
+
+            <div class="mb-3 form-check">
+                <input type="checkbox" asp-for="Disabled" id="createDisabled" name="Disabled" class="form-check-input" />
+                <label class="form-check-label" for="createDisabled">Disable Queue</label>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">Cancel</button>
+                <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function clearFieldErrors(prefix) {
+        $('[id^="error-' + prefix + '"]').text('').closest('.mb-3, .row').find('input, textarea, select').removeClass('is-invalid');
+        $('#form-create-error-summary').html('');
+    }
+
+    function displayFieldErrors(prefix, errors) {
+        errors.forEach(function(error) {
+            var fieldId = 'error-' + prefix + error.field;
+            var inputField = $('#' + prefix + error.field);
+            if (inputField.length > 0) {
+                inputField.addClass('is-invalid');
+                $('#' + fieldId).text(error.message);
+            }
+        });
+    }
+
+    $(function() {
+        $('#form-create-queue').on('submit', function(e) {
+            e.preventDefault();
+            clearFieldErrors('create');
+
+            var form = $(this);
+            var formData = form.serialize();
+
+            $.ajax({
+                url: '@Url.Action("Create", "RouterQueue", new { area = "Administrator" })',
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    if (response.success) {
+                        ToastHelper.success(response.message);
+
+                        var offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasCreateRouterQueue'));
+                        if (offcanvas) offcanvas.hide();
+
+                        if (window.dataTable && window.dataTable.ajax) {
+                            window.dataTable.ajax.reload();
+                        }
+
+                        form[0].reset();
+                        $('#form-create-error-summary').html('');
+                    } else {
+                        if (response.errors && response.errors.length > 0) {
+                            ToastHelper.error(response.errors.join('\n'));
+                        } else {
+                            ToastHelper.error(response.message);
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    ToastHelper.error('Terjadi kesalahan. Silakan coba lagi.');
+                    console.error('Error:', error);
+                }
+            });
+        });
+    });
+</script>

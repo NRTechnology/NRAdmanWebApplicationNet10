@@ -8,61 +8,58 @@ namespace NRAdmanWebApplicationNet10.ViewModels
     {
         [ScaffoldColumn(false)]
         public int Id { get; set; }
-        
-        [Required]
+
+        [Required(ErrorMessage = "NAS Name tidak boleh kosong.")]
         [Display(Name = "NAS Name")]
-        [MaxLength(19)]
-        [StringLength(19, MinimumLength = 7, ErrorMessage = "NAS format tidak valid")]
+        [MaxLength(19, ErrorMessage = "NAS Name maksimal 19 karakter.")]
+        [StringLength(19, MinimumLength = 7, ErrorMessage = "NAS Name harus antara 7-19 karakter.")]
         public string NasName { get; set; } = "";
-        
-        [Required]
+
+        [Required(ErrorMessage = "Short Name tidak boleh kosong.")]
         [Display(Name = "Short Name")]
-        [MaxLength(100)]
-        [StringLength(100, MinimumLength = 5, ErrorMessage = "Short Name format tidak valid")]
+        [MaxLength(100, ErrorMessage = "Short Name maksimal 100 karakter.")]
+        [StringLength(100, MinimumLength = 5, ErrorMessage = "Short Name harus antara 5-100 karakter.")]
         public string ShortName { get; set; } = "";
-        
-        [Required]
+
+        [Required(ErrorMessage = "Type tidak boleh kosong.")]
         [Display(Name = "Type")]
-        [MaxLength(20)]
+        [MaxLength(20, ErrorMessage = "Type maksimal 20 karakter.")]
         public string Type { get; set; } = "other";
 
-        [Required] 
-        [Display(Name = "Port")] 
+        [Required(ErrorMessage = "Port tidak boleh kosong.")] 
+        [Display(Name = "Port")]
+        [Range(1, 65535, ErrorMessage = "Port harus antara 1-65535.")]
         public int? Ports { get; set; } = 1812;
-        
-        [Required]
+
+        [Required(ErrorMessage = "Secret tidak boleh kosong.")]
         [Display(Name = "Secret")]
-        [MaxLength(20)]
+        [MaxLength(20, ErrorMessage = "Secret maksimal 20 karakter.")]
         public string Secret { get; set; } = "";
-        
-        
+
         [Display(Name = "Server")]
-        [MaxLength(100)]
+        [MaxLength(100, ErrorMessage = "Server maksimal 100 karakter.")]
         public string? Server { get; set; }
-        
+
         [Display(Name = "SNMP Community")]
-        [MaxLength(100)]
+        [MaxLength(100, ErrorMessage = "Community maksimal 100 karakter.")]
         public string? Community { get; set; }
 
-        
         [Display(Name = "Description")]
-        [MaxLength(255)]
+        [MaxLength(255, ErrorMessage = "Description maksimal 255 karakter.")]
         public string? Description { get; set; }
 
-
-        [Required]
+        [Required(ErrorMessage = "Router Type harus dipilih.")]
         [Display(Name = "Router Type")]
         public EnumRouterType RouterType { get; set; } = EnumRouterType.Mikrotik;
 
-        [Required]
+        [Required(ErrorMessage = "Router Username tidak boleh kosong.")]
         [Display(Name = "Router Username")]
-        [MaxLength(100)]
+        [MaxLength(100, ErrorMessage = "Router Username maksimal 100 karakter.")]
         public string Username { get; set; } = string.Empty;
 
-        [Required]
+        [Required(ErrorMessage = "Router Password tidak boleh kosong.")]
         [Display(Name = "Router Password")]
-        [MaxLength(100)]
+        [MaxLength(100, ErrorMessage = "Router Password maksimal 100 karakter.")]
         public string Password { get; set; } = string.Empty;
-
     }
 }
