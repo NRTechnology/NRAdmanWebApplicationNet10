@@ -1,3 +1,4 @@
+using NRAdmanWebApplicationNet10.Attributes;
 using System.ComponentModel.DataAnnotations;
 
 namespace NRAdmanWebApplicationNet10.ViewModels
@@ -18,7 +19,7 @@ namespace NRAdmanWebApplicationNet10.ViewModels
         [Required(ErrorMessage = "Target Address tidak boleh kosong.")]
         [StringLength(50, ErrorMessage = "Target Address maksimal 50 karakter.")]
         [Display(Name = "Target Address (IP/Subnet)")]
-        [RegularExpression(@"^(\d{1,3}\.){3}\d{1,3}(/\d{1,2})?$", ErrorMessage = "Format IP Address atau Subnet tidak valid.")]
+        [IpAddressValidation(ErrorMessage = "Format IP Address atau CIDR tidak valid.")]
         public string TargetAddress { get; set; } = "";
 
         [StringLength(255, ErrorMessage = "Parent Queue maksimal 255 karakter.")]

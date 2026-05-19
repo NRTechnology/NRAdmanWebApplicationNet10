@@ -12,12 +12,8 @@
 
             <div class="mb-3">
                 <label for="createNasId" class="form-label">NAS</label>
-                <select id="createNasId" name="NasId" class="form-select">
+                <select asp-for="NasId" asp-items="ViewBag.NasOptions" id="createNasId" name="NasId" class="form-select">
                     <option value="">-- Pilih NAS --</option>
-                    @foreach (var nas in (List<dynamic>)ViewBag.NasOptions ?? new List<dynamic>())
-                    {
-                        <option value="@nas.id">@nas.nasName</option>
-                    }
                 </select>
                 <span class="text-danger" id="error-createNasId"></span>
             </div>

@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using NRAdmanWebApplicationNet10.Services;
 using NRAdmanWebApplicationNet10.Models;
 using NRAdmanWebApplicationNet10.ViewModels;
@@ -58,13 +60,17 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
         }
 
         [HttpGet]
-        public IActionResult CreateModal()
+        public async Task<IActionResult> CreateModal()
         {
-            var nasOptions = applicationDbContext.Nas
-                .Select(n => new { id = n.Id, nasName = n.NasName })
-                .ToList();
+            ViewBag.NasOptions = await applicationDbContext.Nas
+                .AsNoTracking()
+                .Select(n => new SelectListItem
+                {
+                    Value = n.Id.ToString(),
+                    Text = n.NasName
+                })
+                .ToListAsync();
 
-            ViewBag.NasOptions = nasOptions;
             var viewModel = new MikrotikSimpleQueueViewModel();
             return PartialView("../Shared/_Modals/_ModalCreateRouterQueue", viewModel);
         }

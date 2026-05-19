@@ -1,6 +1,6 @@
-﻿using NRAdmanWebApplicationNet10.Models;
+﻿using NRAdmanWebApplicationNet10.Attributes;
+using NRAdmanWebApplicationNet10.Models;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NRAdmanWebApplicationNet10.ViewModels
 {
@@ -11,8 +11,8 @@ namespace NRAdmanWebApplicationNet10.ViewModels
 
         [Required(ErrorMessage = "NAS Name tidak boleh kosong.")]
         [Display(Name = "NAS Name")]
-        [MaxLength(19, ErrorMessage = "NAS Name maksimal 19 karakter.")]
         [StringLength(19, MinimumLength = 7, ErrorMessage = "NAS Name harus antara 7-19 karakter.")]
+        [IpAddressValidation(ErrorMessage = "Format IP Address atau CIDR tidak valid.")]
         public string NasName { get; set; } = "";
 
         [Required(ErrorMessage = "Short Name tidak boleh kosong.")]

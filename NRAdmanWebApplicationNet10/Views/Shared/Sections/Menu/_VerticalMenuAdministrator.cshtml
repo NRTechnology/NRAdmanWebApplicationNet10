@@ -164,6 +164,22 @@
         <li class="menu-header small">
             <span class="menu-header-text" data-i18n="Sytem">System</span>
         </li>
+        <!-- Router menu start -->
+        <li class='menu-item@(currentPage.StartsWith("/Administrator") ? " active open" : "")'>
+            <a href='javascript:void(0);' class='menu-link menu-toggle'>
+                <i class="menu-icon icon-base ti tabler-shopping-cart"></i>
+                <div data-i18n="Router">Router</div>
+            </a>
+            <ul class="menu-sub">
+                <li class='menu-item@(currentPage == "/Administrator/RouterQueue" ? " active" : "")'>
+                    <a asp-area="Administrator" asp-controller="RouterQueue" asp-action="Index" class="menu-link">
+                        <div data-i18n="Queue">Queue</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <!-- Router menu end -->
+
         <!-- Settings menu start -->
         <li class='menu-item@(currentPage.StartsWith("/Administrator") ? " active open" : "")'>
             <a href='javascript:void(0);' class='menu-link menu-toggle'>
@@ -308,7 +324,7 @@
                 </li>
             </ul>
         </li>
-        <!-- e-commerce-app menu end -->
+        <!-- settings menu end -->
 
     <!-- Apps & Pages -->
     <li class="menu-header small">
