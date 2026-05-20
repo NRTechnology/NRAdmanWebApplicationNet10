@@ -9,7 +9,6 @@
         <form id="form-create-nas">
             @Html.AntiForgeryToken()
             <div class="text-danger mb-3" id="form-create-error-summary"></div>
-
             <div class="mb-3">
                 <label for="createNasName" class="form-label">NAS Name</label>
                 <input asp-for="NasName" type="text" id="createNasName" name="NasName" class="form-control" />
@@ -61,7 +60,7 @@
 
             <div class="mb-3">
                 <label for="createRouterType" class="form-label">Router Type</label>
-                <select id="createRouterType" class="form-select" asp-for="RouterType" asp-items="Html.GetEnumSelectList<NRAdmanWebApplicationNet10.Models.EnumRouterType>()"></select>
+                <select id="createRouterType" class="form-select" asp-for="RouterType" name="RouterType" asp-items="Html.GetEnumSelectList<NRAdmanWebApplicationNet10.Models.EnumRouterType>()"></select>
                 <span class="text-danger" id="error-createRouterType"></span>
             </div>
 
@@ -77,6 +76,12 @@
                 <span class="text-danger" id="error-createPassword"></span>
             </div>
 
+            <div class="mb-3">
+                <label for="createRouterPort" class="form-label">Router Port</label>
+                <input asp-for="RouterPorts" type="number" id="createRouterPort" name="RouterPorts" class="form-control" />
+                <span class="text-danger" id="error-createRouterPort"></span>
+            </div>
+
             <div class="d-flex justify-content-end gap-2">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">Cancel</button>
                 <button type="submit" class="btn btn-primary">Create</button>
@@ -86,22 +91,6 @@
 </div>
 
 <script>
-    function clearFieldErrors(prefix) {
-        $('[id^="error-' + prefix + '"]').text('').closest('.mb-3').find('input, textarea, select').removeClass('is-invalid');
-        $('#form-create-error-summary').html('');
-    }
-
-    function displayFieldErrors(prefix, errors) {
-        errors.forEach(function(error) {
-            var fieldId = 'error-' + prefix + error.field;
-            var inputField = $('#' + prefix + error.field);
-            if (inputField.length > 0) {
-                inputField.addClass('is-invalid');
-                $('#' + fieldId).text(error.message);
-            }
-        });
-    }
-
     $(function() {
         $('#form-create-nas').on('submit', function(e) {
             e.preventDefault();
@@ -118,29 +107,106 @@
                     if (response.success) {
                         ToastHelper.success(response.message);
 
+                        // Close offcanvas
                         var offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasCreateNas'));
                         if (offcanvas) offcanvas.hide();
 
+                        // Reload DataTable
                         if (window.dataTable && window.dataTable.ajax) {
                             window.dataTable.ajax.reload();
                         }
 
+                        // Reset form
                         form[0].reset();
                         $('#form-create-error-summary').html('');
+                        clearFieldErrors();
                     } else {
-                        // Display detailed error messages
+                        // Show error toast with detailed message
+                        let errorMessage = response.message;
                         if (response.errors && response.errors.length > 0) {
                             ToastHelper.error(response.errors.join('\n'));
+                            displayFieldErrors(response.errors);
                         } else {
-                            ToastHelper.error(response.message);
+                            ToastHelper.error(errorMessage);
                         }
                     }
                 },
                 error: function(xhr, status, error) {
-                    ToastHelper.error('Terjadi kesalahan. Silakan coba lagi.');
-                    console.error('Error:', error);
+                    let errorMessage = 'Terjadi kesalahan. Silakan coba lagi.';
+                    try {
+                        var response = JSON.parse(xhr.responseText);
+                        if (response.message) {
+                            errorMessage = response.message;
+                        }
+                        if (response.errors && response.errors.length > 0) {
+                            errorMessage += '\n' + response.errors.join('\n');
+                        }
+                    } catch (e) {
+                        // Response is not JSON
+                        console.error('JSON Parse Error:', e);
+
+                        // fallback plain text
+                        if (xhr.responseText) {
+                            errorMessage = xhr.responseText;
+                        }
+                    }
+                    ToastHelper.error(errorMessage);
+                    console.error('Error:', error);                    
                 }
             });
         });
     });
+
+    function clearFieldErrors() {
+        $('#form-create-nas .text-danger').html('');
+        $('#form-create-nas .form-control').removeClass('is-invalid');
+        $('#form-create-nas .form-select').removeClass('is-invalid');
+    }
+
+    function displayFieldErrors(errors) {
+            clearFieldErrors();
+
+            errors.forEach(function(error) {
+                console.log(error)
+                // Try to match error to field
+                if (error.toLowerCase().includes('nas name')) {
+                    $('#error-createNasName').html(error);
+                    $('#createNasName').addClass('is-invalid');                    
+                } else if (error.toLowerCase().includes('short name')) {
+                    $('#error-createShortName').html(error);
+                    $('#createShortName').addClass('is-invalid');
+                } else if (error.toLowerCase().includes('type')) {
+                    $('#error-createType').html(error);
+                    $('#createType').addClass('is-invalid');
+                } else if (error.toLowerCase().includes('port')) {
+                    $('#error-createPorts').html(error);
+                    $('#createPorts').addClass('is-invalid');
+                } else if (error.toLowerCase().includes('secret')) {
+                    $('#error-createSecret').html(error);
+                    $('#createSecret').addClass('is-invalid');                    
+                }  else if (error.toLowerCase().includes('server')) {
+                    $('#error-createServer').html(error);
+                    $('#createServer').addClass('is-invalid');
+                } else if (error.toLowerCase().includes('community')) {
+                    $('#error-createCommunity').html(error);
+                    $('#createCommunity').addClass('is-invalid');
+                } else if (error.toLowerCase().includes('description')) {
+                    $('#error-createDescription').html(error);
+                    $('#createDescription').addClass('is-invalid');
+                }  else if (error.toLowerCase().includes('routertype')) {
+                    $('#error-createRouterType').html(error);
+                    $('#createRouterType').addClass('is-invalid');
+                } else if (error.toLowerCase().includes('username')) {
+                    $('#error-editUsername').html(error);
+                    $('#editUsername').addClass('is-invalid');
+                } else if (error.toLowerCase().includes('password')) {
+                    $('#error-editPassword').html(error);
+                    $('#editPassword').addClass('is-invalid');
+                } else if (error.toLowerCase().includes('router port')) {
+                    $('#error-createRouterPorts').html(error);
+                    $('#createRouterPorts').addClass('is-invalid');
+                }
+            });
+        }
+    
 </script>

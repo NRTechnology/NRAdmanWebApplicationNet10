@@ -1,0 +1,245 @@
+@model NRAdmanWebApplicationNet10.ViewModels.SSHConnectionViewModel
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasConnectSSH" aria-labelledby="offcanvasConnectSSHLabel">
+    <div class="offcanvas-header">
+        <h5 id="offcanvasConnectSSHLabel" class="offcanvas-title">Connect SSH - @Model.NasName</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="mb-3">SSH Connection Information</h6>
+
+                <div class="mb-3">
+                    <label class="form-label">Server</label>
+                    <input asp-for="Server" type="text" class="form-control" id="sshServer" readonly />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input asp-for="Username" type="text" class="form-control" id="sshUsername" readonly />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Port</label>
+                    <input asp-for="Port" type="number" class="form-control" id="sshPort" readonly />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input asp-for="Password" type="password" class="form-control" id="sshPassword" />
+                    <small class="form-text text-muted">Password dari NAS configuration (dapat diubah)</small>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Command (Optional)</label>
+                    <input type="text" class="form-control" id="sshCommand" placeholder="e.g., uname -a, ifconfig, etc." />
+                    <small class="form-text text-muted">Kosongkan untuk hanya test koneksi</small>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Terminal Output</label>
+                    <div class="bg-dark text-light p-3 rounded" id="terminalOutput" style="height: 300px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 12px; border: 1px solid #444;">
+                        <div class="text-muted">Waiting for connection...</div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between gap-2">                    
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-warning btn-sm" id="btn-clear-output" onclick="clearTerminalOutput()">
+                            <i class="icon-base ti tabler-trash icon-sm"></i> Clear
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">Close</button>
+                        <button type="button" class="btn btn-success" id="btn-connect-ssh" onclick="testSSHConnection()">
+                            <i class="icon-base ti tabler-plug icon-sm"></i> Test Connection
+                        </button>
+                        <button type="button" class="btn btn-info" id="btn-execute-cmd" onclick="executeSSHCommand()" style="display: none;">
+                            <i class="icon-base ti tabler-terminal-2 icon-sm"></i> Execute
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-3 p-2 bg-info-subtle rounded" style="display: none;" id="sshInfo">
+                    <small class="text-muted">
+                        <i class="ti tabler-info-circle"></i>
+                        <strong>Info:</strong> Connection test will verify SSH credentials. Execute button will appear after successful connection.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let sshConnected = false;
+    const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+
+    document.addEventListener('DOMContentLoaded', function() {
+        //document.getElementById('sshPort').value = '@Model.Port';
+        //document.getElementById('sshPassword').value = '@Model.Password';
+        document.getElementById('sshInfo').style.display = 'block';
+
+        // Log untuk debugging
+        console.log('SSH Modal Initialized');
+        console.log('Server:', document.getElementById('sshServer').value);
+        console.log('Username:', document.getElementById('sshUsername').value);
+        console.log('Port:', document.getElementById('sshPort').value);
+        console.log('Password set:', document.getElementById('sshPassword').value.length > 0);
+    });
+
+    function clearTerminalOutput() {
+        const terminalOutput = document.getElementById('terminalOutput');
+        terminalOutput.innerHTML = '<div class="text-muted">Terminal cleared...</div>';
+        sshConnected = false;
+        document.getElementById('btn-execute-cmd').style.display = 'none';
+    }
+
+    function appendTerminalOutput(message, className = 'text-light') {
+        const terminalOutput = document.getElementById('terminalOutput');
+        if (terminalOutput.innerHTML.includes('Waiting for connection') || terminalOutput.innerHTML.includes('Terminal cleared')) {
+            terminalOutput.innerHTML = '';
+        }
+        const line = document.createElement('div');
+        line.className = className;
+        line.textContent = message;
+        terminalOutput.appendChild(line);
+        terminalOutput.scrollTop = terminalOutput.scrollHeight;
+    }
+
+    function testSSHConnection() {
+        const server = document.getElementById('sshServer').value;
+        const username = document.getElementById('sshUsername').value;
+        const port = parseInt(document.getElementById('sshPort').value);
+        const password = document.getElementById('sshPassword').value;
+
+        if (!server || !username || !password) {
+            ToastHelper.warning('Server, username, dan password harus diisi.');
+            return;
+        }
+
+        const btn = document.getElementById('btn-connect-ssh');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="icon-base ti tabler-loader-3 icon-sm" style="animation: spin 1s linear infinite;"></i> Testing...';
+
+        appendTerminalOutput('Connecting to ' + username + '@@' + server + ':' + port + '...', 'text-info');
+
+        const request = {
+            server: server,
+            port: port,
+            username: username,
+            password: password
+        };
+
+        fetch('@Url.Action("TestSSHConnection", "SettingsNas", new { area = "Administrator" })', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': csrfToken
+            },
+            body: JSON.stringify(request)
+        })
+        .then(response => response.json())
+        .then(data => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="icon-base ti tabler-plug icon-sm"></i> Test Connection';
+
+            if (data.success) {
+                appendTerminalOutput('✓ Connection successful!', 'text-success');
+                appendTerminalOutput('Connected at: ' + new Date().toLocaleTimeString(), 'text-success');
+                sshConnected = true;
+                document.getElementById('btn-execute-cmd').style.display = 'inline-block';
+                ToastHelper.success(data.message);
+            } else {
+                appendTerminalOutput('✗ Connection failed: ' + data.message, 'text-danger');
+                sshConnected = false;
+                document.getElementById('btn-execute-cmd').style.display = 'none';
+                ToastHelper.error(data.message);
+            }
+        })
+        .catch(error => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="icon-base ti tabler-plug icon-sm"></i> Test Connection';
+            appendTerminalOutput('Error: ' + error.message, 'text-danger');
+            sshConnected = false;
+            document.getElementById('btn-execute-cmd').style.display = 'none';
+            ToastHelper.error('Error: ' + error.message);
+            console.error('Error:', error);
+        });
+    }
+
+    function executeSSHCommand() {
+        const command = document.getElementById('sshCommand').value;
+        if (!command) {
+            ToastHelper.warning('Masukkan command yang akan dijalankan.');
+            return;
+        }
+
+        const server = document.getElementById('sshServer').value;
+        const username = document.getElementById('sshUsername').value;
+        const port = parseInt(document.getElementById('sshPort').value);
+        const password = document.getElementById('sshPassword').value;
+
+        const btn = document.getElementById('btn-execute-cmd');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="icon-base ti tabler-loader-3 icon-sm" style="animation: spin 1s linear infinite;"></i> Executing...';
+
+        appendTerminalOutput('$ ' + command, 'text-warning');
+
+        const request = {
+            server: server,
+            port: port,
+            username: username,
+            password: password,
+            command: command
+        };
+
+        fetch('@Url.Action("ExecuteSSHCommand", "SettingsNas", new { area = "Administrator" })', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': csrfToken
+            },
+            body: JSON.stringify(request)
+        })
+        .then(response => response.json())
+        .then(data => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="icon-base ti tabler-terminal-2 icon-sm"></i> Execute';
+
+            if (data.output) {
+                appendTerminalOutput(data.output, 'text-light');
+            }
+            if (data.errorOutput) {
+                appendTerminalOutput(data.errorOutput, 'text-warning');
+            }
+
+            if (data.success) {
+                appendTerminalOutput('Command executed successfully (Exit Status: ' + data.exitStatus + ')', 'text-success');
+                ToastHelper.success(data.message);
+            } else {
+                appendTerminalOutput('Command failed: ' + data.message + ' (Exit Status: ' + data.exitStatus + ')', 'text-danger');
+                ToastHelper.error(data.message);
+            }
+        })
+        .catch(error => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="icon-base ti tabler-terminal-2 icon-sm"></i> Execute';
+            appendTerminalOutput('Error: ' + error.message, 'text-danger');
+            ToastHelper.error('Error: ' + error.message);
+            console.error('Error:', error);
+        });
+    }
+</script>
+
+<style>
+    #terminalOutput {
+        word-wrap: break-word;
+        white-space: pre-wrap;
+        word-break: break-all;
+    }
+
+    @@keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+</style>

@@ -20,6 +20,9 @@ builder.Host.UseSerilog((context, services, serilogConfiguration) => serilogConf
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<IAntiBruteForceService, AntiBruteForceService>();
 
+// SSH Service
+builder.Services.AddScoped<ISSHService, SSHService>();
+
 builder.Services.AddHttpContextAccessor();
 // Add services to the container.
 builder.Services.AddControllersWithViews();

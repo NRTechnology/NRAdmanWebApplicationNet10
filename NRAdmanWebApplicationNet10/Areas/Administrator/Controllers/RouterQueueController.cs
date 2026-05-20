@@ -76,7 +76,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
         }
 
         [HttpGet]
-        public IActionResult EditModal(int id)
+        public async Task<IActionResult> EditModal(int id)
         {
             var queue = applicationDbContext.MikrotikSimpleQueues.FirstOrDefault(q => q.Id == id);
             if (queue == null)
@@ -84,11 +84,14 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 return NotFound();
             }
 
-            var nasOptions = applicationDbContext.Nas
-                .Select(n => new { id = n.Id, nasName = n.NasName })
-                .ToList();
-
-            ViewBag.NasOptions = nasOptions;
+            ViewBag.NasOptions = await applicationDbContext.Nas
+                .AsNoTracking()
+                .Select(n => new SelectListItem
+                {
+                    Value = n.Id.ToString(),
+                    Text = n.NasName
+                })
+                .ToListAsync();
 
             var viewModel = new MikrotikSimpleQueueViewModel
             {

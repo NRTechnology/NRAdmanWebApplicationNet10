@@ -8,80 +8,81 @@
     <div class="offcanvas-body">
         <form id="form-edit-nas-modal">
             @Html.AntiForgeryToken()
-            <div class="text-danger mb-3" id="form-error-summary"></div>
+            <div class="text-danger mb-3" id="form-edit-error-summary"></div>
 
             <input type="hidden" id="modalNasId" name="Id" value="@Model.Id" />
 
             <div class="mb-3">
-                <label for="nasName" class="form-label">NAS Name</label>
-                <input asp-for="NasName" type="text" id="nasName" name="NasName" class="form-control" />
-                <span class="text-danger" id="error-nasName"></span>
+                <label for="editNasName" class="form-label">NAS Name</label>
+                <input asp-for="NasName" type="text" id="editNasName" name="NasName" class="form-control" />
+                <span class="text-danger" id="error-editNasName"></span>
                 <span class="form-text">Pastikan NAS Name unik.</span>
             </div>
 
             <div class="mb-3">
-                <label for="shortName" class="form-label">Short Name</label>
-                <input asp-for="ShortName" type="text" id="shortName" name="ShortName" class="form-control" />
-                <span class="text-danger" id="error-shortName"></span>
+                <label for="editShortName" class="form-label">Short Name</label>
+                <input asp-for="ShortName" type="text" id="editShortName" name="ShortName" class="form-control" />
+                <span class="text-danger" id="error-editShortName"></span>
             </div>
 
             <div class="mb-3">
-                <label for="type" class="form-label">Type</label>
-                <input asp-for="Type" type="text" id="type" name="Type" class="form-control" />
-                <span class="text-danger" id="error-type"></span>
+                <label for="editType" class="form-label">Type</label>
+                <input asp-for="Type" type="text" id="editType" name="Type" class="form-control" />
+                <span class="text-danger" id="error-editType"></span>
             </div>
 
             <div class="mb-3">
-                <label for="ports" class="form-label">Ports</label>
-                <input asp-for="Ports" type="number" id="ports" name="Ports" class="form-control" />
-                <span class="text-danger" id="error-ports"></span>
+                <label for="editPorts" class="form-label">Ports</label>
+                <input asp-for="Ports" type="number" id="editPorts" name="Ports" class="form-control" />
+                <span class="text-danger" id="error-editPorts"></span>
             </div>
 
             <div class="mb-3">
-                <label for="secret" class="form-label">Secret</label>
-                <input asp-for="Secret" type="text" id="secret" name="Secret" class="form-control" />
-                <span class="text-danger" id="error-secret"></span>
+                <label for="editSecret" class="form-label">Secret</label>
+                <input asp-for="Secret" type="text" id="editSecret" name="Secret" class="form-control" />
+                <span class="text-danger" id="error-editSecret"></span>
             </div>
 
             <div class="mb-3">
-                <label for="server" class="form-label">Server</label>
-                <input asp-for="Server" type="text" id="server" name="Server" class="form-control" />
-                <span class="text-danger" id="error-server"></span>
+                <label for="editServer" class="form-label">Server</label>
+                <input asp-for="Server" type="text" id="editServer" name="Server" class="form-control" />
+                <span class="text-danger" id="error-editServer"></span>
             </div>
 
             <div class="mb-3">
-                <label for="community" class="form-label">Community</label>
-                <input asp-for="Community" type="text" id="community" name="Community" class="form-control" />
-                <span class="text-danger" id="error-community"></span>
+                <label for="editCommunity" class="form-label">Community</label>
+                <input asp-for="Community" type="text" id="editCommunity" name="Community" class="form-control" />
+                <span class="text-danger" id="error-editCommunity"></span>
             </div>
 
             <div class="mb-3">
-                <label for="description" class="form-label">Description</label>
-                <textarea asp-for="Description" id="description" name="Description" class="form-control"></textarea>
-                <span class="text-danger" id="error-description"></span>
+                <label for="editDescription" class="form-label">Description</label>
+                <textarea asp-for="Description" id="editDescription" name="Description" class="form-control"></textarea>
+                <span class="text-danger" id="error-editDescription"></span>
             </div>
 
             <div class="mb-3">
-                <label for="routerType" class="form-label">Router Type</label>
-                <select asp-for="RouterType" id="routerType" name="RouterType" class="form-select">
-                    @foreach (var item in Html.GetEnumSelectList<NRAdmanWebApplicationNet10.Models.EnumRouterType>())
-                    {
-                        <option value="@item.Value" selected="@(item.Value == Model.RouterType.ToString())">@item.Text</option>
-                    }
-                </select>
-                <span class="text-danger" id="error-routerType"></span>
+                <label for="editRouterType" class="form-label">Router Type</label>
+                <select id="editRouterType" class="form-select" asp-for="RouterType" name="RouterType" asp-items="Html.GetEnumSelectList<NRAdmanWebApplicationNet10.Models.EnumRouterType>()"></select>
+                <span class="text-danger" id="error-editRouterType"></span>
             </div>
 
             <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
-                <input asp-for="Username" type="text" id="username" name="Username" class="form-control" />
-                <span class="text-danger" id="error-username"></span>
+                <label for="editUsername" class="form-label">Username</label>
+                <input asp-for="Username" type="text" id="editUsername" name="Username" class="form-control" />
+                <span class="text-danger" id="error-editUsername"></span>
             </div>
 
             <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input asp-for="Password" type="password" id="password" name="Password" class="form-control" />
-                <span class="text-danger" id="error-password"></span>
+                <label for="editPassword" class="form-label">Password</label>
+                <input asp-for="Password" type="password" id="editPassword" name="Password" class="form-control" />
+                <span class="text-danger" id="error-editPassword"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="editRouterPort" class="form-label">Router Port</label>
+                <input asp-for="RouterPorts" type="number" id="editRouterPort" name="RouterPorts" class="form-control" />
+                <span class="text-danger" id="error-editRouterPort"></span>
             </div>
 
             <div class="d-flex justify-content-end gap-2">
@@ -92,62 +93,121 @@
     </div>
 </div>
 
+<script>
+    $(function() {
+        $('#form-edit-nas-modal').on('submit', function(e) {
+            e.preventDefault();            
 
-    <script>
-        function clearFieldErrors() {
-            $('[id^="error-"]').text('').closest('.mb-3').find('input, textarea, select').removeClass('is-invalid');
-            $('#form-error-summary').html('');
-        }
+            var form = $(this);
+            var formData = form.serialize();
+            var nasId = $('#modalNasId').val();
 
-        function displayFieldErrors(errors) {
-            errors.forEach(function(error) {
-                var fieldId = 'error-' + error.field;
-                var inputField = $('#' + error.field);
-                if (inputField.length > 0) {
-                    inputField.addClass('is-invalid');
-                    $('#' + fieldId).text(error.message);
+            $.ajax({
+                url: '@Url.Action("Update", "SettingsNas", new { area = "Administrator" })/' + nasId,
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    if (response.success) {
+                        ToastHelper.success(response.message);
+
+                        // Close offcanvas
+                        var offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasEditNas'));
+                        if (offcanvas) offcanvas.hide();
+
+                        // Reload DataTable
+                        if (window.dataTable && window.dataTable.ajax) {
+                            window.dataTable.ajax.reload();
+                        }
+
+                        // Reset form
+                        form[0].reset();
+                        $('#form-edit-error-summary').html('');
+                        clearFieldErrors();
+                    } else {
+                        // Show error toast with detailed message
+                        let errorMessage = response.message;
+                        if (response.errors && response.errors.length > 0) {
+                            ToastHelper.error(response.errors.join('\n'));
+                            displayFieldErrors(response.errors);
+                        } else {
+                            ToastHelper.error(errorMessage);
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    let errorMessage = 'Terjadi kesalahan. Silakan coba lagi.';
+                    try {
+                        var response = JSON.parse(xhr.responseText);
+                        if (response.message) {
+                            errorMessage = response.message;
+                        }
+                        if (response.errors && response.errors.length > 0) {
+                            errorMessage += '\n' + response.errors.join('\n');
+                        }
+                    } catch (e) {
+                        // Response is not JSON
+                        console.error('JSON Parse Error:', e);
+
+                        // fallback plain text
+                        if (xhr.responseText) {
+                            errorMessage = xhr.responseText;
+                        }
+                    }
+                    ToastHelper.error(errorMessage);
+                    console.error('Error:', error);
                 }
             });
-        }
-
-        $(function() {
-            $('#form-edit-nas-modal').on('submit', function(e) {
-                e.preventDefault();
-                clearFieldErrors();
-
-                var form = $(this);
-                var formData = form.serialize();
-                var nasId = $('#modalNasId').val();
-
-                $.ajax({
-                    url: '@Url.Action("Update", "SettingsNas", new { area = "Administrator" })/' + nasId,
-                    type: 'POST',
-                    data: formData,
-                    success: function(response) {
-                        if (response.success) {
-                            ToastHelper.success(response.message);
-                            var offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasEditNas'));
-                            if (offcanvas) offcanvas.hide();
-
-                            if (window.dataTable && window.dataTable.ajax) {
-                                window.dataTable.ajax.reload();
-                            }
-
-                            form[0].reset();
-                        } else {
-                            // Display detailed error messages
-                            if (response.errors && response.errors.length > 0) {
-                                ToastHelper.error(response.errors.join('\n'));
-                            } else {
-                                ToastHelper.error(response.message);
-                            }
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        ToastHelper.error('Terjadi kesalahan. Silakan coba lagi.');
-                        console.error('Error:', error);
-                    }
-                });
-            });
         });
-    </script>
+    });
+
+    function clearFieldErrors() {
+        $('#form-edit-nas-modal .text-danger').html('');
+        $('#form-edit-nas-modal .form-control').removeClass('is-invalid');
+        $('#form-edit-nas-modal .form-select').removeClass('is-invalid');
+    }
+
+    function displayFieldErrors(errors) {
+        clearFieldErrors();
+
+        errors.forEach(function(error) {
+            // Try to match error to field
+            if (error.toLowerCase().includes('nas name')) {
+                $('#error-editNasName').html(error);
+                $('#editNasName').addClass('is-invalid');
+            } else if (error.toLowerCase().includes('short name')) {
+                $('#error-editShortName').html(error);
+                $('#editShortName').addClass('is-invalid');
+            } else if (error.toLowerCase().includes('type')) {
+                $('#error-editType').html(error);
+                $('#editType').addClass('is-invalid');
+            } else if (error.toLowerCase().includes('ports')) {
+                $('#error-editPorts').html(error);
+                $('#editPorts').addClass('is-invalid');
+            } else if (error.toLowerCase().includes('secret')) {
+                $('#error-editSecret').html(error);
+                $('#editSecret').addClass('is-invalid');
+            } else if (error.toLowerCase().includes('server')) {
+                $('#error-editServer').html(error);
+                $('#editServer').addClass('is-invalid');
+            } else if (error.toLowerCase().includes('community')) {
+                $('#error-editCommunity').html(error);
+                $('#editCommunity').addClass('is-invalid');
+            } else if (error.toLowerCase().includes('description')) {
+                $('#error-editDescription').html(error);
+                $('#editDescription').addClass('is-invalid');
+            } else if (error.toLowerCase().includes('routertype')) {
+                $('#error-editRouterType').html(error);
+                $('#editRouterType').addClass('is-invalid');
+            } else if (error.toLowerCase().includes('username')) {
+                $('#error-editUsername').html(error);
+                $('#editUsername').addClass('is-invalid');
+            } else if (error.toLowerCase().includes('password')) {
+                $('#error-editPassword').html(error);
+                $('#editPassword').addClass('is-invalid');
+            } else if (error.toLowerCase().includes('router port')) {
+                    $('#error-createRouterPorts').html(error);
+                    $('#createRouterPorts').addClass('is-invalid');
+                }
+        });
+    }
+</script>

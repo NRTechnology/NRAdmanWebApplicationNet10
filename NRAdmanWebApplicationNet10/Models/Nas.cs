@@ -29,8 +29,9 @@ namespace NRAdmanWebApplicationNet10.Models
         public string Type { get; set; } = "other";
 
         [Column("ports")]
+        [Required]
         [Display(Name = "Port")]
-        public int? Ports { get; set; }
+        public int Ports { get; set; }
 
         [Column("secret")]
         [Required]
@@ -69,5 +70,10 @@ namespace NRAdmanWebApplicationNet10.Models
         [MaxLength(100)]
         [Display(Name = "Router Password")]
         public string Password { get; set; } = "admin";
+
+        [Column("routerports")]
+        [Required]
+        [Display(Name = "Router Port")]
+        public int RouterPorts { get; set; } = 22;
     }
 }

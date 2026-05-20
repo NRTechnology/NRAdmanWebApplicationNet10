@@ -136,7 +136,13 @@
                             errorMessage += '\n' + response.errors.join('\n');
                         }
                     } catch (e) {
-                        // Response is not JSON
+                        // Response is not JSON                        
+                        console.error('JSON Parse Error:', e);
+
+                        // fallback plain text
+                        if (xhr.responseText) {
+                            errorMessage = xhr.responseText;
+                        }
                     }
                     ToastHelper.error(errorMessage);
                     console.error('Error:', error);

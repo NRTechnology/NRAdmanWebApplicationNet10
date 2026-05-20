@@ -73,7 +73,10 @@
                     { data: 'routerType', title: 'Router Type' },
                     { data: 'username', title: 'Username' },
                     { data: 'id', title: 'Actions', orderable: false, render: function(data, type, row) {
-                        return `<button class="btn btn-sm btn-primary btn-edit-nas" data-id="${data}" data-bs-toggle="offcanvas" data-bs-target="#offcanvasEditNas" style="margin-right: 5px;">Edit</button>
+                        return `<button class="btn btn-sm btn-success btn-connect-ssh" data-id="${data}" data-server="${row.nasName}" data-username="${row.username}" style="margin-right: 5px;" title="Connect via SSH">
+                                    <i class="icon-base ti tabler-terminal-2 icon-sm"></i>
+                                </button>
+                                <button class="btn btn-sm btn-primary btn-edit-nas" data-id="${data}" style="margin-right: 5px;">Edit</button>                                
                                 <button class="btn btn-sm btn-danger btn-delete-nas" data-id="${data}">Delete</button>`;
                     }}
                 ],
@@ -98,6 +101,24 @@
                 $.get('@Url.Action("EditModal", "SettingsNas", new { area = "Administrator" })?' + $.param({ id: nasId }), function(html) {
                     $('#editModalContainer').html(html);
                     var offcanvas = new bootstrap.Offcanvas(document.getElementById('offcanvasEditNas'));
+                    offcanvas.show();
+                });
+            });
+
+            // Handle Connect SSH button click
+            $(document).on('click', '.btn-connect-ssh', function() {
+                var nasId = $(this).data('id');
+                var server = $(this).data('server');
+                var username = $(this).data('username');
+
+                if (!server || !username) {
+                    ToastHelper.warning('Server atau Username belum dikonfigurasi untuk NAS ini.');
+                    return;
+                }
+
+                $.get('@Url.Action("ConnectSSHModal", "SettingsNas", new { area = "Administrator" })?' + $.param({ id: nasId, server: server, username: username }), function(html) {
+                    $('#sshModalContainer').html(html);
+                    var offcanvas = new bootstrap.Offcanvas(document.getElementById('offcanvasConnectSSH'));
                     offcanvas.show();
                 });
             });
@@ -181,3 +202,6 @@
 
 <!-- Container untuk Edit Modal -->
 <div id="editModalContainer"></div>
+
+<!-- Container untuk SSH Connect Modal -->
+<div id="sshModalContainer"></div>

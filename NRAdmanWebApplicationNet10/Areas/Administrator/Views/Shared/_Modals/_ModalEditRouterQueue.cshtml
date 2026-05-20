@@ -8,113 +8,109 @@
     <div class="offcanvas-body">
         <form id="form-edit-queue-modal">
             @Html.AntiForgeryToken()
-            <div class="text-danger mb-3" id="form-error-summary"></div>
+            <div class="text-danger mb-3" id="form-edit-error-summary"></div>
 
-            <input type="hidden" id="modalQueueId" name="Id" value="@Model.Id" />
+            <input type="hidden" id="editModalQueueId" name="Id" value="@Model.Id" />
 
             <div class="mb-3">
-                <label for="nasId" class="form-label">NAS</label>
-                <select id="nasId" name="NasId" class="form-select">
+                <label for="editNasId" class="form-label">NAS</label>
+                <select asp-for="NasId" asp-items="ViewBag.NasOptions" id="editNasId" name="NasId" class="form-select">
                     <option value="">-- Pilih NAS --</option>
-                    @foreach (var nas in (List<dynamic>)ViewBag.NasOptions ?? new List<dynamic>())
-                    {
-                        <option value="@nas.id" selected="@(nas.id == Model.NasId)">@nas.nasName</option>
-                    }
                 </select>
-                <span class="text-danger" id="error-nasId"></span>
+                <span class="text-danger" id="error-editNasId"></span>
+            </div>
+            
+            <div class="mb-3">
+                <label for="editQueueName" class="form-label">Queue Name</label>
+                <input asp-for="QueueName" type="text" id="editQueueName" name="QueueName" class="form-control" />
+                <span class="text-danger" id="error-editQueueName"></span>
             </div>
 
             <div class="mb-3">
-                <label for="queueName" class="form-label">Queue Name</label>
-                <input asp-for="QueueName" type="text" id="queueName" name="QueueName" class="form-control" />
-                <span class="text-danger" id="error-queueName"></span>
-            </div>
-
-            <div class="mb-3">
-                <label for="targetAddress" class="form-label">Target Address (IP/Subnet)</label>
-                <input asp-for="TargetAddress" type="text" id="targetAddress" name="TargetAddress" class="form-control" placeholder="192.168.1.0/24" />
-                <span class="text-danger" id="error-targetAddress"></span>
+                <label for="editTargetAddress" class="form-label">Target Address (IP/Subnet)</label>
+                <input asp-for="TargetAddress" type="text" id="editTargetAddress" name="TargetAddress" class="form-control" placeholder="192.168.1.0/24" />
+                <span class="text-danger" id="error-editTargetAddress"></span>
                 <small class="form-text">Format: 192.168.1.100 atau 192.168.1.0/24</small>
             </div>
 
             <div class="mb-3">
-                <label for="parent" class="form-label">Parent Queue (Optional)</label>
-                <input asp-for="Parent" type="text" id="parent" name="Parent" class="form-control" />
-                <span class="text-danger" id="error-parent"></span>
+                <label for="editParent" class="form-label">Parent Queue (Optional)</label>
+                <input asp-for="Parent" type="text" id="editParent" name="Parent" class="form-control" />
+                <span class="text-danger" id="error-editParent"></span>
             </div>
 
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label for="maxLimit" class="form-label">Max Limit (bps)</label>
-                    <input asp-for="MaxLimit" type="number" id="maxLimit" name="MaxLimit" class="form-control" placeholder="1000000" />
-                    <span class="text-danger" id="error-maxLimit"></span>
+                    <label for="editMaxLimit" class="form-label">Max Limit (bps)</label>
+                    <input asp-for="MaxLimit" type="number" id="editMaxLimit" name="MaxLimit" class="form-control" placeholder="1000000" />
+                    <span class="text-danger" id="error-editMaxLimit"></span>
                     <small class="form-text">Contoh: 1000000 = 1 Mbps</small>
                 </div>
 
                 <div class="col-md-6 mb-3">
-                    <label for="burstLimit" class="form-label">Burst Limit (bps)</label>
-                    <input asp-for="BurstLimit" type="number" id="burstLimit" name="BurstLimit" class="form-control" />
-                    <span class="text-danger" id="error-burstLimit"></span>
+                    <label for="editBurstLimit" class="form-label">Burst Limit (bps)</label>
+                    <input asp-for="BurstLimit" type="number" id="editBurstLimit" name="BurstLimit" class="form-control" />
+                    <span class="text-danger" id="error-editBurstLimit"></span>
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label for="burstThreshold" class="form-label">Burst Threshold (bps)</label>
-                    <input asp-for="BurstThreshold" type="number" id="burstThreshold" name="BurstThreshold" class="form-control" />
-                    <span class="text-danger" id="error-burstThreshold"></span>
+                    <label for="editBurstThreshold" class="form-label">Burst Threshold (bps)</label>
+                    <input asp-for="BurstThreshold" type="number" id="editBurstThreshold" name="BurstThreshold" class="form-control" />
+                    <span class="text-danger" id="error-editBurstThreshold"></span>
                 </div>
 
                 <div class="col-md-6 mb-3">
-                    <label for="burstTime" class="form-label">Burst Time (seconds)</label>
-                    <input asp-for="BurstTime" type="number" id="burstTime" name="BurstTime" class="form-control" />
-                    <span class="text-danger" id="error-burstTime"></span>
+                    <label for="editBurstTime" class="form-label">Burst Time (seconds)</label>
+                    <input asp-for="BurstTime" type="number" id="editBurstTime" name="BurstTime" class="form-control" />
+                    <span class="text-danger" id="error-editBurstTime"></span>
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label for="priority" class="form-label">Priority</label>
-                    <select id="priority" name="Priority" class="form-select">
-                        <option value="0" selected="@(Model.Priority == 0)">0 - Highest</option>
-                        <option value="1" selected="@(Model.Priority == 1)">1</option>
-                        <option value="2" selected="@(Model.Priority == 2)">2</option>
-                        <option value="3" selected="@(Model.Priority == 3)">3</option>
-                        <option value="4" selected="@(Model.Priority == 4)">4</option>
-                        <option value="5" selected="@(Model.Priority == 5)">5</option>
-                        <option value="6" selected="@(Model.Priority == 6)">6</option>
-                        <option value="7" selected="@(Model.Priority == 7)">7</option>
-                        <option value="8" selected="@(Model.Priority == 8)">8 - Default</option>
-                        <option value="9" selected="@(Model.Priority == 9)">9</option>
-                        <option value="10" selected="@(Model.Priority == 10)">10</option>
-                        <option value="11" selected="@(Model.Priority == 11)">11</option>
-                        <option value="12" selected="@(Model.Priority == 12)">12</option>
-                        <option value="13" selected="@(Model.Priority == 13)">13</option>
-                        <option value="14" selected="@(Model.Priority == 14)">14</option>
-                        <option value="15" selected="@(Model.Priority == 15)">15</option>
-                        <option value="16" selected="@(Model.Priority == 16)">16 - Lowest</option>
+                    <label for="editPriority" class="form-label">Priority</label>
+                    <select asp-for="Priority" id="editPriority" name="Priority" class="form-select">
+                        <option value="0">0 - Highest</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8 - Default</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16 - Lowest</option>
                     </select>
-                    <span class="text-danger" id="error-priority"></span>
+                    <span class="text-danger" id="error-editPriority"></span>
                 </div>
 
                 <div class="col-md-6 mb-3">
-                    <label for="packetMark" class="form-label">Packet Mark (Optional)</label>
-                    <input asp-for="PacketMark" type="text" id="packetMark" name="PacketMark" class="form-control" />
-                    <span class="text-danger" id="error-packetMark"></span>
+                    <label for="editPacketMark" class="form-label">Packet Mark (Optional)</label>
+                    <input asp-for="PacketMark" type="text" id="editPacketMark" name="PacketMark" class="form-control" />
+                    <span class="text-danger" id="error-editPacketMark"></span>
                 </div>
             </div>
 
             <div class="mb-3">
-                <label for="comment" class="form-label">Comment (Optional)</label>
-                <textarea asp-for="Comment" id="comment" name="Comment" class="form-control" rows="3"></textarea>
-                <span class="text-danger" id="error-comment"></span>
+                <label for="editComment" class="form-label">Comment (Optional)</label>
+                <textarea asp-for="Comment" id="editComment" name="Comment" class="form-control" rows="3"></textarea>
+                <span class="text-danger" id="error-editComment"></span>
             </div>
 
             <div class="mb-3 form-check">
-                <input type="checkbox" asp-for="Disabled" id="disabled" name="Disabled" class="form-check-input" />
-                <label class="form-check-label" for="disabled">Disable Queue</label>
+                <input type="checkbox" asp-for="Disabled" id="editDisabled" name="Disabled" class="form-check-input" />
+                <label class="form-check-label" for="editDisabled">Disable Queue</label>
             </div>
-
+            
             <div class="d-flex justify-content-end gap-2">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">Cancel</button>
                 <button type="submit" class="btn btn-primary">Update</button>
@@ -124,22 +120,6 @@
 </div>
 
 <script>
-    function clearFieldErrors() {
-        $('[id^="error-"]').text('').closest('.mb-3, .row').find('input, textarea, select').removeClass('is-invalid');
-        $('#form-error-summary').html('');
-    }
-
-    function displayFieldErrors(errors) {
-        errors.forEach(function(error) {
-            var fieldId = 'error-' + error.field;
-            var inputField = $('#' + error.field);
-            if (inputField.length > 0) {
-                inputField.addClass('is-invalid');
-                $('#' + fieldId).text(error.message);
-            }
-        });
-    }
-
     $(function() {
         $('#form-edit-queue-modal').on('submit', function(e) {
             e.preventDefault();
@@ -147,7 +127,7 @@
 
             var form = $(this);
             var formData = form.serialize();
-            var queueId = $('#modalQueueId').val();
+            var queueId = $('#editModalQueueId').val();
 
             $.ajax({
                 url: '@Url.Action("Update", "RouterQueue", new { area = "Administrator" })/' + queueId,
@@ -156,27 +136,102 @@
                 success: function(response) {
                     if (response.success) {
                         ToastHelper.success(response.message);
+
+                        // Close offcanvas
                         var offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasEditRouterQueue'));
                         if (offcanvas) offcanvas.hide();
 
+                        // Reload DataTable
                         if (window.dataTable && window.dataTable.ajax) {
                             window.dataTable.ajax.reload();
                         }
 
+                        // Reset form
                         form[0].reset();
+                        $('#form-edit-error-summary').html('');
+                        clearFieldErrors();
                     } else {
+                        // Show error toast with detailed message
+                        let errorMessage = response.message;
                         if (response.errors && response.errors.length > 0) {
                             ToastHelper.error(response.errors.join('\n'));
+                            displayFieldErrors(response.errors);
                         } else {
-                            ToastHelper.error(response.message);
+                            ToastHelper.error(errorMessage);
                         }
                     }
                 },
                 error: function(xhr, status, error) {
-                    ToastHelper.error('Terjadi kesalahan. Silakan coba lagi.');
+                    let errorMessage = 'Terjadi kesalahan. Silakan coba lagi.';
+                    try {
+                        var response = JSON.parse(xhr.responseText);
+                        if (response.message) {
+                            errorMessage = response.message;
+                        }
+                        if (response.errors && response.errors.length > 0) {
+                            errorMessage += '\n' + response.errors.join('\n');
+                        }
+                    } catch (e) {
+                        // Response is not JSON
+                        console.error('JSON Parse Error:', e);
+
+                        // fallback plain text
+                        if (xhr.responseText) {
+                            errorMessage = xhr.responseText;
+                        }
+                    }
+                    ToastHelper.error(errorMessage);
                     console.error('Error:', error);
                 }
             });
         });
     });
+
+    function clearFieldErrors() {
+        $('#form-edit-queue-modal .text-danger').html('');
+        $('#form-edit-queue-modal .form-control').removeClass('is-invalid');
+        $('#form-edit-queue-modal .form-select').removeClass('is-invalid');
+    }
+
+    function displayFieldErrors(errors) {
+        clearFieldErrors();
+
+        errors.forEach(function(error) {
+            // Try to match error to field
+            if (error.toLowerCase().includes('nasid')) {
+                $('#error-editNasId').html(error);
+                $('#editNasId').addClass('is-invalid');
+            } else if (error.toLowerCase().includes('queuename')) {
+                $('#error-editQueueName').html(error);
+                $('#editQueueName').addClass('is-invalid');
+            } else if (error.toLowerCase().includes('targetaddress')) {
+                $('#error-editTargetAddress').html(error);
+                $('#editTargetAddress').addClass('is-invalid');
+            } else if (error.toLowerCase().includes('parent')) {
+                $('#error-editParent').html(error);
+                $('#editParent').addClass('is-invalid');
+            } else if (error.toLowerCase().includes('maxlimit')) {
+                $('#error-editMaxLimit').html(error);
+                $('#editMaxLimit').addClass('is-invalid');
+            } else if (error.toLowerCase().includes('burstlimit')) {
+                $('#error-editBurstLimit').html(error);
+                $('#editBurstLimit').addClass('is-invalid');
+            } else if (error.toLowerCase().includes('burstthreshold')) {
+                $('#error-editBurstThreshold').html(error);
+                $('#editBurstThreshold').addClass('is-invalid');
+            } else if (error.toLowerCase().includes('bursttime')) {
+                $('#error-editBurstTime').html(error);
+                $('#editBurstTime').addClass('is-invalid');
+            } else if (error.toLowerCase().includes('priority')) {
+                $('#error-editPriority').html(error);
+                $('#editPriority').addClass('is-invalid');
+            } else if (error.toLowerCase().includes('packetmark')) {
+                $('#error-editPacketMark').html(error);
+                $('#editPacketMark').addClass('is-invalid');
+            } else if (error.toLowerCase().includes('comment')) {
+                $('#error-editComment').html(error);
+                $('#editComment').addClass('is-invalid');
+            }
+        });
+    }
 </script>

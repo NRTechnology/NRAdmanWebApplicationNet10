@@ -10,7 +10,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
     [Authorize(Roles = "Administrator")]
     public class SettingsNasController(ApplicationDbContext applicationDbContext,
         IWebHostEnvironment environment, ILogger<SettingsNasController> logger,
-        IConfiguration configuration) : Controller
+        IConfiguration configuration, ISSHService sshService) : Controller
     {
         public IActionResult Index()
         {
@@ -77,7 +77,8 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 Description = nas.Description,
                 RouterType = nas.RouterType,
                 Username = nas.Username,
-                Password = nas.Password
+                Password = nas.Password,
+                RouterPorts = nas.RouterPorts
             };
 
             return PartialView("../Shared/_Modals/_ModalEditNas", viewModel);
@@ -114,7 +115,8 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                     Description = model.Description,
                     RouterType = model.RouterType,
                     Username = model.Username,
-                    Password = model.Password
+                    Password = model.Password,
+                    RouterPorts = model.RouterPorts ?? 22
                 };
 
                 applicationDbContext.Nas.Add(entity);
@@ -171,6 +173,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 entity.RouterType = model.RouterType;
                 entity.Username = model.Username;
                 entity.Password = model.Password;
+                entity.RouterPorts = model.RouterPorts ?? 22;
 
                 applicationDbContext.Nas.Update(entity);
                 applicationDbContext.SaveChanges();
@@ -205,6 +208,85 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
             {
                 logger.LogError(ex, "Gagal menghapus NAS");
                 return Json(new { success = false, message = "Gagal menghapus data NAS. Silakan coba lagi." });
+            }
+        }
+
+        [HttpGet]
+        public IActionResult ConnectSSHModal(int id, string server, string username)
+        {
+            var nas = applicationDbContext.Nas.FirstOrDefault(n => n.Id == id);
+            if (nas == null)
+            {
+                return NotFound();
+            }
+
+            var viewModel = new SSHConnectionViewModel
+            {
+                Id = nas.Id,
+                NasName = nas.NasName,
+                Server = server,
+                Username = username,
+                Password = nas.Password ?? "",
+                Port = nas.RouterPorts
+            };
+
+            return PartialView("../Shared/_Modals/_ModalConnectSSH", viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> TestSSHConnection([FromBody] SSHConnectionRequest request)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(request.Server) || string.IsNullOrWhiteSpace(request.Username) || string.IsNullOrWhiteSpace(request.Password))
+                {
+                    return Json(new { success = false, message = "Server, username, dan password tidak boleh kosong." });
+                }
+
+                var result = await sshService.TestConnectionAsync(request.Server, request.Port, request.Username, request.Password);
+
+                return Json(new 
+                { 
+                    success = result.IsSuccessful, 
+                    message = result.Message,
+                    connectedAt = result.ConnectedAt
+                });
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error testing SSH connection");
+                return Json(new { success = false, message = $"Error: {ex.Message}" });
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ExecuteSSHCommand([FromBody] SSHCommandRequest request)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(request.Server) || string.IsNullOrWhiteSpace(request.Username) || 
+                    string.IsNullOrWhiteSpace(request.Password) || string.IsNullOrWhiteSpace(request.Command))
+                {
+                    return Json(new { success = false, message = "Semua parameter wajib diisi." });
+                }
+
+                var result = await sshService.ExecuteCommandAsync(request.Server, request.Port, request.Username, request.Password, request.Command);
+
+                return Json(new 
+                { 
+                    success = result.IsSuccessful, 
+                    message = result.Message,
+                    output = result.Output,
+                    errorOutput = result.ErrorOutput,
+                    exitStatus = result.ExitStatus
+                });
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error executing SSH command");
+                return Json(new { success = false, message = $"Error: {ex.Message}" });
             }
         }
     }

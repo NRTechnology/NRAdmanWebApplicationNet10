@@ -29,7 +29,7 @@ namespace NRAdmanWebApplicationNet10.ViewModels
         [Required(ErrorMessage = "Port tidak boleh kosong.")] 
         [Display(Name = "Port")]
         [Range(1, 65535, ErrorMessage = "Port harus antara 1-65535.")]
-        public int? Ports { get; set; } = 1812;
+        public int Ports { get; set; } = 1812;
 
         [Required(ErrorMessage = "Secret tidak boleh kosong.")]
         [Display(Name = "Secret")]
@@ -55,11 +55,16 @@ namespace NRAdmanWebApplicationNet10.ViewModels
         [Required(ErrorMessage = "Router Username tidak boleh kosong.")]
         [Display(Name = "Router Username")]
         [MaxLength(100, ErrorMessage = "Router Username maksimal 100 karakter.")]
-        public string Username { get; set; } = string.Empty;
+        public string Username { get; set; } = "admin";
 
         [Required(ErrorMessage = "Router Password tidak boleh kosong.")]
         [Display(Name = "Router Password")]
         [MaxLength(100, ErrorMessage = "Router Password maksimal 100 karakter.")]
-        public string Password { get; set; } = string.Empty;
+        public string Password { get; set; } = "admin";
+
+        [Required(ErrorMessage = "Router Port tidak boleh kosong.")]
+        [Display(Name = "Router Port")]
+        [Range(1, 65535, ErrorMessage = "Router Port harus antara 1-65535.")]
+        public int? RouterPorts { get; set; } = 22;
     }
 }
