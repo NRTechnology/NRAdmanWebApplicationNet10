@@ -47,24 +47,5 @@ namespace NRAdmanWebApplicationNet10.ViewModels
         [Display(Name = "Description")]
         [MaxLength(255, ErrorMessage = "Description maksimal 255 karakter.")]
         public string? Description { get; set; }
-
-        [Required(ErrorMessage = "Router Type harus dipilih.")]
-        [Display(Name = "Router Type")]
-        public EnumRouterType RouterType { get; set; } = EnumRouterType.Mikrotik;
-
-        [Required(ErrorMessage = "Router Username tidak boleh kosong.")]
-        [Display(Name = "Router Username")]
-        [MaxLength(100, ErrorMessage = "Router Username maksimal 100 karakter.")]
-        public string Username { get; set; } = "admin";
-
-        [Required(ErrorMessage = "Router Password tidak boleh kosong.")]
-        [Display(Name = "Router Password")]
-        [MaxLength(100, ErrorMessage = "Router Password maksimal 100 karakter.")]
-        public string Password { get; set; } = "admin";
-
-        [Required(ErrorMessage = "Router Port tidak boleh kosong.")]
-        [Display(Name = "Router Port")]
-        [Range(1, 65535, ErrorMessage = "Router Port harus antara 1-65535.")]
-        public int? RouterPorts { get; set; } = 22;
     }
 }

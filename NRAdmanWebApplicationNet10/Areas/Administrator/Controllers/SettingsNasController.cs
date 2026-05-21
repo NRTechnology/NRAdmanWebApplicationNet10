@@ -40,9 +40,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 ports = n.Ports,
                 server = n.Server,
                 community = n.Community,
-                description = n.Description,
-                routerType = n.RouterType.ToString(),
-                username = n.Username
+                description = n.Description,                
             }).ToList();
 
             return Json(data);
@@ -74,11 +72,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 Secret = nas.Secret,
                 Server = nas.Server,
                 Community = nas.Community,
-                Description = nas.Description,
-                RouterType = nas.RouterType,
-                Username = nas.Username,
-                Password = nas.Password,
-                RouterPorts = nas.RouterPorts
+                Description = nas.Description,                
             };
 
             return PartialView("../Shared/_Modals/_ModalEditNas", viewModel);
@@ -112,11 +106,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                     Secret = model.Secret,
                     Server = model.Server,
                     Community = model.Community,
-                    Description = model.Description,
-                    RouterType = model.RouterType,
-                    Username = model.Username,
-                    Password = model.Password,
-                    RouterPorts = model.RouterPorts ?? 22
+                    Description = model.Description,                
                 };
 
                 applicationDbContext.Nas.Add(entity);
@@ -169,11 +159,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 entity.Secret = model.Secret;
                 entity.Server = model.Server;
                 entity.Community = model.Community;
-                entity.Description = model.Description;
-                entity.RouterType = model.RouterType;
-                entity.Username = model.Username;
-                entity.Password = model.Password;
-                entity.RouterPorts = model.RouterPorts ?? 22;
+                entity.Description = model.Description;                
 
                 applicationDbContext.Nas.Update(entity);
                 applicationDbContext.SaveChanges();
@@ -225,9 +211,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 Id = nas.Id,
                 NasName = nas.NasName,
                 Server = server,
-                Username = username,
-                Password = nas.Password ?? "",
-                Port = nas.RouterPorts
+                Username = username,                
             };
 
             return PartialView("../Shared/_Modals/_ModalConnectSSH", viewModel);
@@ -235,7 +219,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> TestSSHConnection([FromBody] SSHConnectionRequest request)
+        public async Task<IActionResult> TestSSHConnection(SSHConnectionRequest request)
         {
             try
             {
@@ -262,7 +246,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ExecuteSSHCommand([FromBody] SSHCommandRequest request)
+        public async Task<IActionResult> ExecuteSSHCommand(SSHCommandRequest request)
         {
             try
             {

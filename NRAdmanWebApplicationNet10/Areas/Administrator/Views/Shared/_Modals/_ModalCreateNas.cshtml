@@ -56,31 +56,7 @@
                 <label for="createDescription" class="form-label">Description</label>
                 <textarea asp-for="Description" id="createDescription" name="Description" class="form-control"></textarea>
                 <span class="text-danger" id="error-createDescription"></span>
-            </div>
-
-            <div class="mb-3">
-                <label for="createRouterType" class="form-label">Router Type</label>
-                <select id="createRouterType" class="form-select" asp-for="RouterType" name="RouterType" asp-items="Html.GetEnumSelectList<NRAdmanWebApplicationNet10.Models.EnumRouterType>()"></select>
-                <span class="text-danger" id="error-createRouterType"></span>
-            </div>
-
-            <div class="mb-3">
-                <label for="createUsername" class="form-label">Username</label>
-                <input asp-for="Username" type="text" id="createUsername" name="Username" class="form-control" />
-                <span class="text-danger" id="error-createUsername"></span>
-            </div>
-
-            <div class="mb-3">
-                <label for="createPassword" class="form-label">Password</label>
-                <input asp-for="Password" type="password" id="createPassword" name="Password" class="form-control" />
-                <span class="text-danger" id="error-createPassword"></span>
-            </div>
-
-            <div class="mb-3">
-                <label for="createRouterPort" class="form-label">Router Port</label>
-                <input asp-for="RouterPorts" type="number" id="createRouterPort" name="RouterPorts" class="form-control" />
-                <span class="text-danger" id="error-createRouterPort"></span>
-            </div>
+            </div>            
 
             <div class="d-flex justify-content-end gap-2">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">Cancel</button>
@@ -193,19 +169,7 @@
                 } else if (error.toLowerCase().includes('description')) {
                     $('#error-createDescription').html(error);
                     $('#createDescription').addClass('is-invalid');
-                }  else if (error.toLowerCase().includes('routertype')) {
-                    $('#error-createRouterType').html(error);
-                    $('#createRouterType').addClass('is-invalid');
-                } else if (error.toLowerCase().includes('username')) {
-                    $('#error-editUsername').html(error);
-                    $('#editUsername').addClass('is-invalid');
-                } else if (error.toLowerCase().includes('password')) {
-                    $('#error-editPassword').html(error);
-                    $('#editPassword').addClass('is-invalid');
-                } else if (error.toLowerCase().includes('router port')) {
-                    $('#error-createRouterPorts').html(error);
-                    $('#createRouterPorts').addClass('is-invalid');
-                }
+                }                 
             });
         }
     

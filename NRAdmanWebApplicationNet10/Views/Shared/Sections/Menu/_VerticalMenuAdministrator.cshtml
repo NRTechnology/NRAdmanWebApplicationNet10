@@ -192,6 +192,11 @@
                         <div data-i18n="NAS">NAS</div>
                     </a>
                 </li>
+                <li class='menu-item@(currentPage == "/Administrator/SettingsRouter" ? " active" : "")'>
+                    <a asp-area="Administrator" asp-controller="SettingsRouter" asp-action="Index" class="menu-link">
+                        <div data-i18n="Router">Router</div>
+                    </a>
+                </li>
                 <li class='menu-item@(currentPage == "/Administrator/SettingsUser" ? " active" : "")'>
                     <a asp-area="Administrator" asp-controller="SettingsUser" asp-action="Index" class="menu-link">
                         <div data-i18n="User">User</div>

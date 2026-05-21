@@ -1,0 +1,162 @@
+@{
+    ViewData["Title"] = "Settings Router - Administrator";
+}
+
+@section VendorStyles {
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" />
+}
+
+@section VendorScripts {
+    <script src="~/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+    <script src="~/assets/vendor/libs/jquery-validate/jquery.validate.min.js"></script>
+    <script src="~/assets/vendor/libs/jquery-validate/additional-methods.min.js"></script>
+    <script src="~/assets/vendor/libs/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+}
+
+@section PageScripts {
+    <script>
+        var dataTable;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            dataTable = new DataTable(document.querySelector('#datatable'), {
+                ajax: {
+                    url: '@Url.Action("GetJsonResult", "SettingsRouter", new { area = "Administrator" })',
+                    dataSrc: ''
+                },
+                layout: {
+                    topStart: {
+                        rowClass: 'row mx-3 my-0 justify-content-between',
+                        features: [
+                            {
+                                pageLength: {
+                                    menu: [7, 10, 25, 50, 100],
+                                    text: 'Show_MENU_entries'
+                                }
+                            }
+                        ]
+                    },
+                    topEnd: {
+                        search: {
+                            placeholder: ''
+                        }
+                    },
+                    bottomStart: {
+                        rowClass: 'row mx-3 justify-content-between',
+                        features: ['info']
+                    },
+                    bottomEnd: 'paging'
+                },
+                language: {
+                    paginate: {
+                        next: '<i class="icon-base ti tabler-chevron-right scaleX-n1-rtl icon-18px"></i>',
+                        previous: '<i class="icon-base ti tabler-chevron-left scaleX-n1-rtl icon-18px"></i>',
+                        first: '<i class="icon-base ti tabler-chevrons-left scaleX-n1-rtl icon-18px"></i>',
+                        last: '<i class="icon-base ti tabler-chevrons-right scaleX-n1-rtl icon-18px"></i>'
+                    }
+                },
+                columns: [
+                    { data: 'routerType', title: 'Router Type' },
+                    { data: 'ipAddress', title: 'IP Address' },
+                    { data: 'username', title: 'Username' },
+                    { data: 'ports', title: 'SSH Port' },
+                    { data: 'id', title: 'Actions', orderable: false, render: function(data, type, row) {
+                        return `<button class="btn btn-sm btn-primary btn-edit-router" data-id="${data}" style="margin-right: 5px;">Edit</button>
+                                <button class="btn btn-sm btn-danger btn-delete-router" data-id="${data}">Delete</button>`;
+                    }}
+                ],
+                responsive: true
+            });
+
+            // Store dataTable reference globally for use in modal
+            window.dataTable = dataTable;
+
+            // Handle Add New button click
+            $(document).on('click', '#btn-add-router', function() {
+                $.get('@Url.Action("CreateModal", "SettingsRouter", new { area = "Administrator" })', function(html) {
+                    $('#createModalContainer').html(html);
+                    var offcanvas = new bootstrap.Offcanvas(document.getElementById('offcanvasCreateRouter'));
+                    offcanvas.show();
+                });
+            });
+
+            // Handle Edit button click
+            $(document).on('click', '.btn-edit-router', function() {
+                var routerId = $(this).data('id');
+                $.get('@Url.Action("EditModal", "SettingsRouter", new { area = "Administrator" })?' + $.param({ id: routerId }), function(html) {
+                    $('#editModalContainer').html(html);
+                    var offcanvas = new bootstrap.Offcanvas(document.getElementById('offcanvasEditRouter'));
+                    offcanvas.show();
+                });
+            });
+
+            // Handle Delete button click
+            $(document).on('click', '.btn-delete-router', function() {
+                var routerId = $(this).data('id');
+                if (confirm('Apakah Anda yakin ingin menghapus router ini?')) {
+                    $.ajax({
+                        url: '@Url.Action("Delete", "SettingsRouter", new { area = "Administrator" })/' + routerId,
+                        type: 'POST',
+                        headers: {
+                            'X-CSRF-Token': $('[name="__RequestVerificationToken"]').val()
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                ToastHelper.success(response.message);
+                                dataTable.ajax.reload();
+                            } else {
+                                ToastHelper.error('Error: ' + response.message);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            ToastHelper.error('Terjadi kesalahan saat menghapus data.');
+                            console.error('Error:', error);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}
+
+<div class="card">
+    <!-- HEADER -->
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2 border-bottom">
+        <h5 class="mb-0">List Router</h5>
+
+        <button type="button" class="btn btn-primary" id="btn-add-router">
+            <span class="d-flex align-items-center gap-2">
+                <i class="icon-base ti tabler-plus icon-sm"></i>
+                <span class="d-none d-sm-inline-block">
+                    Add New Router
+                </span>
+            </span>
+        </button>
+    </div>
+
+    <!-- TABLE -->
+    <div class="card-datatable table-responsive">
+        <table id="datatable"
+               class="datatables-ajax table table-bordered table-striped">
+
+            <thead>
+            <tr>
+                <th>Router Type</th>
+                <th>IP Address</th>
+                <th>Username</th>
+                <th>SSH Port</th>
+                <th width="200">Actions</th>
+            </tr>
+            </thead>
+
+            <tbody></tbody>
+
+        </table>
+    </div>
+</div>
+
+<!-- Container untuk Create Modal -->
+<div id="createModalContainer"></div>
+
+<!-- Container untuk Edit Modal -->
+<div id="editModalContainer"></div>

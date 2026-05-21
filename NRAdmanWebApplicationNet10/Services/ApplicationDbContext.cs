@@ -34,6 +34,8 @@ namespace NRAdmanWebApplicationNet10.Services
 
         public DbSet<Customer> Customers => Set<Customer>();
 
+        public DbSet<Router> Routers => Set<Router>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -52,6 +54,12 @@ namespace NRAdmanWebApplicationNet10.Services
                     .HasForeignKey(e => e.NasId)
                     .OnDelete(DeleteBehavior.Cascade);
                 entity.HasIndex(e => new { e.NasId, e.QueueName }, "idx_nas_queue_name").IsUnique();
+            });
+
+            modelBuilder.Entity<Router>(entity =>
+            {
+                entity.ToTable("routers");
+                entity.HasIndex(e => e.Id, "RouterId_index_unique").IsUnique();
             });
         }
     }

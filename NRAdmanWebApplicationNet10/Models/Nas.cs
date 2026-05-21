@@ -53,27 +53,5 @@ namespace NRAdmanWebApplicationNet10.Models
         [MaxLength(255)]
         [Display(Name = "Description")]
         public string? Description { get; set; }
-
-        [Column("routertype")] 
-        [Required]
-        [Display(Name = "Router Type")]
-        public EnumRouterType RouterType { get; set; }
-
-        [Column("routerusername")]
-        [Required]
-        [MaxLength(100)]
-        [Display(Name = "Router Username")]
-        public string Username { get; set; } = "admin";
-
-        [Column("routerpassword")]
-        [Required]
-        [MaxLength(100)]
-        [Display(Name = "Router Password")]
-        public string Password { get; set; } = "admin";
-
-        [Column("routerports")]
-        [Required]
-        [Display(Name = "Router Port")]
-        public int RouterPorts { get; set; } = 22;
     }
 }
