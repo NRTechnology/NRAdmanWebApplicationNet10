@@ -8,7 +8,7 @@ namespace NRAdmanWebApplicationNet10.Models
     {
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
-                
+
         [Required]
         [Display(Name = "Router Type")]
         public EnumRouterType RouterType { get; set; }
@@ -31,5 +31,15 @@ namespace NRAdmanWebApplicationNet10.Models
         [Required]
         [Display(Name = "Router Port")]
         public int Ports { get; set; } = 22;
+
+        [MaxLength(255)]
+        [Display(Name = "Description")]
+        public string? Description { get; set; }
+
+        [Display(Name = "Created Date")]
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+
+        [Display(Name = "Last Modified Date")]
+        public DateTime? LastModifiedDate { get; set; }
     }
 }

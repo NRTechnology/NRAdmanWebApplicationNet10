@@ -32,5 +32,9 @@ namespace NRAdmanWebApplicationNet10.ViewModels
         [Display(Name = "Router Port")]
         [Range(1, 65535, ErrorMessage = "Router Port harus antara 1-65535.")]
         public int Ports { get; set; } = 22;
+
+        [Display(Name = "Description")]
+        [MaxLength(255, ErrorMessage = "Description maksimal 255 karakter.")]
+        public string? Description { get; set; }
     }
 }

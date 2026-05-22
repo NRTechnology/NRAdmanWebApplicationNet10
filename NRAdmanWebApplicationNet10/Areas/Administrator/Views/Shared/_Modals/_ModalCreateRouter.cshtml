@@ -12,38 +12,39 @@
 
             <div class="mb-3">
                 <label for="createRouterType" class="form-label">Router Type</label>
-                <select id="createRouterType" name="RouterType" class="form-select">
-                    <option value="0">MikroTik</option>
-                    <option value="1">Cisco</option>
-                    <option value="2">Juniper</option>
-                    <option value="3">Other</option>
-                </select>
+                <select id="createRouterType" class="form-select" asp-for="RouterType" name="RouterType" asp-items="Html.GetEnumSelectList<NRAdmanWebApplicationNet10.Models.EnumRouterType>()"></select>                
                 <span class="text-danger" id="error-createRouterType"></span>
             </div>
 
             <div class="mb-3">
                 <label for="createIpAddress" class="form-label">IP Address</label>
-                <input type="text" id="createIpAddress" name="IpAddress" class="form-control" placeholder="192.168.1.1" />
+                <input asp-for="IpAddress" type="text" id="createIpAddress" name="IpAddress" class="form-control" placeholder="192.168.1.1" />
                 <span class="text-danger" id="error-createIpAddress"></span>
                 <span class="form-text">Pastikan IP Address unik.</span>
             </div>
 
             <div class="mb-3">
                 <label for="createUsername" class="form-label">Username</label>
-                <input type="text" id="createUsername" name="Username" class="form-control" value="admin" />
+                <input asp-for="Username" type="text" id="createUsername" name="Username" class="form-control" value="admin" />
                 <span class="text-danger" id="error-createUsername"></span>
             </div>
 
             <div class="mb-3">
                 <label for="createPassword" class="form-label">Password</label>
-                <input type="password" id="createPassword" name="Password" class="form-control" value="admin" />
+                <input asp-for="Password" type="password" id="createPassword" name="Password" class="form-control" value="admin" />
                 <span class="text-danger" id="error-createPassword"></span>
             </div>
 
             <div class="mb-3">
                 <label for="createRouterPorts" class="form-label">SSH Port</label>
-                <input type="number" id="createRouterPorts" name="RouterPorts" class="form-control" value="22" />
-                <span class="text-danger" id="error-createRouterPorts"></span>
+                <input asp-for="Ports" type="number" id="createRouterPorts" name="Ports" class="form-control" value="22" />
+                <span class="text-danger" id="error-createPorts"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="createDescription" class="form-label">Description</label>
+                <textarea asp-for="Description" id="createDescription" name="Description" class="form-control" rows="2" placeholder="e.g., Main office router, Secondary router, etc."></textarea>
+                <span class="text-danger" id="error-createDescription"></span>
             </div>
 
             <div class="d-flex justify-content-end gap-2">
@@ -58,7 +59,7 @@
     $(function() {
         $('#form-create-router').on('submit', function(e) {
             e.preventDefault();
-            clearFieldErrors('create');
+            clearFieldErrors();
 
             var form = $(this);
             var formData = form.serialize();
@@ -88,7 +89,7 @@
                         let errorMessage = response.message;
                         if (response.errors && response.errors.length > 0) {
                             ToastHelper.error(response.errors.join('\n'));
-                            displayFieldErrors('create', response.errors);
+                            displayFieldErrors(response.errors);
                         } else {
                             ToastHelper.error(errorMessage);
                         }
@@ -117,37 +118,36 @@
         });
     });
 
-    function clearFieldErrors(prefix = '') {
-        const selector = prefix ? `#form-${prefix}-router` : '#form-create-router';
-        $(selector + ' .text-danger').html('');
-        $(selector + ' .form-control').removeClass('is-invalid');
-        $(selector + ' .form-select').removeClass('is-invalid');
-        $(selector + ' .form-check-input').removeClass('is-invalid');
+    function clearFieldErrors() {
+      $('#form-create-router .text-danger').html('');
+        $('#form-create-router .form-control').removeClass('is-invalid');
+        $('#form-create-router .form-select').removeClass('is-invalid');
+        $('#form-create-router .form-check-input').removeClass('is-invalid');
     }
 
-    function displayFieldErrors(prefix, errors) {
-        clearFieldErrors(prefix);
+    function displayFieldErrors(errors) {
+        clearFieldErrors();
 
-        const fieldPrefix = prefix === 'create' ? 'create' : 'edit';
-        errors.forEach(function(error) {
-            const lowerError = error.toLowerCase();
-
-            if (lowerError.includes('ip address')) {
-                $('#error-' + fieldPrefix + 'IpAddress').html(error);
-                $('#' + fieldPrefix + 'IpAddress').addClass('is-invalid');
+            errors.forEach(function(error) {
+                const lowerError = error.toLowerCase();
+                console.log(error);
+                // Try to match error to field
+                if (lowerError.includes('ip address')) {
+                $('#error-createIpAddress').html(error);
+                $('#createIpAddress').addClass('is-invalid');
             } else if (lowerError.includes('username')) {
-                $('#error-' + fieldPrefix + 'Username').html(error);
-                $('#' + fieldPrefix + 'Username').addClass('is-invalid');
+                $('#error-createUsername').html(error);
+                $('#createUsername').addClass('is-invalid');
             } else if (lowerError.includes('password')) {
-                $('#error-' + fieldPrefix + 'Password').html(error);
-                $('#' + fieldPrefix + 'Password').addClass('is-invalid');
+                $('#error-createPassword').html(error);
+                $('#createPassword').addClass('is-invalid');
             } else if (lowerError.includes('port')) {
-                $('#error-' + fieldPrefix + 'RouterPorts').html(error);
-                $('#' + fieldPrefix + 'RouterPorts').addClass('is-invalid');
+                $('#error-createRouterPorts').html(error);
+                $('#createRouterPorts').addClass('is-invalid');
             } else if (lowerError.includes('router type')) {
-                $('#error-' + fieldPrefix + 'RouterType').html(error);
-                $('#' + fieldPrefix + 'RouterType').addClass('is-invalid');
+                $('#error-createRouterType').html(error);
+                $('#createRouterType').addClass('is-invalid');
             }
-        });
+       });
     }
 </script>

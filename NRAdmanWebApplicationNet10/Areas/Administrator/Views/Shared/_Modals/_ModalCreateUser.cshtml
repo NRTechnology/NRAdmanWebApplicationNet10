@@ -160,17 +160,19 @@
             clearFieldErrors();
 
             errors.forEach(function(error) {
+                const lowerError = error.toLowerCase();
+                console.log(error);
                 // Try to match error to field
-                if (error.toLowerCase().includes('username')) {
+                if (lowerError.includes('username')) {
                     $('#error-createUserName').html(error);
                     $('#createUserName').addClass('is-invalid');
-                } else if (error.toLowerCase().includes('email')) {
+                } else if (lowerError.includes('email')) {
                     $('#error-createEmail').html(error);
                     $('#createEmail').addClass('is-invalid');
-                } else if (error.toLowerCase().includes('phone')) {
+                } else if (lowerError.includes('phone')) {
                     $('#error-createPhoneNumber').html(error);
                     $('#createPhoneNumber').addClass('is-invalid');
-                } else if (error.toLowerCase().includes('password')) {
+                } else if (lowerError.includes('password')) {
                     $('#error-createPassword').html(error);
                     $('#createPassword').addClass('is-invalid');
                     $('#error-createConfirmPassword').html(error);

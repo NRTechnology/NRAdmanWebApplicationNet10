@@ -143,30 +143,31 @@
             clearFieldErrors();
 
             errors.forEach(function(error) {
-                console.log(error)
+                const lowerError = error.toLowerCase();
+                console.log(error);
                 // Try to match error to field
-                if (error.toLowerCase().includes('nas name')) {
+                if (lowerError.includes('nas name')) {
                     $('#error-createNasName').html(error);
                     $('#createNasName').addClass('is-invalid');                    
-                } else if (error.toLowerCase().includes('short name')) {
+                } else if (lowerError.includes('short name')) {
                     $('#error-createShortName').html(error);
                     $('#createShortName').addClass('is-invalid');
-                } else if (error.toLowerCase().includes('type')) {
+                } else if (lowerError.includes('type')) {
                     $('#error-createType').html(error);
                     $('#createType').addClass('is-invalid');
-                } else if (error.toLowerCase().includes('port')) {
+                } else if (lowerError.includes('port')) {
                     $('#error-createPorts').html(error);
                     $('#createPorts').addClass('is-invalid');
-                } else if (error.toLowerCase().includes('secret')) {
+                } else if (lowerError.includes('secret')) {
                     $('#error-createSecret').html(error);
                     $('#createSecret').addClass('is-invalid');                    
-                }  else if (error.toLowerCase().includes('server')) {
+                }  else if (lowerError.includes('server')) {
                     $('#error-createServer').html(error);
                     $('#createServer').addClass('is-invalid');
-                } else if (error.toLowerCase().includes('community')) {
+                } else if (lowerError.includes('community')) {
                     $('#error-createCommunity').html(error);
                     $('#createCommunity').addClass('is-invalid');
-                } else if (error.toLowerCase().includes('description')) {
+                } else if (lowerError.includes('description')) {
                     $('#error-createDescription').html(error);
                     $('#createDescription').addClass('is-invalid');
                 }                 

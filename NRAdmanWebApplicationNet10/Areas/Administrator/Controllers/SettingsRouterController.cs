@@ -28,7 +28,9 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                     routerType = r.RouterType.ToString(),
                     ipAddress = r.IpAddress,
                     username = r.Username,
-                    ports = r.Ports
+                    ports = r.Ports,
+                    description = r.Description,
+                    createdDate = r.CreatedDate.ToString("yyyy-MM-dd HH:mm:ss")
                 }).ToList();
 
                 return Json(data);
@@ -85,7 +87,8 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 IpAddress = router.IpAddress,
                 Username = router.Username,
                 Password = router.Password,
-                Ports = router.Ports
+                Ports = router.Ports,
+                Description = router.Description
             };
 
             return PartialView("../Shared/_Modals/_ModalEditRouter", viewModel);
@@ -118,7 +121,9 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                     IpAddress = model.IpAddress,
                     Username = model.Username,
                     Password = model.Password,
-                    Ports = model.Ports
+                    Ports = model.Ports,
+                    Description = model.Description,
+                    CreatedDate = DateTime.UtcNow
                 };
 
                 applicationDbContext.Routers.Add(router);
@@ -136,16 +141,12 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Update(string id, RouterViewModel model)
+        public IActionResult Update(Guid id, RouterViewModel model)
         {
-            if (!Guid.TryParse(id, out var routerId))
+            // Remove password validation if password is empty (optional on edit)
+            if (string.IsNullOrEmpty(model.Password))
             {
-                return Json(new { success = false, message = "ID router tidak valid." });
-            }
-
-            if (routerId != model.Id)
-            {
-                return Json(new { success = false, message = "ID tidak sesuai." });
+                ModelState.Remove("Password");
             }
 
             if (!ModelState.IsValid)
@@ -158,14 +159,14 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
 
             try
             {
-                var router = applicationDbContext.Routers.FirstOrDefault(r => r.Id == routerId);
+                var router = applicationDbContext.Routers.FirstOrDefault(r => r.Id == id);
                 if (router == null)
                 {
                     return Json(new { success = false, message = "Router tidak ditemukan." });
                 }
 
                 // Check if IP Address is unique (exclude current router)
-                var existingRouter = applicationDbContext.Routers.FirstOrDefault(r => r.IpAddress == model.IpAddress && r.Id != routerId);
+                var existingRouter = applicationDbContext.Routers.FirstOrDefault(r => r.IpAddress == model.IpAddress && r.Id != id);
                 if (existingRouter != null)
                 {
                     return Json(new { success = false, message = "IP Address sudah digunakan oleh router lain." });
@@ -174,8 +175,15 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 router.RouterType = model.RouterType;
                 router.IpAddress = model.IpAddress;
                 router.Username = model.Username;
-                router.Password = model.Password;
                 router.Ports = model.Ports;
+                router.Description = model.Description;
+                router.LastModifiedDate = DateTime.UtcNow;
+
+                // Update password if provided
+                if (!string.IsNullOrEmpty(model.Password))
+                {
+                    router.Password = model.Password;
+                }
 
                 applicationDbContext.SaveChanges();
 
@@ -191,16 +199,16 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(string id)
+        public IActionResult Delete(Guid id)
         {
-            if (!Guid.TryParse(id, out var routerId))
+            if (id == Guid.Empty)
             {
                 return Json(new { success = false, message = "ID router tidak valid." });
             }
 
             try
             {
-                var router = applicationDbContext.Routers.FirstOrDefault(r => r.Id == routerId);
+                var router = applicationDbContext.Routers.FirstOrDefault(r => r.Id == id);
                 if (router == null)
                 {
                     return Json(new { success = false, message = "Router tidak ditemukan." });

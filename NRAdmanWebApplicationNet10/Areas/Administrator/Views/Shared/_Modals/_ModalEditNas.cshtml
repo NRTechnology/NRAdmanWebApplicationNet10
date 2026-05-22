@@ -146,29 +146,31 @@
         clearFieldErrors();
 
         errors.forEach(function(error) {
+             const lowerError = error.toLowerCase();
+                console.log(error);
             // Try to match error to field
-            if (error.toLowerCase().includes('nas name')) {
+            if (lowerError.includes('nas name')) {
                 $('#error-editNasName').html(error);
                 $('#editNasName').addClass('is-invalid');
-            } else if (error.toLowerCase().includes('short name')) {
+            } else if (lowerError.includes('short name')) {
                 $('#error-editShortName').html(error);
                 $('#editShortName').addClass('is-invalid');
-            } else if (error.toLowerCase().includes('type')) {
+            } else if (lowerError.includes('type')) {
                 $('#error-editType').html(error);
                 $('#editType').addClass('is-invalid');
-            } else if (error.toLowerCase().includes('ports')) {
+            } else if (lowerError.includes('ports')) {
                 $('#error-editPorts').html(error);
                 $('#editPorts').addClass('is-invalid');
-            } else if (error.toLowerCase().includes('secret')) {
+            } else if (lowerError.includes('secret')) {
                 $('#error-editSecret').html(error);
                 $('#editSecret').addClass('is-invalid');
-            } else if (error.toLowerCase().includes('server')) {
+            } else if (lowerError.includes('server')) {
                 $('#error-editServer').html(error);
                 $('#editServer').addClass('is-invalid');
-            } else if (error.toLowerCase().includes('community')) {
+            } else if (lowerError.includes('community')) {
                 $('#error-editCommunity').html(error);
                 $('#editCommunity').addClass('is-invalid');
-            } else if (error.toLowerCase().includes('description')) {
+            } else if (lowerError.includes('description')) {
                 $('#error-editDescription').html(error);
                 $('#editDescription').addClass('is-invalid');
             } 

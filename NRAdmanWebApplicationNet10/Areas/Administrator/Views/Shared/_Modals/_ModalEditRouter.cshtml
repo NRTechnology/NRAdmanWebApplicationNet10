@@ -6,7 +6,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
-        <form id="form-edit-router-modal">
+        <form id="form-edit-router">
             @Html.AntiForgeryToken()
             <div class="text-danger mb-3" id="form-edit-error-summary"></div>
 
@@ -14,38 +14,39 @@
 
             <div class="mb-3">
                 <label for="editRouterType" class="form-label">Router Type</label>
-                <select id="editRouterType" name="RouterType" class="form-select">
-                    <option value="0">MikroTik</option>
-                    <option value="1">Cisco</option>
-                    <option value="2">Juniper</option>
-                    <option value="3">Other</option>
-                </select>
+                <select id="createRouterType" class="form-select" asp-for="RouterType" name="RouterType" asp-items="Html.GetEnumSelectList<NRAdmanWebApplicationNet10.Models.EnumRouterType>()"></select>                
                 <span class="text-danger" id="error-editRouterType"></span>
             </div>
 
             <div class="mb-3">
                 <label for="editIpAddress" class="form-label">IP Address</label>
-                <input type="text" id="editIpAddress" name="IpAddress" class="form-control" value="@Model.IpAddress" />
+                <input asp-for="IpAddress" type="text" id="editIpAddress" name="IpAddress" class="form-control" />
                 <span class="text-danger" id="error-editIpAddress"></span>
                 <span class="form-text">Pastikan IP Address unik.</span>
             </div>
 
             <div class="mb-3">
                 <label for="editUsername" class="form-label">Username</label>
-                <input type="text" id="editUsername" name="Username" class="form-control" value="@Model.Username" />
+                <input asp-for="Username" type="text" id="editUsername" name="Username" class="form-control" />
                 <span class="text-danger" id="error-editUsername"></span>
             </div>
 
             <div class="mb-3">
                 <label for="editPassword" class="form-label">Password</label>
-                <input type="password" id="editPassword" name="Password" class="form-control" value="@Model.Password" />
+                <input asp-for="Password" type="password" id="editPassword" name="Password" class="form-control" />
                 <span class="text-danger" id="error-editPassword"></span>
             </div>
 
             <div class="mb-3">
                 <label for="editRouterPorts" class="form-label">SSH Port</label>
-                <input type="number" id="editRouterPorts" name="Ports" class="form-control" value="@Model.Ports" />
+                <input asp-for="Ports" type="number" id="editRouterPorts" name="Ports" class="form-control" />
                 <span class="text-danger" id="error-editRouterPorts"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="editDescription" class="form-label">Description</label>
+                <textarea asp-for="Description" id="editDescription" name="Description" class="form-control" rows="2" placeholder="e.g., Main office router, Secondary router, etc."></textarea>
+                <span class="text-danger" id="error-editDescription"></span>
             </div>
 
             <div class="d-flex justify-content-end gap-2">
@@ -61,7 +62,7 @@
         // Set the router type on load
         $('#editRouterType').val((Model.RouterType).toString());
 
-        $('#form-edit-router-modal').on('submit', function(e) {
+        $('#form-edit-router').on('submit', function(e) {
             e.preventDefault();
 
             var form = $(this);
@@ -123,35 +124,34 @@
     });
 
     function clearFieldErrors(prefix = '') {
-        const selector = prefix ? `#form-${prefix}-router-modal` : '#form-edit-router-modal';
-        $(selector + ' .text-danger').html('');
-        $(selector + ' .form-control').removeClass('is-invalid');
-        $(selector + ' .form-select').removeClass('is-invalid');
-        $(selector + ' .form-check-input').removeClass('is-invalid');
+        $('#form-edit-router .text-danger').html('');
+        $('#form-edit-router .form-control').removeClass('is-invalid');
+        $('#form-edit-router .form-select').removeClass('is-invalid');
+        $('#form-edit-router .form-check-input').removeClass('is-invalid');        
     }
 
-    function displayFieldErrors(prefix, errors) {
-        clearFieldErrors(prefix);
-
-        const fieldPrefix = prefix === 'create' ? 'create' : 'edit';
+    function displayFieldErrors(errors) {
+        clearFieldErrors();
+                
         errors.forEach(function(error) {
             const lowerError = error.toLowerCase();
-
+            console.log(error);
+            // Try to match error to field
             if (lowerError.includes('ip address')) {
-                $('#error-' + fieldPrefix + 'IpAddress').html(error);
-                $('#' + fieldPrefix + 'IpAddress').addClass('is-invalid');
+                $('#error-editIpAddress').html(error);
+                $('#editIpAddress').addClass('is-invalid');
             } else if (lowerError.includes('username')) {
-                $('#error-' + fieldPrefix + 'Username').html(error);
-                $('#' + fieldPrefix + 'Username').addClass('is-invalid');
+                $('#error-editUsername').html(error);
+                $('#editUsername').addClass('is-invalid');
             } else if (lowerError.includes('password')) {
-                $('#error-' + fieldPrefix + 'Password').html(error);
-                $('#' + fieldPrefix + 'Password').addClass('is-invalid');
+                $('#error-editPassword').html(error);
+                $('#editPassword').addClass('is-invalid');
             } else if (lowerError.includes('port')) {
-                $('#error-' + fieldPrefix + 'RouterPorts').html(error);
-                $('#' + fieldPrefix + 'RouterPorts').addClass('is-invalid');
+                $('#error-editRouterPorts').html(error);
+                $('#editRouterPorts').addClass('is-invalid');
             } else if (lowerError.includes('router type')) {
-                $('#error-' + fieldPrefix + 'RouterType').html(error);
-                $('#' + fieldPrefix + 'RouterType').addClass('is-invalid');
+                $('#error-editRouterType').html(error);
+                $('#editRouterType').addClass('is-invalid');
             }
         });
     }

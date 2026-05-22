@@ -60,6 +60,8 @@
                     { data: 'ipAddress', title: 'IP Address' },
                     { data: 'username', title: 'Username' },
                     { data: 'ports', title: 'SSH Port' },
+                    { data: 'description', title: 'Description' },
+                    { data: 'createdDate', title: 'Created' },
                     { data: 'id', title: 'Actions', orderable: false, render: function(data, type, row) {
                         return `<button class="btn btn-sm btn-primary btn-edit-router" data-id="${data}" style="margin-right: 5px;">Edit</button>
                                 <button class="btn btn-sm btn-danger btn-delete-router" data-id="${data}">Delete</button>`;
@@ -98,7 +100,7 @@
                         url: '@Url.Action("Delete", "SettingsRouter", new { area = "Administrator" })/' + routerId,
                         type: 'POST',
                         headers: {
-                            'X-CSRF-Token': $('[name="__RequestVerificationToken"]').val()
+                            'RequestVerificationToken': $('[name="__RequestVerificationToken"]').val()
                         },
                         success: function(response) {
                             if (response.success) {
@@ -118,7 +120,7 @@
         });
     </script>
 }
-
+@Html.AntiForgeryToken()
 <div class="card">
     <!-- HEADER -->
     <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2 border-bottom">
@@ -145,6 +147,8 @@
                 <th>IP Address</th>
                 <th>Username</th>
                 <th>SSH Port</th>
+                <th>Description</th>
+                <th>Created</th>
                 <th width="200">Actions</th>
             </tr>
             </thead>
