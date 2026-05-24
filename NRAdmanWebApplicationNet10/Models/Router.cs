@@ -7,11 +7,17 @@ namespace NRAdmanWebApplicationNet10.Models
     public class Router
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; } = Guid.NewGuid();
 
         [Required]
         [Display(Name = "Router Type")]
         public EnumRouterType RouterType { get; set; }
+
+        [Required]
+        [MaxLength(255)]
+        [Display(Name = "Router Name")]
+        public string Name { get; set; } = "";
 
         [Required]
         [MaxLength(19)]        

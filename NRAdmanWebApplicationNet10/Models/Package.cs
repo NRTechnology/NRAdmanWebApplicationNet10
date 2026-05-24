@@ -8,48 +8,42 @@ namespace NRAdmanWebApplicationNet10.Models
     public class Package
     {
         [Key]
-        [Column("id")]
-        public int Id { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Id { get; set; }
 
         [Required]
         [MaxLength(32)]
-        [Column("code")]
         public string Code { get; set; } = string.Empty;
 
         [Required]
         [MaxLength(100)]
-        [Column("name")]
         public string Name { get; set; } = string.Empty;
 
         [MaxLength(255)]
-        [Column("description")]
         public string? Description { get; set; }
 
         // Example: 1M/1M
         [Required]
         [MaxLength(64)]
-        [Column("rate_limit")]
         public string RateLimit { get; set; } = string.Empty;
 
         // in seconds
-        [Column("session_timeout")]
-        public int SessionTimeout { get; set; }
+        [Required] 
+        public int SessionTimeout { get; set; } = 0;
 
         // in seconds
-        [Column("idle_timeout")]
         public int? IdleTimeout { get; set; }
 
         // total quota in MB
-        [Column("quota_mb")]
         public long? QuotaMb { get; set; }
 
-        [Column("price")]
-        public decimal Price { get; set; }
+        [Required] 
+        public decimal Price { get; set; } = 0;
 
-        [Column("is_active")]
+        [Required]
         public bool IsActive { get; set; } = true;
 
-        [Column("created_at")]
+        [Required]
         public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     }
 }

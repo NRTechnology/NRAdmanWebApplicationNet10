@@ -1,6 +1,6 @@
 namespace NRAdmanWebApplicationNet10.ViewModels
 {
-    public class SSHConnectionRequest
+    public class SshConnectionRequest
     {
         public string Server { get; set; } = "";
         public int Port { get; set; } = 22;
@@ -8,7 +8,7 @@ namespace NRAdmanWebApplicationNet10.ViewModels
         public string Password { get; set; } = "";
     }
 
-    public class SSHCommandRequest
+    public class SshCommandRequest
     {
         public string Server { get; set; } = "";
         public int Port { get; set; } = 22;

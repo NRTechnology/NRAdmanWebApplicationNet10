@@ -13,11 +13,11 @@
             <input type="hidden" id="editModalQueueId" name="Id" value="@Model.Id" />
 
             <div class="mb-3">
-                <label for="editNasId" class="form-label">NAS</label>
-                <select asp-for="NasId" asp-items="ViewBag.NasOptions" id="editNasId" name="NasId" class="form-select">
-                    <option value="">-- Pilih NAS --</option>
+                <label for="editRouterId" class="form-label">Router</label>
+                <select asp-for="RouterId" asp-items="ViewBag.RouterOptions" id="editRouterId" name="RouterId" class="form-select">
+                    <option value="">-- Pilih Router --</option>
                 </select>
-                <span class="text-danger" id="error-editNasId"></span>
+                <span class="text-danger" id="error-editRouterId"></span>
             </div>
             
             <div class="mb-3">
@@ -198,9 +198,9 @@
 
         errors.forEach(function(error) {
             // Try to match error to field
-            if (error.toLowerCase().includes('nasid')) {
-                $('#error-editNasId').html(error);
-                $('#editNasId').addClass('is-invalid');
+            if (error.toLowerCase().includes('routerid')) {
+                $('#error-editRouterId').html(error);
+                $('#editRouterId').addClass('is-invalid');
             } else if (error.toLowerCase().includes('queuename')) {
                 $('#error-editQueueName').html(error);
                 $('#editQueueName').addClass('is-invalid');

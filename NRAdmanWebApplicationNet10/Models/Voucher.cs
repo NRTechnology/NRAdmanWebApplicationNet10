@@ -8,38 +8,35 @@ namespace NRAdmanWebApplicationNet10.Models
     public class Voucher
     {
         [Key]
-        [Column("id")]
-        public int Id { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Id { get; set; }
 
         [Required]
         [MaxLength(64)]
-        [Column("code")]
         public string Code { get; set; } = string.Empty;
 
         [Required]
         [ForeignKey(nameof(Package))]
-        [Column("package_id")]
-        public int PackageId { get; set; }
+        public Guid PackageId { get; set; }
 
-        public Package? Package { get; set; }
+        public virtual Package? Package { get; set; }
 
-        [Column("validity_days")]
-        public int ValidityDays { get; set; }
+        [Required] public int ValidityDays { get; set; } = 0;
 
-        [Column("max_devices")]
+        [Required]
         public int MaxDevices { get; set; } = 1;
 
-        [Column("is_used")]
-        public bool IsUsed { get; set; }
+        [Required]
+        public bool IsUsed { get; set; } = false;
 
-        [Column("used_at")]
+        [Required]
         public DateTimeOffset? UsedAt { get; set; }
 
+        [Required]
         [MaxLength(64)]
-        [Column("used_by")]
-        public string? UsedBy { get; set; }
+        public string? UsedBy { get; set; } = string.Empty;
 
-        [Column("created_at")]
+        [Required]
         public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     }
 }

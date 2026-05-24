@@ -25,14 +25,14 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
             try
             {
                 var data = applicationDbContext.MikrotikSimpleQueues
-                    .Join(applicationDbContext.Nas,
-                        queue => queue.NasId,
-                        nas => nas.Id,
-                        (queue, nas) => new
+                    .Join(applicationDbContext.Routers,
+                        queue => queue.RouterId,
+                        router => router.Id,
+                        (queue, router) => new
                         {
                             id = queue.Id,
-                            nasId = queue.NasId,
-                            nasName = nas.NasName,
+                            routerId = queue.RouterId,
+                            routerName = router.Name,
                             queueName = queue.QueueName,
                             targetAddress = queue.TargetAddress,
                             parent = queue.Parent,
@@ -76,7 +76,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> EditModal(int id)
+        public async Task<IActionResult> EditModal(Guid id)
         {
             var queue = applicationDbContext.MikrotikSimpleQueues.FirstOrDefault(q => q.Id == id);
             if (queue == null)
@@ -96,8 +96,8 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
             var viewModel = new MikrotikSimpleQueueViewModel
             {
                 Id = queue.Id,
-                NasId = queue.NasId,
-                NasName = applicationDbContext.Nas.FirstOrDefault(n => n.Id == queue.NasId)?.NasName,
+                RouterId = queue.RouterId,
+                RouterName = applicationDbContext.Routers.FirstOrDefault(r => r.Id == queue.RouterId)?.Name,
                 QueueName = queue.QueueName,
                 TargetAddress = queue.TargetAddress,
                 Parent = queue.Parent,
@@ -125,18 +125,18 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 return Json(new { success = false, message = "Validasi gagal.", errors = errorList });
             }
 
-            // Check if queue name already exists for this NAS
+            // Check if queue name already exists for this Router
             if (applicationDbContext.MikrotikSimpleQueues.Any(q => 
-                q.NasId == model.NasId && q.QueueName == model.QueueName))
+                q.RouterId == model.RouterId && q.QueueName == model.QueueName))
             {
-                return Json(new { success = false, message = "Queue Name sudah ada untuk NAS ini." });
+                return Json(new { success = false, message = "Queue Name sudah ada untuk Router ini." });
             }
 
             try
             {
                 var entity = new MikrotikSimpleQueue
                 {
-                    NasId = model.NasId,
+                    RouterId = model.RouterId,
                     QueueName = model.QueueName,
                     TargetAddress = model.TargetAddress,
                     Parent = model.Parent,
@@ -156,8 +156,8 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 applicationDbContext.MikrotikSimpleQueues.Add(entity);
                 applicationDbContext.SaveChanges();
 
-                logger.LogInformation("Queue {QueueName} berhasil dibuat untuk NAS ID {NasId} oleh {AdminUser}", 
-                    model.QueueName, model.NasId, User.Identity?.Name);
+                logger.LogInformation("Queue {QueueName} berhasil dibuat untuk Router ID {RouterId} oleh {AdminUser}", 
+                    model.QueueName, model.RouterId, User.Identity?.Name);
                 return Json(new { success = true, message = "Queue berhasil ditambahkan." });
             }
             catch (Exception ex)
@@ -169,7 +169,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Update(int id, MikrotikSimpleQueueViewModel model)
+        public IActionResult Update(Guid id, MikrotikSimpleQueueViewModel model)
         {
             if (id != model.Id)
             {
@@ -183,11 +183,11 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 return Json(new { success = false, message = "Validasi gagal.", errors = errorList });
             }
 
-            // Check if queue name already exists for this NAS (exclude current record)
+            // Check if queue name already exists for this Router (exclude current record)
             if (applicationDbContext.MikrotikSimpleQueues.Any(q => 
-                q.NasId == model.NasId && q.QueueName == model.QueueName && q.Id != id))
+                q.RouterId == model.RouterId && q.QueueName == model.QueueName && q.Id != id))
             {
-                return Json(new { success = false, message = "Queue Name sudah ada untuk NAS ini." });
+                return Json(new { success = false, message = "Queue Name sudah ada untuk Router ini." });
             }
 
             try
@@ -198,7 +198,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                     return Json(new { success = false, message = "Data Queue tidak ditemukan." });
                 }
 
-                entity.NasId = model.NasId;
+                entity.RouterId = model.RouterId;
                 entity.QueueName = model.QueueName;
                 entity.TargetAddress = model.TargetAddress;
                 entity.Parent = model.Parent;
@@ -228,7 +228,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
         }
 
         [HttpPost]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(Guid id)
         {
             try
             {

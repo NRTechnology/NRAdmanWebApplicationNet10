@@ -11,11 +11,11 @@
             <div class="text-danger mb-3" id="form-create-error-summary"></div>
 
             <div class="mb-3">
-                <label for="createNasId" class="form-label">NAS</label>
-                <select asp-for="NasId" asp-items="ViewBag.NasOptions" id="createNasId" name="NasId" class="form-select">
-                    <option value="">-- Pilih NAS --</option>
+                <label for="createRouterId" class="form-label">Router</label>
+                <select asp-for="RouterId" asp-items="ViewBag.RouterOptions" id="createRouterId" name="RouterId" class="form-select">
+                    <option value="">-- Pilih Router --</option>
                 </select>
-                <span class="text-danger" id="error-createNasId"></span>
+                <span class="text-danger" id="error-createRouterId"></span>
             </div>
 
             <div class="mb-3">
@@ -195,9 +195,9 @@
 
         errors.forEach(function(error) {
             // Try to match error to field
-            if (error.toLowerCase().includes('nasid')) {
-                $('#error-createNasId').html(error);
-                $('#createNasId').addClass('is-invalid');
+            if (error.toLowerCase().includes('routerid')) {
+                $('#error-createRouterId').html(error);
+                $('#createRouterId').addClass('is-invalid');
             } else if (error.toLowerCase().includes('queuename')) {
                 $('#error-createQueueName').html(error);
                 $('#createQueueName').addClass('is-invalid');

@@ -8,45 +8,40 @@ namespace NRAdmanWebApplicationNet10.Models
     public class Transaction
     {
         [Key]
-        [Column("id")]
-        public long Id { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Id { get; set; }
 
         [Required]
         [MaxLength(50)]
-        [Column("transaction_code")]
         public string TransactionCode { get; set; } = string.Empty;
 
+        [Required]
         [ForeignKey(nameof(Customer))]
-        [Column("customer_id")]
-        public int? CustomerId { get; set; }
+        public Guid CustomerId { get; set; }
 
-        public Customer? Customer { get; set; }
+        public virtual Customer? Customer { get; set; }
 
         [Required]
         [ForeignKey(nameof(Package))]
-        [Column("package_id")]
-        public int PackageId { get; set; }
+        public Guid PackageId { get; set; }
 
-        public Package? Package { get; set; }
+        public virtual Package? Package { get; set; }
 
-        [Column("amount")]
-        public decimal Amount { get; set; }
+        [Required] public decimal Amount { get; set; } = 0;
 
         [Required]
         [MaxLength(20)]
-        [Column("payment_method")]
         public string PaymentMethod { get; set; } = "Cash";
 
         // Pending, Paid, Cancelled
         [Required]
         [MaxLength(20)]
-        [Column("status")]
         public string Status { get; set; } = "Pending";
 
-        [Column("paid_at")]
+        
         public DateTimeOffset? PaidAt { get; set; }
 
-        [Column("created_at")]
+        
         public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     }
 }

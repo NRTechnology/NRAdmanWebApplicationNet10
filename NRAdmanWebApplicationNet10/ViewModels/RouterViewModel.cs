@@ -6,6 +6,7 @@ namespace NRAdmanWebApplicationNet10.ViewModels
 {
     public class RouterViewModel
     {
+        [ScaffoldColumn(false)]
         public Guid Id { get; set; } = Guid.NewGuid();
 
         [Required(ErrorMessage = "Router Type harus dipilih.")]

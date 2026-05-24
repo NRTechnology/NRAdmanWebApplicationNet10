@@ -5,11 +5,12 @@ namespace NRAdmanWebApplicationNet10.ViewModels
 {
     public class MikrotikSimpleQueueViewModel
     {
-        public int Id { get; set; }
+        [ScaffoldColumn(false)]
+        public Guid Id { get; set; }
 
-        [Required(ErrorMessage = "NAS harus dipilih.")]
-        [Display(Name = "NAS")]
-        public int NasId { get; set; }
+        [Required(ErrorMessage = "Router harus dipilih.")]
+        [Display(Name = "Router")]
+        public Guid RouterId { get; set; }
 
         [Required(ErrorMessage = "Queue Name tidak boleh kosong.")]
         [StringLength(255, MinimumLength = 3, ErrorMessage = "Queue Name harus antara 3-255 karakter.")]
@@ -59,7 +60,7 @@ namespace NRAdmanWebApplicationNet10.ViewModels
         public bool Disabled { get; set; } = false;
 
         // Additional property for UI
-        [Display(Name = "NAS Name")]
-        public string? NasName { get; set; }
+        [Display(Name = "Router Name")]
+        public string? RouterName { get; set; }
     }
 }

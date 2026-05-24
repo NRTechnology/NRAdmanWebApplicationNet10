@@ -219,7 +219,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> TestSSHConnection(SSHConnectionRequest request)
+        public async Task<IActionResult> TestSSHConnection(SshConnectionRequest request)
         {
             try
             {
@@ -246,7 +246,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ExecuteSSHCommand(SSHCommandRequest request)
+        public async Task<IActionResult> ExecuteSSHCommand(SshCommandRequest request)
         {
             try
             {

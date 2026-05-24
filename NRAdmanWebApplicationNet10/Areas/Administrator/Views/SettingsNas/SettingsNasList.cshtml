@@ -69,9 +69,7 @@
                     { data: 'ports', title: 'Port' },
                     { data: 'server', title: 'Server' },
                     { data: 'community', title: 'SNMP Community' },
-                    { data: 'description', title: 'Description' },
-                    { data: 'routerType', title: 'Router Type' },
-                    { data: 'username', title: 'Username' },
+                    { data: 'description', title: 'Description' },                    
                     { data: 'id', title: 'Actions', orderable: false, render: function(data, type, row) {
                         return `<button class="btn btn-sm btn-success btn-connect-ssh" data-id="${data}" data-server="${row.nasName}" data-username="${row.username}" style="margin-right: 5px;" title="Connect via SSH">
                                     <i class="icon-base ti tabler-terminal-2 icon-sm"></i>
@@ -185,8 +183,6 @@
                 <th>Server</th>
                 <th>SNMP Community</th>
                 <th>Description</th>
-                <th>Router Type</th>
-                <th>Username</th>
                 <th width="180">Actions</th>
             </tr>
             </thead>

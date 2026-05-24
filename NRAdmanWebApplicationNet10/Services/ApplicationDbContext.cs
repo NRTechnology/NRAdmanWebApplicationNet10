@@ -49,11 +49,11 @@ namespace NRAdmanWebApplicationNet10.Services
             modelBuilder.Entity<MikrotikSimpleQueue>(entity =>
             {
                 entity.ToTable("mikrotik_simple_queues");
-                entity.HasOne(e => e.Nas)
+                entity.HasOne(e => e.Router)
                     .WithMany()
-                    .HasForeignKey(e => e.NasId)
+                    .HasForeignKey(e => e.RouterId)
                     .OnDelete(DeleteBehavior.Cascade);
-                entity.HasIndex(e => new { e.NasId, e.QueueName }, "idx_nas_queue_name").IsUnique();
+                entity.HasIndex(e => new { e.RouterId, e.QueueName }, "idx_router_queue_name").IsUnique();
             });
 
             modelBuilder.Entity<Router>(entity =>
