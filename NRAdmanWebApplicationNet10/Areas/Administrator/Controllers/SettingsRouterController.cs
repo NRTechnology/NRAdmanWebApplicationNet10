@@ -226,5 +226,28 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 return Json(new { success = false, message = "Gagal menghapus data router. Silakan coba lagi." });
             }
         }
+
+
+        [HttpGet]
+        public IActionResult ConnectSshModal(Guid id)
+        {
+            var router = applicationDbContext.Routers.FirstOrDefault(n => n.Id == id);
+            if (router == null)
+            {
+                return NotFound();
+            }
+
+            var viewModel = new SshConnectionViewModel
+            {
+                Id = router.Id,
+                RouterName = router.Name,
+                IpAddress = router.IpAddress,
+                Username = router.Username,
+                Password = router.Password,
+                Port = router.Ports
+            };
+
+            return PartialView("../Shared/_Modals/_ModalConnectSSH", viewModel);
+        }
     }
 }

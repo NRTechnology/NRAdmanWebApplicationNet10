@@ -63,7 +63,10 @@
                     { data: 'description', title: 'Description' },
                     { data: 'createdDate', title: 'Created' },
                     { data: 'id', title: 'Actions', orderable: false, render: function(data, type, row) {
-                        return `<button class="btn btn-sm btn-primary btn-edit-router" data-id="${data}" style="margin-right: 5px;">Edit</button>
+                                return `<button class="btn btn-sm btn-success btn-connect-ssh" data-id="${data}" data-server="${row.nasName}" data-username="${row.username}" style="margin-right: 5px;" title="Connect via SSH">
+                                <i class="icon-base ti tabler-terminal-2 icon-sm"></i>
+                                </button>
+                                <button class="btn btn-sm btn-primary btn-edit-router" data-id="${data}" style="margin-right: 5px;">Edit</button>
                                 <button class="btn btn-sm btn-danger btn-delete-router" data-id="${data}">Delete</button>`;
                     }}
                 ],
@@ -72,6 +75,22 @@
 
             // Store dataTable reference globally for use in modal
             window.dataTable = dataTable;
+            // Handle Connect SSH button click
+            $(document).on('click', '.btn-connect-ssh', function() {
+                var routerId = $(this).data('id');
+
+                if (!server || !username) {
+                ToastHelper.warning('Server atau Username belum dikonfigurasi untuk NAS ini.');
+                return;
+                }
+
+        $.get('@Url.Action("ConnectSshModal", "SettingsRouter", new { area = "Administrator" })?' + $.param({ id: routerId }), function(html) {
+                $('#sshModalContainer').html(html);
+                var offcanvas = new bootstrap.Offcanvas(document.getElementById('offcanvasConnectSSH'));
+                offcanvas.show();
+                });
+            });
+
 
             // Handle Add New button click
             $(document).on('click', '#btn-add-router', function() {
@@ -164,3 +183,6 @@
 
 <!-- Container untuk Edit Modal -->
 <div id="editModalContainer"></div>
+
+<!-- Container untuk SSH Connect Modal -->
+<div id="sshModalContainer"></div>

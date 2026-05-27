@@ -1,8 +1,8 @@
-@model NRAdmanWebApplicationNet10.ViewModels.SSHConnectionViewModel
+@model NRAdmanWebApplicationNet10.ViewModels.SshConnectionViewModel
 
 <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasConnectSSH" aria-labelledby="offcanvasConnectSSHLabel">
     <div class="offcanvas-header">
-        <h5 id="offcanvasConnectSSHLabel" class="offcanvas-title">Connect SSH - @Model.NasName</h5>
+        <h5 id="offcanvasConnectSSHLabel" class="offcanvas-title">Connect SSH - @Model.RouterName</h5>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
@@ -13,30 +13,24 @@
                     <h6 class="mb-3">SSH Connection Information</h6>
 
                     <div class="mb-3">
-                        <label class="form-label">Server</label>
-                        <input type="text" name="Server" class="form-control" id="sshServer" readonly value="@Model.Server" />
+                        <label class="form-label">Ip Address</label>
+                        <input asp-for="IpAddress" type="text" name="Server" class="form-control" id="sshServer" readonly value="@Model.IpAddress" />
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Username</label>
-                        <input type="text" name="Username" class="form-control" id="sshUsername" readonly value="@Model.Username" />
+                        <input asp-for="Username" type="text" name="Username" class="form-control" id="sshUsername" readonly value="@Model.Username" />
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Port</label>
-                        <input type="number" name="Port" class="form-control" id="sshPort" readonly value="@Model.Port" />
+                        <input asp-for="Port" type="number" name="Port" class="form-control" id="sshPort" readonly value="@Model.Port" />
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Password</label>
-                        <input type="password" name="Password" class="form-control" id="sshPassword" value="@Model.Password" />
+                        <input asp-for="Password" type="password" name="Password" class="form-control" id="sshPassword" value="@Model.Password" />
                         <small class="form-text text-muted">Password dari NAS configuration (dapat diubah)</small>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Command (Optional)</label>
-                        <input type="text" name="Command" class="form-control" id="sshCommand" placeholder="e.g., uname -a, ifconfig, etc." />
-                        <small class="form-text text-muted">Kosongkan untuk hanya test koneksi</small>
                     </div>
 
                     <div class="mb-3">
@@ -56,9 +50,6 @@
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">Close</button>
                             <button type="button" class="btn btn-success" id="btn-connect-ssh" onclick="testSSHConnection()">
                                 <i class="icon-base ti tabler-plug icon-sm"></i> Test Connection
-                            </button>
-                            <button type="button" class="btn btn-info" id="btn-execute-cmd" onclick="executeSSHCommand()" style="display: none;">
-                                <i class="icon-base ti tabler-terminal-2 icon-sm"></i> Execute
                             </button>
                         </div>
                     </div>

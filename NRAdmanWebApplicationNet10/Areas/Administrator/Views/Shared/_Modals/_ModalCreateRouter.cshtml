@@ -22,6 +22,13 @@
                 <span class="text-danger" id="error-createIpAddress"></span>
                 <span class="form-text">Pastikan IP Address unik.</span>
             </div>
+            
+            <div class="mb-3">
+                <label for="createRouterName" class="form-label">Router Name</label>
+                <input asp-for="Name" type="text" id="createRouterName" name="Name" class="form-control" placeholder="Main Office Router" />
+                <span class="text-danger" id="error-createRouterName"></span>
+                <span class="form-text">Pastikan Router Name unik.</span>
+            </div>
 
             <div class="mb-3">
                 <label for="createUsername" class="form-label">Username</label>
@@ -133,21 +140,24 @@
                 console.log(error);
                 // Try to match error to field
                 if (lowerError.includes('ip address')) {
-                $('#error-createIpAddress').html(error);
-                $('#createIpAddress').addClass('is-invalid');
-            } else if (lowerError.includes('username')) {
-                $('#error-createUsername').html(error);
-                $('#createUsername').addClass('is-invalid');
-            } else if (lowerError.includes('password')) {
-                $('#error-createPassword').html(error);
-                $('#createPassword').addClass('is-invalid');
-            } else if (lowerError.includes('port')) {
-                $('#error-createRouterPorts').html(error);
-                $('#createRouterPorts').addClass('is-invalid');
-            } else if (lowerError.includes('router type')) {
-                $('#error-createRouterType').html(error);
-                $('#createRouterType').addClass('is-invalid');
-            }
+                    $('#error-createIpAddress').html(error);
+                    $('#createIpAddress').addClass('is-invalid');
+                } else if (lowerError.includes('name')) {
+                    $('#error-createRouterName').html(error);
+                    $('#createRouterName').addClass('is-invalid');
+                }  else if (lowerError.includes('username')) {
+                    $('#error-createUsername').html(error);
+                    $('#createUsername').addClass('is-invalid');
+                } else if (lowerError.includes('password')) {
+                    $('#error-createPassword').html(error);
+                    $('#createPassword').addClass('is-invalid');
+                } else if (lowerError.includes('port')) {
+                    $('#error-createRouterPorts').html(error);
+                    $('#createRouterPorts').addClass('is-invalid');
+                } else if (lowerError.includes('router type')) {
+                    $('#error-createRouterType').html(error);
+                    $('#createRouterType').addClass('is-invalid');
+                }
        });
     }
 </script>

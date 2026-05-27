@@ -19,6 +19,11 @@ namespace NRAdmanWebApplicationNet10.ViewModels
         [IpAddressValidation(ErrorMessage = "Format IP Address atau CIDR tidak valid.")]
         public string IpAddress { get; set; } = "";
 
+        [Required(ErrorMessage = "Router Name tidak boleh kosong.")]
+        [Display(Name = "Router Name")]
+        [MaxLength(255, ErrorMessage = "Router Name maksimal 255 karakter.")]
+        public string Name { get; set; } = string.Empty;
+
         [Required(ErrorMessage = "Router Username tidak boleh kosong.")]
         [Display(Name = "Router Username")]
         [MaxLength(100, ErrorMessage = "Router Username maksimal 100 karakter.")]

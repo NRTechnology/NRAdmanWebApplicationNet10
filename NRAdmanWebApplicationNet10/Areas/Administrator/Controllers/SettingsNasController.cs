@@ -197,26 +197,6 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
             }
         }
 
-        [HttpGet]
-        public IActionResult ConnectSSHModal(int id, string server, string username)
-        {
-            var nas = applicationDbContext.Nas.FirstOrDefault(n => n.Id == id);
-            if (nas == null)
-            {
-                return NotFound();
-            }
-
-            var viewModel = new SSHConnectionViewModel
-            {
-                Id = nas.Id,
-                NasName = nas.NasName,
-                Server = server,
-                Username = username,                
-            };
-
-            return PartialView("../Shared/_Modals/_ModalConnectSSH", viewModel);
-        }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> TestSSHConnection(SshConnectionRequest request)
