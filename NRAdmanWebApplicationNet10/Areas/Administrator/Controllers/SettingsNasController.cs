@@ -10,7 +10,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
     [Authorize(Roles = "Administrator")]
     public class SettingsNasController(ApplicationDbContext applicationDbContext,
         IWebHostEnvironment environment, ILogger<SettingsNasController> logger,
-        IConfiguration configuration, ISSHService sshService) : Controller
+        IConfiguration configuration) : Controller
     {
         public IActionResult Index()
         {
@@ -197,61 +197,6 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
             }
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> TestSSHConnection(SshConnectionRequest request)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(request.Server) || string.IsNullOrWhiteSpace(request.Username) || string.IsNullOrWhiteSpace(request.Password))
-                {
-                    return Json(new { success = false, message = "Server, username, dan password tidak boleh kosong." });
-                }
-
-                var result = await sshService.TestConnectionAsync(request.Server, request.Port, request.Username, request.Password);
-
-                return Json(new 
-                { 
-                    success = result.IsSuccessful, 
-                    message = result.Message,
-                    connectedAt = result.ConnectedAt
-                });
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error testing SSH connection");
-                return Json(new { success = false, message = $"Error: {ex.Message}" });
-            }
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ExecuteSSHCommand(SshCommandRequest request)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(request.Server) || string.IsNullOrWhiteSpace(request.Username) || 
-                    string.IsNullOrWhiteSpace(request.Password) || string.IsNullOrWhiteSpace(request.Command))
-                {
-                    return Json(new { success = false, message = "Semua parameter wajib diisi." });
-                }
-
-                var result = await sshService.ExecuteCommandAsync(request.Server, request.Port, request.Username, request.Password, request.Command);
-
-                return Json(new 
-                { 
-                    success = result.IsSuccessful, 
-                    message = result.Message,
-                    output = result.Output,
-                    errorOutput = result.ErrorOutput,
-                    exitStatus = result.ExitStatus
-                });
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error executing SSH command");
-                return Json(new { success = false, message = $"Error: {ex.Message}" });
-            }
-        }
+        
     }
 }

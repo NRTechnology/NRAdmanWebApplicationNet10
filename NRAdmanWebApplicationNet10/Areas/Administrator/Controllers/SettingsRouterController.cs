@@ -10,7 +10,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
     [Authorize(Roles = "Administrator")]
     public class SettingsRouterController(
         ApplicationDbContext applicationDbContext,
-        ILogger<SettingsRouterController> logger) : Controller
+        ILogger<SettingsRouterController> logger, ISSHService sshService) : Controller
     {
         public IActionResult Index()
         {
@@ -26,6 +26,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 {
                     id = r.Id.ToString(),
                     routerType = r.RouterType.ToString(),
+                    name = r.Name,
                     ipAddress = r.IpAddress,
                     username = r.Username,
                     ports = r.Ports,
@@ -84,6 +85,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
             {
                 Id = router.Id,
                 RouterType = router.RouterType,
+                Name = router.Name,
                 IpAddress = router.IpAddress,
                 Username = router.Username,
                 Password = router.Password,
@@ -118,6 +120,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 var router = new Router
                 {
                     RouterType = model.RouterType,
+                    Name = model.Name,
                     IpAddress = model.IpAddress,
                     Username = model.Username,
                     Password = model.Password,
@@ -173,6 +176,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 }
 
                 router.RouterType = model.RouterType;
+                router.Name = model.Name;
                 router.IpAddress = model.IpAddress;
                 router.Username = model.Username;
                 router.Ports = model.Ports;
@@ -243,11 +247,78 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 RouterName = router.Name,
                 IpAddress = router.IpAddress,
                 Username = router.Username,
-                Password = router.Password,
                 Port = router.Ports
             };
 
             return PartialView("../Shared/_Modals/_ModalConnectSSH", viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> TestSshConnection(Guid id, SshConnectionViewModel request)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(request.IpAddress) || string.IsNullOrWhiteSpace(request.Username))
+                {
+                    return Json(new { success = false, message = "Server, username, dan password tidak boleh kosong." });
+                }
+
+                var router = applicationDbContext.Routers.FirstOrDefault(r => r.Id == request.Id);
+                if (router == null)
+                {
+                    return Json(new { success = false, message = "Router tidak ditemukan." });
+                }
+
+                var result = await sshService.TestConnectionAsync(router.IpAddress, router.Ports, request.Username, router.Password);
+
+                return Json(new
+                {
+                    success = result.IsSuccessful,
+                    message = result.Message,
+                    connectedAt = result.ConnectedAt
+                });
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error testing SSH connection");
+                return Json(new { success = false, message = $"Error: {ex.Message}" });
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ExecuteSshCommand(SshConnectionViewModel request)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(request.IpAddress) || string.IsNullOrWhiteSpace(request.Username))
+                {
+                    return Json(new { success = false, message = "Semua parameter wajib diisi." });
+                }
+
+                var router = applicationDbContext.Routers.FirstOrDefault(r => r.Id == request.Id);
+                if (router == null)
+                {
+                    return Json(new { success = false, message = "Router tidak ditemukan." });
+                }
+
+                var result = await sshService.ExecuteCommandAsync(router.IpAddress, router.Ports, request.Username, router.Password, "ls");
+
+                return Json(new
+                {
+                    success = result.IsSuccessful,
+                    message = result.Message,
+                    output = result.Output,
+                    errorOutput = result.ErrorOutput,
+                    exitStatus = result.ExitStatus
+                });
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error executing SSH command");
+                return Json(new { success = false, message = $"Error: {ex.Message}" });
+            }
         }
     }
 }

@@ -56,14 +56,14 @@
                     }
                 },
                 columns: [
-                    { data: 'routerType', title: 'Router Type' },
+                    { data: 'routerType', title: 'Type' },
+                    { data: 'name', title: 'Name' },
                     { data: 'ipAddress', title: 'IP Address' },
                     { data: 'username', title: 'Username' },
                     { data: 'ports', title: 'SSH Port' },
-                    { data: 'description', title: 'Description' },
-                    { data: 'createdDate', title: 'Created' },
+                    { data: 'description', title: 'Description' },                    
                     { data: 'id', title: 'Actions', orderable: false, render: function(data, type, row) {
-                                return `<button class="btn btn-sm btn-success btn-connect-ssh" data-id="${data}" data-server="${row.nasName}" data-username="${row.username}" style="margin-right: 5px;" title="Connect via SSH">
+                                return `<button class="btn btn-sm btn-success btn-connect-ssh" data-id="${data}" style="margin-right: 5px;" title="Connect via SSH">
                                 <i class="icon-base ti tabler-terminal-2 icon-sm"></i>
                                 </button>
                                 <button class="btn btn-sm btn-primary btn-edit-router" data-id="${data}" style="margin-right: 5px;">Edit</button>
@@ -79,15 +79,16 @@
             $(document).on('click', '.btn-connect-ssh', function() {
                 var routerId = $(this).data('id');
 
-                if (!server || !username) {
-                ToastHelper.warning('Server atau Username belum dikonfigurasi untuk NAS ini.');
-                return;
+                if (!routerId) {
+                    ToastHelper.warning('Server atau Username belum dikonfigurasi untuk NAS ini.');
+                    return;
                 }
 
-        $.get('@Url.Action("ConnectSshModal", "SettingsRouter", new { area = "Administrator" })?' + $.param({ id: routerId }), function(html) {
-                $('#sshModalContainer').html(html);
-                var offcanvas = new bootstrap.Offcanvas(document.getElementById('offcanvasConnectSSH'));
-                offcanvas.show();
+                //alert("Coba");
+                $.get('@Url.Action("ConnectSshModal", "SettingsRouter", new { area = "Administrator" })?' + $.param({ id: routerId }), function(html) {
+                    $('#sshModalContainer').html(html);
+                    var offcanvas = new bootstrap.Offcanvas(document.getElementById('offcanvasConnectSSH'));
+                    offcanvas.show();
                 });
             });
 
@@ -167,8 +168,7 @@
                 <th>Username</th>
                 <th>SSH Port</th>
                 <th>Description</th>
-                <th>Created</th>
-                <th width="200">Actions</th>
+                <th width="180">Actions</th>
             </tr>
             </thead>
 

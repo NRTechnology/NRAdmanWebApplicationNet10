@@ -66,9 +66,6 @@
 
 <script>
     $(function() {
-        // Set the router type on load
-        $('#editRouterType').val((Model.RouterType).toString());
-
         $('#form-edit-router').on('submit', function(e) {
             e.preventDefault();
 
@@ -101,7 +98,7 @@
                         let errorMessage = response.message;
                         if (response.errors && response.errors.length > 0) {
                             ToastHelper.error(response.errors.join('\n'));
-                            displayFieldErrors('edit', response.errors);
+                            displayFieldErrors(response.errors);
                         } else {
                             ToastHelper.error(errorMessage);
                         }
