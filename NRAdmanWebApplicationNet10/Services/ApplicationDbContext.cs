@@ -36,6 +36,10 @@ namespace NRAdmanWebApplicationNet10.Services
 
         public DbSet<Router> Routers => Set<Router>();
 
+        public DbSet<MikrotikRadiusPolicy> MikrotikRadiusPolicies => Set<MikrotikRadiusPolicy>();
+
+        public DbSet<MikrotikRadiusAccounting> MikrotikRadiusAccounting => Set<MikrotikRadiusAccounting>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

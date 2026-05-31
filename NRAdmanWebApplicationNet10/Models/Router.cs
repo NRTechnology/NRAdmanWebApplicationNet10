@@ -35,8 +35,12 @@ namespace NRAdmanWebApplicationNet10.Models
         public string Password { get; set; } = "admin";
 
         [Required]
-        [Display(Name = "Router Port")]
-        public int Ports { get; set; } = 22;
+        [Display(Name = "Router SSH Port")]
+        public int SShPort { get; set; } = 22;
+
+        [Required]
+        [Display(Name = "Router API Port")]
+        public int ApiPort { get; set; } = 8729;
 
         [MaxLength(255)]
         [Display(Name = "Description")]

@@ -1,0 +1,244 @@
+@using NRAdmanWebApplicationNet10.Models
+@model NRAdmanWebApplicationNet10.ViewModels.MikrotikRadiusPolicyViewModel
+
+@{
+    ViewData["Title"] = "Create RADIUS Policy";
+}
+
+@section VendorScripts {
+    <script src="~/assets/vendor/libs/jquery-validate/jquery.validate.min.js"></script>
+    <script src="~/assets/vendor/libs/jquery-validate/additional-methods.min.js"></script>
+    <script src="~/assets/vendor/libs/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+}
+
+@section PageScripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // jQuery Validation
+            $('#form-create-policy').validate({
+                rules: {
+                    PolicyName: {
+                        required: true,
+                        minlength: 3,
+                        maxlength: 100,
+                        remote: {
+                            url: '@Url.Action("CheckPolicyNameUnique", "MikrotikRadiusProfile", new { area = "Administrator" })',
+                            type: 'post',
+                            data: {
+                                policyName: function() { return $('#PolicyName').val(); }
+                            }
+                        }
+                    },
+                    QueueType: {
+                        required: true
+                    },
+                    Priority: {
+                        required: true,
+                        number: true,
+                        range: [1, 16]
+                    },
+                    DownloadLimit: {
+                        number: true,
+                        min: 0.1
+                    },
+                    UploadLimit: {
+                        number: true,
+                        min: 0.1
+                    }
+                },
+                messages: {
+                    PolicyName: {
+                        required: 'Policy Name is required',
+                        minlength: 'Policy Name must be at least 3 characters',
+                        maxlength: 'Policy Name cannot exceed 100 characters',
+                        remote: 'Policy Name already exists'
+                    },
+                    QueueType: {
+                        required: 'Queue Type is required'
+                    },
+                    Priority: {
+                        required: 'Priority is required',
+                        range: 'Priority must be between 1 and 16'
+                    }
+                },
+                errorElement: 'span',
+                errorClass: 'invalid-feedback',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+                },
+                submitHandler: function(form) {
+                    form.submit();
+                }
+            });
+        });
+    </script>
+}
+
+<div class="page-wrapper">
+    <div class="container-xl">
+        <div class="page-header d-print-none">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h2 class="page-title">
+                        Create New RADIUS Policy
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-body">
+        <div class="container-xl">
+            <div class="row row-cards">
+                <div class="col-lg-8 offset-lg-2">
+                    <form id="form-create-policy" method="post" asp-action="Create" class="card">
+                        @Html.AntiForgeryToken()
+
+                        <div class="card-body">
+                            @if (ViewBag.ErrorMessage != null)
+                            {
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    @ViewBag.ErrorMessage
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            }
+
+                            <div class="mb-3">
+                                <label class="form-label">Policy Name <span class="text-danger">*</span></label>
+                                <input asp-for="PolicyName" class="form-control" placeholder="e.g., Premium Package" />
+                                <span asp-validation-for="PolicyName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea asp-for="Description" class="form-control" rows="3" placeholder="Enter policy description"></textarea>
+                                <span asp-validation-for="Description" class="text-danger small"></span>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Download Limit (Mbps)</label>
+                                        <input asp-for="DownloadLimit" type="number" step="0.1" class="form-control" placeholder="e.g., 10.5" />
+                                        <span asp-validation-for="DownloadLimit" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Upload Limit (Mbps)</label>
+                                        <input asp-for="UploadLimit" type="number" step="0.1" class="form-control" placeholder="e.g., 5.5" />
+                                        <span asp-validation-for="UploadLimit" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Queue Type <span class="text-danger">*</span></label>
+                                        <select asp-for="QueueType" class="form-select">
+                                            <option value="">Select Queue Type</option>
+                                            @foreach (EnumQueueType type in Enum.GetValues(typeof(EnumQueueType)))
+                                            {
+                                                <option value="@type">@type.ToString()</option>
+                                            }
+                                        </select>
+                                        <span asp-validation-for="QueueType" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Priority (1=Highest, 16=Lowest) <span class="text-danger">*</span></label>
+                                        <input asp-for="Priority" type="number" class="form-control" value="8" min="1" max="16" />
+                                        <span asp-validation-for="Priority" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4" />
+                            <h4 class="mb-3">Burst Settings (Optional)</h4>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Burst Download Limit (Mbps)</label>
+                                        <input asp-for="BurstLimitDown" type="number" step="0.1" class="form-control" />
+                                        <span asp-validation-for="BurstLimitDown" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Burst Upload Limit (Mbps)</label>
+                                        <input asp-for="BurstLimitUp" type="number" step="0.1" class="form-control" />
+                                        <span asp-validation-for="BurstLimitUp" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Burst Threshold Down (%)</label>
+                                        <input asp-for="BurstThresholdDown" type="number" class="form-control" min="1" max="100" />
+                                        <span asp-validation-for="BurstThresholdDown" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Burst Threshold Up (%)</label>
+                                        <input asp-for="BurstThresholdUp" type="number" class="form-control" min="1" max="100" />
+                                        <span asp-validation-for="BurstThresholdUp" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Burst Time (seconds)</label>
+                                        <input asp-for="BurstTime" type="number" class="form-control" min="1" max="3600" />
+                                        <span asp-validation-for="BurstTime" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4" />
+                            <h4 class="mb-3">Advanced Settings (Optional)</h4>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Max Limit Download (Mbps)</label>
+                                        <input asp-for="MaxLimitDown" type="number" step="0.1" class="form-control" />
+                                        <span asp-validation-for="MaxLimitDown" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Max Limit Upload (Mbps)</label>
+                                        <input asp-for="MaxLimitUp" type="number" step="0.1" class="form-control" />
+                                        <span asp-validation-for="MaxLimitUp" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="IsActive" asp-for="IsActive" checked />
+                                    <label class="form-check-label" for="IsActive">
+                                        Is Active
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-footer text-end">
+                            <a href="@Url.Action("Index", "MikrotikRadiusProfile", new { area = "Administrator" })" class="btn btn-link">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Create Policy</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

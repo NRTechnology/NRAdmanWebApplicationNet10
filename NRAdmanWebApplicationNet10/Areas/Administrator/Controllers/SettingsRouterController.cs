@@ -22,16 +22,17 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
         {
             try
             {
-                var data = applicationDbContext.Routers.Select(r => new
+                var data = applicationDbContext.Routers.Select(router => new
                 {
-                    id = r.Id.ToString(),
-                    routerType = r.RouterType.ToString(),
-                    name = r.Name,
-                    ipAddress = r.IpAddress,
-                    username = r.Username,
-                    ports = r.Ports,
-                    description = r.Description,
-                    createdDate = r.CreatedDate.ToString("yyyy-MM-dd HH:mm:ss")
+                    id = router.Id.ToString(),
+                    routerType = router.RouterType.ToString(),
+                    name = router.Name,
+                    ipAddress = router.IpAddress,
+                    username = router.Username,
+                    sshports = router.SShPort,
+                    apiports = router.ApiPort,
+                    description = router.Description,
+                    createdDate = router.CreatedDate.ToString("yyyy-MM-dd HH:mm:ss")
                 }).ToList();
 
                 return Json(data);
@@ -89,7 +90,8 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 IpAddress = router.IpAddress,
                 Username = router.Username,
                 Password = router.Password,
-                Ports = router.Ports,
+                SshPorts = router.SShPort,
+                ApiPorts = router.ApiPort,
                 Description = router.Description
             };
 
@@ -124,7 +126,8 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                     IpAddress = model.IpAddress,
                     Username = model.Username,
                     Password = model.Password,
-                    Ports = model.Ports,
+                    SShPort = model.SshPorts,
+                    ApiPort = model.ApiPorts,
                     Description = model.Description,
                     CreatedDate = DateTime.UtcNow
                 };
@@ -179,7 +182,8 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 router.Name = model.Name;
                 router.IpAddress = model.IpAddress;
                 router.Username = model.Username;
-                router.Ports = model.Ports;
+                router.SShPort = model.SshPorts;
+                router.ApiPort = model.ApiPorts;
                 router.Description = model.Description;
                 router.LastModifiedDate = DateTime.UtcNow;
 
@@ -247,7 +251,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 RouterName = router.Name,
                 IpAddress = router.IpAddress,
                 Username = router.Username,
-                Port = router.Ports
+                Port = router.SShPort
             };
 
             return PartialView("../Shared/_Modals/_ModalConnectSSH", viewModel);
@@ -270,7 +274,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                     return Json(new { success = false, message = "Router tidak ditemukan." });
                 }
 
-                var result = await sshService.TestConnectionAsync(router.IpAddress, router.Ports, request.Username, router.Password);
+                var result = await sshService.TestConnectionAsync(router.IpAddress, router.SShPort, request.Username, router.Password);
 
                 return Json(new
                 {
@@ -303,7 +307,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                     return Json(new { success = false, message = "Router tidak ditemukan." });
                 }
 
-                var result = await sshService.ExecuteCommandAsync(router.IpAddress, router.Ports, request.Username, router.Password, "ls");
+                var result = await sshService.ExecuteCommandAsync(router.IpAddress, router.SShPort, request.Username, router.Password, "ls");
 
                 return Json(new
                 {

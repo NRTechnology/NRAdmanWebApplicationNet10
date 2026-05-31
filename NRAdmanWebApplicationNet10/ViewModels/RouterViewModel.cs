@@ -34,10 +34,15 @@ namespace NRAdmanWebApplicationNet10.ViewModels
         [MaxLength(100, ErrorMessage = "Router Password maksimal 100 karakter.")]
         public string Password { get; set; } = "admin";
 
+        [Required(ErrorMessage = "Router SSH Port tidak boleh kosong.")]
+        [Display(Name = "Router SSH Port")]
+        [Range(1, 65535, ErrorMessage = "Router SSH Port harus antara 1-65535.")]
+        public int SshPorts { get; set; } = 22;
+
         [Required(ErrorMessage = "Router Port tidak boleh kosong.")]
-        [Display(Name = "Router Port")]
-        [Range(1, 65535, ErrorMessage = "Router Port harus antara 1-65535.")]
-        public int Ports { get; set; } = 22;
+        [Display(Name = "Router API Port")]
+        [Range(1, 65535, ErrorMessage = "Router API Port harus antara 1-65535.")]
+        public int ApiPorts { get; set; } = 8729;
 
         [Display(Name = "Description")]
         [MaxLength(255, ErrorMessage = "Description maksimal 255 karakter.")]
