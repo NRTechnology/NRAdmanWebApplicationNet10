@@ -1,9 +1,12 @@
-﻿using NRAdmanWebApplicationNet10.Attributes;
+﻿using Microsoft.EntityFrameworkCore;
+using NRAdmanWebApplicationNet10.Attributes;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NRAdmanWebApplicationNet10.Models
 {
+    [Index(nameof(Name), IsUnique = true)]
+    [Index(nameof(IpAddress), IsUnique = true)]
     public class Router
     {
         [Key]

@@ -1,0 +1,208 @@
+@{
+    ViewData["Title"] = "Deploy RADIUS Policy to Routers";
+    var policies = ViewBag.Policies as List<NRAdmanWebApplicationNet10.Models.MikrotikRadiusPolicy>;
+    var routers = ViewBag.Routers as List<NRAdmanWebApplicationNet10.Models.Router>;
+}
+
+@section PageScripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle policy selection
+            $('#policyId').on('change', function() {
+                const policyId = $(this).val();
+                if (policyId) {
+                    $.get('@Url.Action("Index", "MikrotikRadiusProfile", new { area = "Administrator" })?' + $.param({ id: policyId }), function(data) {
+                        // Load policy details
+                    });
+                }
+            });
+
+            // Handle router selection
+            $(document).on('change', 'input[name="routerSelect"]', function() {
+                const routerId = $(this).val();
+                const row = $(this).closest('tr');
+
+                if ($(this).is(':checked')) {
+                    $.get('@Url.Action("GetRouterDetails", "MikrotikRadiusDeployment", new { area = "Administrator" })?' + $.param({ routerId }), function(data) {
+                        row.find('.router-ip').text(data.managementIp);
+                        row.find('input[name="targetAddress"]').val(data.managementIp);
+                    });
+                }
+            });
+
+            // Test connection
+            $(document).on('click', '.btn-test-conn', function() {
+                const routerId = $(this).data('router-id');
+                $(this).prop('disabled', true).text('Testing...');
+
+                $.post('@Url.Action("TestConnection", "MikrotikRadiusDeployment", new { area = "Administrator" })',
+                    { routerId },
+                    function(response) {
+                        alert(response.message);
+                    }).always(function() {
+                    $(this).prop('disabled', false).text('Test');
+                });
+            });
+
+            // Deploy
+            $('#btnExecuteDeploy').on('click', function() {
+                const policyId = $('#policyId').val();
+                const selectedRouters = [];
+                const targetAddresses = [];
+
+                $('input[name="routerSelect"]:checked').each(function() {
+                    selectedRouters.push($(this).val());
+                    targetAddresses.push($(this).closest('tr').find('input[name="targetAddress"]').val());
+                });
+
+                if (!policyId) {
+                    alert('Pilih policy terlebih dahulu');
+                    return;
+                }
+
+                if (selectedRouters.length === 0) {
+                    alert('Pilih minimal satu router');
+                    return;
+                }
+
+                $(this).prop('disabled', true).text('Deploying...');
+
+                $.post('@Url.Action("ExecuteDeploy", "MikrotikRadiusDeployment", new { area = "Administrator" })',
+                    {
+                        policyId: policyId,
+                        selectedRouters: selectedRouters,
+                        targetAddresses: targetAddresses
+                    },
+                    function(response) {
+                        if (response.success) {
+                            alert('Deploy berhasil: ' + response.deployed + ' queue deployed');
+                            window.location.href = '@Url.Action("Index", "MikrotikRadiusDeployment", new { area = "Administrator" })';
+                        } else {
+                            alert('Deploy gagal: ' + response.message);
+                            if (response.errors && response.errors.length > 0) {
+                                alert('Errors:\n' + response.errors.join('\n'));
+                            }
+                        }
+                    }).always(function() {
+                    $('#btnExecuteDeploy').prop('disabled', false).text('Deploy Policy');
+                });
+            });
+
+            // Cancel
+            $('#btnCancel').on('click', function() {
+                window.location.href = '@Url.Action("Index", "MikrotikRadiusDeployment", new { area = "Administrator" })';
+            });
+        });
+    </script>
+}
+
+<div class="page-wrapper">
+    <div class="container-xl">
+        <div class="page-header d-print-none">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h2 class="page-title">
+                        Deploy RADIUS Policy to Routers
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-body">
+        <div class="container-xl">
+            <div class="row row-cards">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="card">
+                        <div class="card-body">
+                            <!-- Policy Selection -->
+                            <div class="mb-4">
+                                <label class="form-label">Select RADIUS Policy <span class="text-danger">*</span></label>
+                                <select id="policyId" class="form-select">
+                                    <option value="">-- Select Policy --</option>
+                                    @if (policies != null)
+                                    {
+                                        @foreach (var policy in policies)
+                                        {
+                                            <option value="@policy.Id">@policy.PolicyName (Download: @policy.DownloadLimit Mbps, Upload: @policy.UploadLimit Mbps)</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+
+                            <!-- Router Selection Table -->
+                            <div class="mb-4">
+                                <label class="form-label">Select Routers and Target Addresses <span class="text-danger">*</span></label>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Select</th>
+                                                <th>Router Name</th>
+                                                <th>Management IP</th>
+                                                <th>Target Address</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (routers != null)
+                                            {
+                                                @foreach (var router in routers)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            <input type="checkbox" name="routerSelect" value="@router.Id" class="form-check-input" />
+                                                        </td>
+                                                        <td>@router.Name</td>
+                                                        <td class="router-ip">@router.IpAddress</td>
+                                                        <td>
+                                                            <input type="text" name="targetAddress" class="form-control form-control-sm" value="@router.IpAddress" placeholder="e.g., 192.168.1.100" />
+                                                        </td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-sm btn-info btn-test-conn" data-router-id="@router.Id">
+                                                                Test
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Info Box -->
+                            <div class="alert alert-info" role="alert">
+                                <div class="d-flex">
+                                    <div>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-avatar flex-shrink-0" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path d="M12 8h.01" />
+                                            <path d="M11 12h1v4h1" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="alert-title">Deployment Information</h3>
+                                        <div class="text-muted">
+                                            <ul class="mb-0">
+                                                <li>Target Address dapat diubah sesuai kebutuhan (IP/Subnet untuk queue)</li>
+                                                <li>Klik "Test" untuk memverifikasi koneksi ke router sebelum deploy</li>
+                                                <li>Deploy akan membuat Simple Queue di Mikrotik dengan pengaturan dari policy</li>
+                                                <li>Status deploy dapat dipantau di halaman utama Deployment</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-footer text-end">
+                            <button id="btnCancel" class="btn btn-link">Cancel</button>
+                            <button id="btnExecuteDeploy" class="btn btn-primary">Deploy Policy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,281 @@
+@{
+    ViewData["Title"] = "Mikrotik RADIUS Deployment Management";
+}
+
+@section VendorStyles {
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css" />
+}
+
+@section VendorScripts {
+    <script src="~/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+}
+
+@section PageScripts {
+    <script>
+        let deploymentTable;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize DataTable
+            deploymentTable = new DataTable(document.querySelector('#deploymentTable'), {
+                ajax: {
+                    url: '@Url.Action("GetJsonResult", "MikrotikRadiusDeployment", new { area = "Administrator" })',
+                    dataSrc: ''
+                },
+                columns: [
+                    { data: 'id', title: 'ID' },
+                    { data: 'routerName', title: 'Router' },
+                    { data: 'policyName', title: 'Policy' },
+                    { data: 'queueName', title: 'Queue Name' },
+                    { data: 'targetAddress', title: 'Target' },
+                    { data: 'deploymentStatus', title: 'Deploy Status' },
+                    { data: 'syncStatus', title: 'Sync Status' },
+                    { data: 'deployedDate', title: 'Deployed' },
+                    { data: 'lastSyncDate', title: 'Last Sync' },
+                    {
+                        data: 'id', title: 'Actions', orderable: false, render: function(data) {
+                            return `<button class="btn btn-sm btn-info btn-detail" data-id="${data}">Detail</button>
+                                    <button class="btn btn-sm btn-danger btn-rollback" data-id="${data}">Rollback</button>`;
+                        }
+                    }
+                ],
+                responsive: true,
+                pageLength: 10
+            });
+
+            // Load status
+            loadStatus();
+
+            // Detail button
+            $(document).on('click', '.btn-detail', function() {
+                const id = $(this).data('id');
+                $.get('@Url.Action("GetDetail", "MikrotikRadiusDeployment", new { area = "Administrator" })?' + $.param({ id }), function(data) {
+                    showDetailModal(data);
+                });
+            });
+
+            // Rollback button
+            $(document).on('click', '.btn-rollback', function() {
+                const id = $(this).data('id');
+                if (confirm('Apakah anda yakin ingin rollback queue ini?')) {
+                    $.post('@Url.Action("Rollback", "MikrotikRadiusDeployment", new { area = "Administrator" })',
+                        { configIds: [id] },
+                        function(response) {
+                            alert(response.message);
+                            deploymentTable.ajax.reload();
+                        });
+                }
+            });
+
+            // Sync status button
+            $('#btnSyncStatus').on('click', function() {
+                $(this).prop('disabled', true);
+                $.post('@Url.Action("SyncStatus", "MikrotikRadiusDeployment", new { area = "Administrator" })', function(response) {
+                    alert(response.message);
+                    deploymentTable.ajax.reload();
+                    loadStatus();
+                }).always(function() {
+                    $('#btnSyncStatus').prop('disabled', false);
+                });
+            });
+
+            // Pull accounting button
+            $('#btnPullAccounting').on('click', function() {
+                $(this).prop('disabled', true);
+                $.post('@Url.Action("PullAccounting", "MikrotikRadiusDeployment", new { area = "Administrator" })', function(response) {
+                    alert(response.message);
+                }).always(function() {
+                    $('#btnPullAccounting').prop('disabled', false);
+                });
+            });
+
+            // Deploy button
+            $('#btnDeploy').on('click', function() {
+                window.location.href = '@Url.Action("Deploy", "MikrotikRadiusDeployment", new { area = "Administrator" })';
+            });
+        });
+
+        function loadStatus() {
+            $.get('@Url.Action("GetStatus", "MikrotikRadiusDeployment", new { area = "Administrator" })', function(status) {
+                $('#totalConfigs').text(status['total-configs'] || 0);
+                $('#deployedCount').text(status['deployed-count'] || 0);
+                $('#inSyncCount').text(status['in-sync-count'] || 0);
+                $('#outOfSyncCount').text(status['out-of-sync-count'] || 0);
+                $('#deploymentRate').text((status['deployment-success-rate'] || 0).toFixed(1) + '%');
+                $('#syncRate').text((status['sync-success-rate'] || 0).toFixed(1) + '%');
+            });
+        }
+
+        function showDetailModal(data) {
+            const html = `
+                <div class="modal fade" id="detailModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Queue Configuration Detail</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <dl class="row">
+                                    <dt class="col-sm-3">Router:</dt>
+                                    <dd class="col-sm-9">${data.routerName}</dd>
+                                    <dt class="col-sm-3">Policy:</dt>
+                                    <dd class="col-sm-9">${data.policyName}</dd>
+                                    <dt class="col-sm-3">Queue Name:</dt>
+                                    <dd class="col-sm-9">${data.queueName}</dd>
+                                    <dt class="col-sm-3">Target Address:</dt>
+                                    <dd class="col-sm-9">${data.targetAddress}</dd>
+                                    <dt class="col-sm-3">Mikrotik Queue ID:</dt>
+                                    <dd class="col-sm-9">${data.mikrotikQueueId}</dd>
+                                    <dt class="col-sm-3">Deploy Status:</dt>
+                                    <dd class="col-sm-9"><span class="badge bg-info">${data.deploymentStatus}</span></dd>
+                                    <dt class="col-sm-3">Sync Status:</dt>
+                                    <dd class="col-sm-9"><span class="badge bg-success">${data.syncStatus}</span></dd>
+                                    <dt class="col-sm-3">Config Version:</dt>
+                                    <dd class="col-sm-9">${data.configVersion}</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            $('body').append(html);
+            new bootstrap.Modal(document.getElementById('detailModal')).show();
+        }
+    </script>
+}
+
+<div class="container-xl">
+    <div class="page-header d-print-none">
+        <div class="row align-items-center">
+            <div class="col">
+                <h2 class="page-title">
+                    Mikrotik RADIUS Deployment Management
+                </h2>
+            </div>
+            <div class="col-auto ms-auto d-print-none">
+                <div class="btn-list">
+                    <button id="btnDeploy" class="btn btn-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M12 5l0 14m-7 -7l14 0" />
+                        </svg>
+                        Deploy New Policy
+                    </button>
+                    <button id="btnSyncStatus" class="btn btn-info">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M9 4h-4a2 2 0 0 0 -2 2v4m15 -6h4a2 2 0 0 1 2 2v4m-15 6h4a2 2 0 0 1 2 2v4m-9 -6h-4a2 2 0 0 0 -2 -2v-4" />
+                        </svg>
+                        Sync Status
+                    </button>
+                    <button id="btnPullAccounting" class="btn btn-warning">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M19 9v-2a2 2 0 0 0 -2 -2h-12a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
+                            <path d="M13 5v6" />
+                            <path d="M9 13h4" />
+                        </svg>
+                        Pull Accounting
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="page-wrapper">
+    <div class="page-body">
+        <div class="container-xl">
+            <!-- Status Cards -->
+            <div class="row row-deck row-cards mb-4">
+                <div class="col-sm-6 col-lg-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="text-truncate">
+                                <h3 class="card-title text-muted font-weight-normal">Total Configs</h3>
+                                <div class="h1 mb-0">
+                                    <span id="totalConfigs">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="text-truncate">
+                                <h3 class="card-title text-muted font-weight-normal">Deployed</h3>
+                                <div class="h1 mb-0">
+                                    <span id="deployedCount">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="text-truncate">
+                                <h3 class="card-title text-muted font-weight-normal">In Sync</h3>
+                                <div class="h1 mb-0">
+                                    <span id="inSyncCount">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="text-truncate">
+                                <h3 class="card-title text-muted font-weight-normal">Out of Sync</h3>
+                                <div class="h1 mb-0">
+                                    <span id="outOfSyncCount">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Success Rates -->
+            <div class="row row-deck row-cards mb-4">
+                <div class="col-sm-6 col-lg-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="text-truncate">
+                                <h3 class="card-title text-muted font-weight-normal">Deployment Rate</h3>
+                                <div class="h1 mb-0">
+                                    <span id="deploymentRate">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="text-truncate">
+                                <h3 class="card-title text-muted font-weight-normal">Sync Rate</h3>
+                                <div class="h1 mb-0">
+                                    <span id="syncRate">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deployment Table -->
+            <div class="row row-deck row-cards">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table id="deploymentTable" class="table table-vcenter card-table"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

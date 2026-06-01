@@ -3,7 +3,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NRAdmanWebApplicationNet10.Models
 {
-    [Table("mikrotik_radius_policy")]
+    /// <summary>
+    /// Model untuk RADIUS Policy di Mikrotik
+    /// Menyimpan konfigurasi bandwidth/QoS yang akan diterapkan ke queue
+    /// </summary>
+    [Table("mikrotik_radius_policies")]
     public class MikrotikRadiusPolicy
     {
         [Key]
@@ -11,69 +15,78 @@ namespace NRAdmanWebApplicationNet10.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [Column("policy_name")]
         [Required]
-        [MaxLength(100)]
+        [MaxLength(255)]
+        [Column("policy_name")]
         [Display(Name = "Policy Name")]
         public string PolicyName { get; set; } = "";
 
         [Column("description")]
         [MaxLength(500)]
-        [Display(Name = "Description")]
         public string? Description { get; set; }
 
-        // Bandwidth Management
+        /// <summary>
+        /// Download limit dalam Mbps
+        /// </summary>
         [Column("download_limit")]
         [Display(Name = "Download Limit (Mbps)")]
         public decimal? DownloadLimit { get; set; }
 
+        /// <summary>
+        /// Upload limit dalam Mbps
+        /// </summary>
         [Column("upload_limit")]
         [Display(Name = "Upload Limit (Mbps)")]
         public decimal? UploadLimit { get; set; }
 
-        // Queue Type
-        [Column("queue_type")]
-        [Required]
-        [Display(Name = "Queue Type")]
-        public EnumQueueType QueueType { get; set; } = EnumQueueType.SimpleQueue;
-
-        // Priority (1-16, lower = higher priority)
-        [Column("priority")]
-        [Display(Name = "Priority (1-16)")]
-        public int Priority { get; set; } = 8;
-
-        // Burst Settings
+        /// <summary>
+        /// Burst limit untuk download dalam Mbps
+        /// </summary>
         [Column("burst_limit_down")]
-        [Display(Name = "Burst Download Limit (Mbps)")]
+        [Display(Name = "Burst Download (Mbps)")]
         public decimal? BurstLimitDown { get; set; }
 
+        /// <summary>
+        /// Burst limit untuk upload dalam Mbps
+        /// </summary>
         [Column("burst_limit_up")]
-        [Display(Name = "Burst Upload Limit (Mbps)")]
+        [Display(Name = "Burst Upload (Mbps)")]
         public decimal? BurstLimitUp { get; set; }
 
+        /// <summary>
+        /// Burst threshold untuk download dalam persen
+        /// </summary>
         [Column("burst_threshold_down")]
         [Display(Name = "Burst Threshold Down (%)")]
         public int? BurstThresholdDown { get; set; }
 
+        /// <summary>
+        /// Burst threshold untuk upload dalam persen
+        /// </summary>
         [Column("burst_threshold_up")]
         [Display(Name = "Burst Threshold Up (%)")]
         public int? BurstThresholdUp { get; set; }
 
+        /// <summary>
+        /// Burst time dalam detik
+        /// </summary>
         [Column("burst_time")]
         [Display(Name = "Burst Time (seconds)")]
         public int? BurstTime { get; set; }
 
-        // Advanced Settings
-        [Column("max_limit_down")]
-        [Display(Name = "Max Limit Download (Mbps)")]
-        public decimal? MaxLimitDown { get; set; }
+        /// <summary>
+        /// Priority queue (1-16, 1 adalah highest)
+        /// </summary>
+        [Column("priority")]
+        [Range(1, 16)]
+        [Display(Name = "Priority")]
+        public int Priority { get; set; } = 8;
 
-        [Column("max_limit_up")]
-        [Display(Name = "Max Limit Upload (Mbps)")]
-        public decimal? MaxLimitUp { get; set; }
-
+        /// <summary>
+        /// Status policy (aktif/nonaktif)
+        /// </summary>
         [Column("is_active")]
-        [Display(Name = "Is Active")]
+        [Display(Name = "Active")]
         public bool IsActive { get; set; } = true;
 
         [Column("created_date")]
@@ -81,7 +94,6 @@ namespace NRAdmanWebApplicationNet10.Models
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
         [Column("modified_date")]
-        [Display(Name = "Modified Date")]
         public DateTime? ModifiedDate { get; set; }
 
         [Column("created_by")]
@@ -91,15 +103,5 @@ namespace NRAdmanWebApplicationNet10.Models
         [Column("modified_by")]
         [MaxLength(255)]
         public string? ModifiedBy { get; set; }
-    }
-
-    public enum EnumQueueType
-    {
-        [Display(Name = "Simple Queue")]
-        SimpleQueue = 1,
-        [Display(Name = "PCQ")]
-        PCQ = 2,
-        [Display(Name = "HTB")]
-        HTB = 3
     }
 }

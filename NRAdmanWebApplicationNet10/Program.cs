@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NRAdmanWebApplicationNet10.Services;
+using NRAdmanWebApplicationNet10.Services.Mikrotik;
 using NRAdmanWebApplicationNet10.Data;
 using Serilog;
 
@@ -22,6 +23,11 @@ builder.Services.AddSingleton<IAntiBruteForceService, AntiBruteForceService>();
 
 // SSH Service
 builder.Services.AddScoped<ISSHService, SSHService>();
+
+// Mikrotik Services
+builder.Services.AddScoped<MikrotikApiService>();
+builder.Services.AddScoped<MikrotikPolicyApplicationService>();
+builder.Services.AddScoped<MikrotikSyncService>();
 
 builder.Services.AddHttpContextAccessor();
 // Add services to the container.

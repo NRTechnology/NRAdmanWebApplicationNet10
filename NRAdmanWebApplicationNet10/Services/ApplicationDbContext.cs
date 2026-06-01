@@ -40,6 +40,8 @@ namespace NRAdmanWebApplicationNet10.Services
 
         public DbSet<MikrotikRadiusAccounting> MikrotikRadiusAccounting => Set<MikrotikRadiusAccounting>();
 
+        public DbSet<MikrotikQueueConfig> MikrotikQueueConfigs => Set<MikrotikQueueConfig>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -64,6 +66,37 @@ namespace NRAdmanWebApplicationNet10.Services
             {
                 entity.ToTable("routers");
                 entity.HasIndex(e => e.Id, "RouterId_index_unique").IsUnique();
+            });
+
+            // Mikrotik Radius entities
+            modelBuilder.Entity<MikrotikRadiusPolicy>(entity =>
+            {
+                entity.ToTable("mikrotik_radius_policies");
+                entity.HasKey(e => e.Id);
+                entity.HasIndex(e => e.PolicyName).IsUnique();
+            });
+
+            modelBuilder.Entity<MikrotikRadiusAccounting>(entity =>
+            {
+                entity.ToTable("mikrotik_radius_accounting");
+                entity.HasKey(e => e.Id);
+                entity.HasIndex(e => e.CreatedDate);
+            });
+
+            modelBuilder.Entity<MikrotikQueueConfig>(entity =>
+            {
+                entity.ToTable("mikrotik_queue_config");
+                entity.HasKey(e => e.Id);
+                entity.HasOne(e => e.Router)
+                    .WithMany()
+                    .HasForeignKey(e => e.RouterId)
+                    .OnDelete(DeleteBehavior.SetNull);
+                entity.HasOne(e => e.Policy)
+                    .WithMany()
+                    .HasForeignKey(e => e.PolicyId)
+                    .OnDelete(DeleteBehavior.SetNull);
+                entity.HasIndex(e => e.RouterId);
+                entity.HasIndex(e => e.PolicyId);
             });
         }
     }

@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NRAdmanWebApplicationNet10.Models
 {
-    [Table("mikrotik_simple_queues")]
     public class MikrotikSimpleQueue
     {
         [Key]

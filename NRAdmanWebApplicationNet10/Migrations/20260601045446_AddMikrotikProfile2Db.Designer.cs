@@ -3,6 +3,7 @@ using System;
 using System.Net;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NRAdmanWebApplicationNet10.Services;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NRAdmanWebApplicationNet10.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260601045446_AddMikrotikProfile2Db")]
+    partial class AddMikrotikProfile2Db
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -319,7 +322,7 @@ namespace NRAdmanWebApplicationNet10.Migrations
 
                     b.HasIndex("RouterId");
 
-                    b.ToTable("mikrotik_queue_config", (string)null);
+                    b.ToTable("mikrotik_queue_config");
                 });
 
             modelBuilder.Entity("NRAdmanWebApplicationNet10.Models.MikrotikRadiusAccounting", b =>
@@ -382,9 +385,7 @@ namespace NRAdmanWebApplicationNet10.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedDate");
-
-                    b.ToTable("mikrotik_radius_accounting", (string)null);
+                    b.ToTable("mikrotik_radius_accounting");
                 });
 
             modelBuilder.Entity("NRAdmanWebApplicationNet10.Models.MikrotikRadiusPolicy", b =>
@@ -463,10 +464,7 @@ namespace NRAdmanWebApplicationNet10.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PolicyName")
-                        .IsUnique();
-
-                    b.ToTable("mikrotik_radius_policies", (string)null);
+                    b.ToTable("mikrotik_radius_policies");
                 });
 
             modelBuilder.Entity("NRAdmanWebApplicationNet10.Models.MikrotikSimpleQueue", b =>
@@ -1237,13 +1235,11 @@ namespace NRAdmanWebApplicationNet10.Migrations
                 {
                     b.HasOne("NRAdmanWebApplicationNet10.Models.MikrotikRadiusPolicy", "Policy")
                         .WithMany()
-                        .HasForeignKey("PolicyId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("PolicyId");
 
                     b.HasOne("NRAdmanWebApplicationNet10.Models.Router", "Router")
                         .WithMany()
-                        .HasForeignKey("RouterId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("RouterId");
 
                     b.Navigation("Policy");
 

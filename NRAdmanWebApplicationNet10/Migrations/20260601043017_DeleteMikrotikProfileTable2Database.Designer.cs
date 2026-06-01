@@ -3,6 +3,7 @@ using System;
 using System.Net;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NRAdmanWebApplicationNet10.Services;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NRAdmanWebApplicationNet10.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260601043017_DeleteMikrotikProfileTable2Database")]
+    partial class DeleteMikrotikProfileTable2Database
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -231,242 +234,6 @@ namespace NRAdmanWebApplicationNet10.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("LoginAttempts");
-                });
-
-            modelBuilder.Entity("NRAdmanWebApplicationNet10.Models.MikrotikQueueConfig", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ConfigMetadata")
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)")
-                        .HasColumnName("config_metadata");
-
-                    b.Property<int>("ConfigVersion")
-                        .HasColumnType("integer")
-                        .HasColumnName("config_version");
-
-                    b.Property<string>("CreatedBy")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("created_by");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_date");
-
-                    b.Property<DateTime?>("DeployedDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deployed_date");
-
-                    b.Property<int>("DeploymentStatus")
-                        .HasColumnType("integer")
-                        .HasColumnName("deployment_status");
-
-                    b.Property<string>("LastError")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("last_error");
-
-                    b.Property<DateTime?>("LastSyncDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("last_sync_date");
-
-                    b.Property<string>("MikrotikQueueId")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("mikrotik_queue_id");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("modified_by");
-
-                    b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("modified_date");
-
-                    b.Property<int?>("PolicyId")
-                        .HasColumnType("integer")
-                        .HasColumnName("policy_id");
-
-                    b.Property<string>("QueueName")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("queue_name");
-
-                    b.Property<Guid?>("RouterId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("router_id");
-
-                    b.Property<int?>("SyncStatus")
-                        .HasColumnType("integer")
-                        .HasColumnName("sync_status");
-
-                    b.Property<string>("TargetAddress")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("target_address");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PolicyId");
-
-                    b.HasIndex("RouterId");
-
-                    b.ToTable("mikrotik_queue_config", (string)null);
-                });
-
-            modelBuilder.Entity("NRAdmanWebApplicationNet10.Models.MikrotikRadiusAccounting", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<long?>("AcctInputOctets")
-                        .HasColumnType("bigint")
-                        .HasColumnName("acct_input_octets");
-
-                    b.Property<long?>("AcctInputPackets")
-                        .HasColumnType("bigint")
-                        .HasColumnName("acct_input_packets");
-
-                    b.Property<long?>("AcctOutputOctets")
-                        .HasColumnType("bigint")
-                        .HasColumnName("acct_output_octets");
-
-                    b.Property<long?>("AcctOutputPackets")
-                        .HasColumnType("bigint")
-                        .HasColumnName("acct_output_packets");
-
-                    b.Property<string>("AcctSessionId")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("acct_session_id");
-
-                    b.Property<long?>("AcctSessionTime")
-                        .HasColumnType("bigint")
-                        .HasColumnName("acct_session_time");
-
-                    b.Property<string>("AcctStatusType")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("acct_status_type");
-
-                    b.Property<string>("AcctTerminateCause")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("acct_terminate_cause");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_date");
-
-                    b.Property<string>("NasIpAddress")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("nas_ip_address");
-
-                    b.Property<string>("Username")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("username");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedDate");
-
-                    b.ToTable("mikrotik_radius_accounting", (string)null);
-                });
-
-            modelBuilder.Entity("NRAdmanWebApplicationNet10.Models.MikrotikRadiusPolicy", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal?>("BurstLimitDown")
-                        .HasColumnType("numeric")
-                        .HasColumnName("burst_limit_down");
-
-                    b.Property<decimal?>("BurstLimitUp")
-                        .HasColumnType("numeric")
-                        .HasColumnName("burst_limit_up");
-
-                    b.Property<int?>("BurstThresholdDown")
-                        .HasColumnType("integer")
-                        .HasColumnName("burst_threshold_down");
-
-                    b.Property<int?>("BurstThresholdUp")
-                        .HasColumnType("integer")
-                        .HasColumnName("burst_threshold_up");
-
-                    b.Property<int?>("BurstTime")
-                        .HasColumnType("integer")
-                        .HasColumnName("burst_time");
-
-                    b.Property<string>("CreatedBy")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("created_by");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_date");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("description");
-
-                    b.Property<decimal?>("DownloadLimit")
-                        .HasColumnType("numeric")
-                        .HasColumnName("download_limit");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_active");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("modified_by");
-
-                    b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("modified_date");
-
-                    b.Property<string>("PolicyName")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("policy_name");
-
-                    b.Property<int>("Priority")
-                        .HasColumnType("integer")
-                        .HasColumnName("priority");
-
-                    b.Property<decimal?>("UploadLimit")
-                        .HasColumnType("numeric")
-                        .HasColumnName("upload_limit");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PolicyName")
-                        .IsUnique();
-
-                    b.ToTable("mikrotik_radius_policies", (string)null);
                 });
 
             modelBuilder.Entity("NRAdmanWebApplicationNet10.Models.MikrotikSimpleQueue", b =>
@@ -1231,23 +998,6 @@ namespace NRAdmanWebApplicationNet10.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("NRAdmanWebApplicationNet10.Models.MikrotikQueueConfig", b =>
-                {
-                    b.HasOne("NRAdmanWebApplicationNet10.Models.MikrotikRadiusPolicy", "Policy")
-                        .WithMany()
-                        .HasForeignKey("PolicyId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("NRAdmanWebApplicationNet10.Models.Router", "Router")
-                        .WithMany()
-                        .HasForeignKey("RouterId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Policy");
-
-                    b.Navigation("Router");
                 });
 
             modelBuilder.Entity("NRAdmanWebApplicationNet10.Models.MikrotikSimpleQueue", b =>
