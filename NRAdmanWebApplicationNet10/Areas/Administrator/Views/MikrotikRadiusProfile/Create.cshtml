@@ -1,0 +1,188 @@
+@model NRAdmanWebApplicationNet10.Models.MikrotikRadiusPolicy
+
+@{
+    ViewData["Title"] = "Create RADIUS Policy";
+}
+
+@section PageScripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            $('#form-create-policy').on('submit', function(e) {
+                e.preventDefault();
+
+                const form = $(this)[0];
+                const formData = new FormData(form);
+
+                $.ajax({
+                    url: '@Url.Action("Create", "MikrotikRadiusProfile", new { area = "Administrator" })',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        if (response.success) {
+                            ToastHelper.showSuccess(response.message);
+                            setTimeout(() => {
+                                window.location.href = '@Url.Action("Index", "MikrotikRadiusProfile", new { area = "Administrator" })';
+                            }, 1000);
+                        } else {
+                            ToastHelper.showError(response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        ToastHelper.showError('Error creating policy');
+                    }
+                });
+            });
+
+            $('#btnCancel').on('click', function() {
+                window.location.href = '@Url.Action("Index", "MikrotikRadiusProfile", new { area = "Administrator" })';
+            });
+        });
+    </script>
+}
+
+<div class="page-wrapper">
+    <div class="container-xl">
+        <div class="page-header d-print-none">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h2 class="page-title">
+                        Create RADIUS Policy
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-body">
+        <div class="container-xl">
+            <div class="row row-cards">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="card">
+                        <div class="card-body">
+                            <form id="form-create-policy" method="post">
+                                @Html.AntiForgeryToken()
+
+                                <!-- Policy Name -->
+                                <div class="mb-3">
+                                    <label class="form-label">Policy Name <span class="text-danger">*</span></label>
+                                    <input type="text" asp-for="PolicyName" class="form-control" placeholder="e.g., PREMIUM_100M" required />
+                                    <span asp-validation-for="PolicyName" class="text-danger small"></span>
+                                </div>
+
+                                <!-- Description -->
+                                <div class="mb-3">
+                                    <label class="form-label">Description</label>
+                                    <textarea asp-for="Description" class="form-control" rows="3" placeholder="Policy description..."></textarea>
+                                </div>
+
+                                <!-- Bandwidth Settings -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Download Limit (Mbps) <span class="text-danger">*</span></label>
+                                            <input type="number" asp-for="DownloadLimit" class="form-control" step="0.01" placeholder="100" required />
+                                            <span asp-validation-for="DownloadLimit" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Upload Limit (Mbps) <span class="text-danger">*</span></label>
+                                            <input type="number" asp-for="UploadLimit" class="form-control" step="0.01" placeholder="50" required />
+                                            <span asp-validation-for="UploadLimit" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Burst Settings -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Burst Limit Down (Mbps)</label>
+                                            <input type="number" asp-for="BurstLimitDown" class="form-control" step="0.01" placeholder="200" />
+                                            <span asp-validation-for="BurstLimitDown" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Burst Limit Up (Mbps)</label>
+                                            <input type="number" asp-for="BurstLimitUp" class="form-control" step="0.01" placeholder="100" />
+                                            <span asp-validation-for="BurstLimitUp" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Burst Threshold -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Burst Threshold Down (%)</label>
+                                            <input type="number" asp-for="BurstThresholdDown" class="form-control" min="1" max="100" placeholder="50" />
+                                            <span asp-validation-for="BurstThresholdDown" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Burst Threshold Up (%)</label>
+                                            <input type="number" asp-for="BurstThresholdUp" class="form-control" min="1" max="100" placeholder="50" />
+                                            <span asp-validation-for="BurstThresholdUp" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Burst Time -->
+                                <div class="mb-3">
+                                    <label class="form-label">Burst Time (seconds)</label>
+                                    <input type="number" asp-for="BurstTime" class="form-control" min="1" placeholder="10" />
+                                    <span asp-validation-for="BurstTime" class="text-danger small"></span>
+                                </div>
+
+                                <!-- Priority -->
+                                <div class="mb-3">
+                                    <label class="form-label">Priority (1-16) <span class="text-danger">*</span></label>
+                                    <input type="number" asp-for="Priority" class="form-control" min="1" max="16" value="8" required />
+                                    <span asp-validation-for="Priority" class="text-danger small"></span>
+                                    <small class="text-muted">1 = Highest, 16 = Lowest (default: 8)</small>
+                                </div>
+
+                                <!-- Active Status -->
+                                <div class="mb-3">
+                                    <label class="form-check">
+                                        <input type="checkbox" asp-for="IsActive" class="form-check-input" checked />
+                                        <span class="form-check-label">Active</span>
+                                    </label>
+                                </div>
+
+                                <!-- Info -->
+                                <div class="alert alert-info" role="alert">
+                                    <div class="d-flex">
+                                        <div>
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-avatar flex-shrink-0" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 8h.01" /><path d="M11 12h1v4h1" /></svg>
+                                        </div>
+                                        <div>
+                                            <h3 class="alert-title">Bandwidth Policy Information</h3>
+                                            <div class="text-muted text-sm">
+                                                <ul class="mb-0">
+                                                    <li>Semua nilai dalam satuan Mbps (Megabit per second)</li>
+                                                    <li>Burst limit untuk bandwidth temporary yang lebih tinggi</li>
+                                                    <li>Priority rendah berarti prioritas tinggi (1=tertinggi)</li>
+                                                    <li>Policy tidak bisa dihapus jika masih di-deploy</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="card-footer text-end">
+                            <button id="btnCancel" class="btn btn-link">Cancel</button>
+                            <button form="form-create-policy" type="submit" class="btn btn-primary">Create Policy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

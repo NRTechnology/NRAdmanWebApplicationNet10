@@ -11,8 +11,9 @@
             $('#policyId').on('change', function() {
                 const policyId = $(this).val();
                 if (policyId) {
-                    $.get('@Url.Action("Index", "MikrotikRadiusProfile", new { area = "Administrator" })?' + $.param({ id: policyId }), function(data) {
+                    $.get('@Url.Action("GetDetail", "MikrotikRadiusProfile", new { area = "Administrator" })?' + $.param({ id: policyId }), function(data) {
                         // Load policy details
+                        console.log('Policy loaded:', data);
                     });
                 }
             });

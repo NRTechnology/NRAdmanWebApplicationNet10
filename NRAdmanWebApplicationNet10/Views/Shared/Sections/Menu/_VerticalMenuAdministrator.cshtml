@@ -206,6 +206,27 @@
         </li>
         <!-- settings menu end -->
 
+        <!-- Mikrotik RADIUS menu start -->
+        <li class='menu-item@(currentPage.StartsWith("/Administrator/MikrotikRadius") ? " active open" : "")'>
+            <a href='javascript:void(0);' class='menu-link menu-toggle'>
+                <i class="menu-icon icon-base ti tabler-network"></i>
+                <div data-i18n="Mikrotik RADIUS">Mikrotik RADIUS</div>
+            </a>
+            <ul class="menu-sub">
+                <li class='menu-item@(currentPage == "/Administrator/MikrotikRadiusProfile" ? " active" : "")'>
+                    <a asp-area="Administrator" asp-controller="MikrotikRadiusProfile" asp-action="Index" class="menu-link">
+                        <div data-i18n="Policies">Policies</div>
+                    </a>
+                </li>
+                <li class='menu-item@(currentPage == "/Administrator/MikrotikRadiusDeployment" ? " active" : "")'>
+                    <a asp-area="Administrator" asp-controller="MikrotikRadiusDeployment" asp-action="Index" class="menu-link">
+                        <div data-i18n="Deployment">Deployment</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <!-- Mikrotik RADIUS menu end -->
+
     <!-- Apps & Pages -->
     <li class="menu-header small">
       <span class="menu-header-text" data-i18n="Apps & Pages">Apps &amp; Pages</span>

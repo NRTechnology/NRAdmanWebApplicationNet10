@@ -1,0 +1,182 @@
+@{
+    ViewData["Title"] = "RADIUS Policy Management";
+}
+
+@section VendorStyles {
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css" />
+}
+
+@section VendorScripts {
+    <script src="~/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+}
+
+@section PageScripts {
+    <script>
+        let policiesTable;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize DataTable
+            policiesTable = new DataTable(document.querySelector('#policiesTable'), {
+                ajax: {
+                    url: '@Url.Action("GetJsonResult", "MikrotikRadiusProfile", new { area = "Administrator" })',
+                    dataSrc: ''
+                },
+                columns: [
+                    { data: 'id', title: 'ID' },
+                    { data: 'policyName', title: 'Policy Name' },
+                    { data: 'description', title: 'Description' },
+                    { data: 'downloadLimit', title: 'Download' },
+                    { data: 'uploadLimit', title: 'Upload' },
+                    { data: 'priority', title: 'Priority' },
+                    { data: 'isActive', title: 'Status' },
+                    { data: 'createdDate', title: 'Created' },
+                    {
+                        data: 'id', title: 'Actions', orderable: false, render: function(data) {
+                            return `<button class="btn btn-sm btn-info btn-detail" data-id="${data}">Detail</button>
+                                    <button class="btn btn-sm btn-warning btn-edit" data-id="${data}">Edit</button>
+                                    <button class="btn btn-sm btn-danger btn-delete" data-id="${data}">Delete</button>`;
+                        }
+                    }
+                ],
+                responsive: true,
+                pageLength: 10
+            });
+
+            // Load statistics
+            loadStatistics();
+
+            // Detail button
+            $(document).on('click', '.btn-detail', function() {
+                const id = $(this).data('id');
+                $.get('@Url.Action("GetDetail", "MikrotikRadiusProfile", new { area = "Administrator" })?id=' + id, function(data) {
+                    let detailHtml = `
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Policy Name:</strong> ${data.policyName}</p>
+                                <p><strong>Description:</strong> ${data.description || '-'}</p>
+                                <p><strong>Download Limit:</strong> ${data.downloadLimit ? data.downloadLimit + ' Mbps' : 'Unlimited'}</p>
+                                <p><strong>Upload Limit:</strong> ${data.uploadLimit ? data.uploadLimit + ' Mbps' : 'Unlimited'}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Burst Down:</strong> ${data.burstLimitDown ? data.burstLimitDown + ' Mbps' : '-'}</p>
+                                <p><strong>Burst Up:</strong> ${data.burstLimitUp ? data.burstLimitUp + ' Mbps' : '-'}</p>
+                                <p><strong>Priority:</strong> ${data.priority}</p>
+                                <p><strong>Status:</strong> ${data.isActive ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Inactive</span>'}</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <p><strong>Created:</strong> ${new Date(data.createdDate).toLocaleString()}</p>
+                        <p><strong>Modified:</strong> ${data.modifiedDate ? new Date(data.modifiedDate).toLocaleString() : '-'}</p>
+                    `;
+                    alert(detailHtml);
+                });
+            });
+
+            // Edit button
+            $(document).on('click', '.btn-edit', function() {
+                const id = $(this).data('id');
+                window.location.href = '@Url.Action("Edit", "MikrotikRadiusProfile", new { area = "Administrator" })?id=' + id;
+            });
+
+            // Delete button
+            $(document).on('click', '.btn-delete', function() {
+                const id = $(this).data('id');
+                if (confirm('Yakin ingin menghapus policy ini?')) {
+                    $.post('@Url.Action("Delete", "MikrotikRadiusProfile", new { area = "Administrator" })',
+                        { id },
+                        function(response) {
+                            if (response.success) {
+                                ToastHelper.showSuccess(response.message);
+                                policiesTable.ajax.reload();
+                                loadStatistics();
+                            } else {
+                                ToastHelper.showError(response.message);
+                            }
+                        });
+                }
+            });
+
+            // Create button
+            $('#btnCreate').on('click', function() {
+                window.location.href = '@Url.Action("Create", "MikrotikRadiusProfile", new { area = "Administrator" })';
+            });
+        });
+
+        function loadStatistics() {
+            $.get('@Url.Action("GetStatistics", "MikrotikRadiusProfile", new { area = "Administrator" })', function(data) {
+                $('#totalPolicies').text(data.totalPolicies);
+                $('#activePolicies').text(data.activePolicies);
+                $('#deployedPolicies').text(data.deployedPolicies);
+            });
+        }
+    </script>
+}
+
+<div class="page-wrapper">
+    <div class="container-xl">
+        <div class="page-header d-print-none">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h2 class="page-title">
+                        RADIUS Policy Management
+                    </h2>
+                </div>
+                <div class="col-auto">
+                    <button id="btnCreate" class="btn btn-primary">
+                        <i class="ti ti-plus"></i> Create Policy
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-body">
+        <div class="container-xl">
+            <!-- Statistics -->
+            <div class="row row-deck row-cards mb-3">
+                <div class="col-sm-6 col-lg-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="text-muted text-sm font-semibold">Total Policies</div>
+                            <div class="mt-2">
+                                <div class="h3 mb-0" id="totalPolicies">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="text-muted text-sm font-semibold">Active Policies</div>
+                            <div class="mt-2">
+                                <div class="h3 mb-0" id="activePolicies">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="text-muted text-sm font-semibold">Deployed Policies</div>
+                            <div class="mt-2">
+                                <div class="h3 mb-0" id="deployedPolicies">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="row row-cards">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table id="policiesTable" class="table table-vcenter card-table">
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

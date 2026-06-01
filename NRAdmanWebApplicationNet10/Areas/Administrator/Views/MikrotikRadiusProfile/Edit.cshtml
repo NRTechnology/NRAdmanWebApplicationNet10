@@ -1,0 +1,182 @@
+@model NRAdmanWebApplicationNet10.Models.MikrotikRadiusPolicy
+
+@{
+    ViewData["Title"] = "Edit RADIUS Policy";
+}
+
+@section PageScripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            $('#form-edit-policy').on('submit', function(e) {
+                e.preventDefault();
+
+                const form = $(this)[0];
+                const formData = new FormData(form);
+                const id = $('#Id').val();
+
+                $.ajax({
+                    url: '@Url.Action("Edit", "MikrotikRadiusProfile", new { area = "Administrator" })?id=' + id,
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        if (response.success) {
+                            ToastHelper.showSuccess(response.message);
+                            setTimeout(() => {
+                                window.location.href = '@Url.Action("Index", "MikrotikRadiusProfile", new { area = "Administrator" })';
+                            }, 1000);
+                        } else {
+                            ToastHelper.showError(response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        ToastHelper.showError('Error updating policy');
+                    }
+                });
+            });
+
+            $('#btnCancel').on('click', function() {
+                window.location.href = '@Url.Action("Index", "MikrotikRadiusProfile", new { area = "Administrator" })';
+            });
+        });
+    </script>
+}
+
+<div class="page-wrapper">
+    <div class="container-xl">
+        <div class="page-header d-print-none">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h2 class="page-title">
+                        Edit RADIUS Policy
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-body">
+        <div class="container-xl">
+            <div class="row row-cards">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="card">
+                        <div class="card-body">
+                            <form id="form-edit-policy" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" asp-for="Id" id="Id" />
+
+                                <!-- Policy Name -->
+                                <div class="mb-3">
+                                    <label class="form-label">Policy Name <span class="text-danger">*</span></label>
+                                    <input type="text" asp-for="PolicyName" class="form-control" required />
+                                    <span asp-validation-for="PolicyName" class="text-danger small"></span>
+                                </div>
+
+                                <!-- Description -->
+                                <div class="mb-3">
+                                    <label class="form-label">Description</label>
+                                    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                                </div>
+
+                                <!-- Bandwidth Settings -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Download Limit (Mbps) <span class="text-danger">*</span></label>
+                                            <input type="number" asp-for="DownloadLimit" class="form-control" step="0.01" required />
+                                            <span asp-validation-for="DownloadLimit" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Upload Limit (Mbps) <span class="text-danger">*</span></label>
+                                            <input type="number" asp-for="UploadLimit" class="form-control" step="0.01" required />
+                                            <span asp-validation-for="UploadLimit" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Burst Settings -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Burst Limit Down (Mbps)</label>
+                                            <input type="number" asp-for="BurstLimitDown" class="form-control" step="0.01" />
+                                            <span asp-validation-for="BurstLimitDown" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Burst Limit Up (Mbps)</label>
+                                            <input type="number" asp-for="BurstLimitUp" class="form-control" step="0.01" />
+                                            <span asp-validation-for="BurstLimitUp" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Burst Threshold -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Burst Threshold Down (%)</label>
+                                            <input type="number" asp-for="BurstThresholdDown" class="form-control" min="1" max="100" />
+                                            <span asp-validation-for="BurstThresholdDown" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Burst Threshold Up (%)</label>
+                                            <input type="number" asp-for="BurstThresholdUp" class="form-control" min="1" max="100" />
+                                            <span asp-validation-for="BurstThresholdUp" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Burst Time -->
+                                <div class="mb-3">
+                                    <label class="form-label">Burst Time (seconds)</label>
+                                    <input type="number" asp-for="BurstTime" class="form-control" min="1" />
+                                    <span asp-validation-for="BurstTime" class="text-danger small"></span>
+                                </div>
+
+                                <!-- Priority -->
+                                <div class="mb-3">
+                                    <label class="form-label">Priority (1-16) <span class="text-danger">*</span></label>
+                                    <input type="number" asp-for="Priority" class="form-control" min="1" max="16" required />
+                                    <span asp-validation-for="Priority" class="text-danger small"></span>
+                                    <small class="text-muted">1 = Highest, 16 = Lowest</small>
+                                </div>
+
+                                <!-- Active Status -->
+                                <div class="mb-3">
+                                    <label class="form-check">
+                                        <input type="checkbox" asp-for="IsActive" class="form-check-input" />
+                                        <span class="form-check-label">Active</span>
+                                    </label>
+                                </div>
+
+                                <!-- Audit Info -->
+                                <div class="mb-3">
+                                    <small class="text-muted">
+                                        Created: @Model.CreatedDate.ToString("yyyy-MM-dd HH:mm") by @Model.CreatedBy
+                                        <br />
+                                        @if (Model.ModifiedDate.HasValue)
+                                        {
+                                            <text>Modified: @Model.ModifiedDate.Value.ToString("yyyy-MM-dd HH:mm") by @Model.ModifiedBy</text>
+                                        }
+                                    </small>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="card-footer text-end">
+                            <button id="btnCancel" class="btn btn-link">Cancel</button>
+                            <button form="form-edit-policy" type="submit" class="btn btn-primary">Update Policy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
