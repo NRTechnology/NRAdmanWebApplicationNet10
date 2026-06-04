@@ -90,6 +90,54 @@ namespace NRAdmanWebApplicationNet10.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "mikrotik_radius_accounting",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Username = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    NasIpAddress = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    AcctInputOctets = table.Column<long>(type: "bigint", nullable: true),
+                    AcctOutputOctets = table.Column<long>(type: "bigint", nullable: true),
+                    AcctInputPackets = table.Column<long>(type: "bigint", nullable: true),
+                    AcctOutputPackets = table.Column<long>(type: "bigint", nullable: true),
+                    AcctSessionTime = table.Column<long>(type: "bigint", nullable: true),
+                    AcctStatusType = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    AcctSessionId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    AcctTerminateCause = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_mikrotik_radius_accounting", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "mikrotik_radius_policies",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    PolicyName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    DownloadLimit = table.Column<decimal>(type: "numeric", nullable: true),
+                    UploadLimit = table.Column<decimal>(type: "numeric", nullable: true),
+                    BurstLimitDown = table.Column<decimal>(type: "numeric", nullable: true),
+                    BurstLimitUp = table.Column<decimal>(type: "numeric", nullable: true),
+                    BurstThresholdDown = table.Column<int>(type: "integer", nullable: true),
+                    BurstThresholdUp = table.Column<int>(type: "integer", nullable: true),
+                    BurstTime = table.Column<int>(type: "integer", nullable: true),
+                    Priority = table.Column<int>(type: "integer", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedBy = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    ModifiedBy = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_mikrotik_radius_policies", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "nas",
                 columns: table => new
                 {
@@ -255,7 +303,8 @@ namespace NRAdmanWebApplicationNet10.Migrations
                     IpAddress = table.Column<string>(type: "character varying(19)", maxLength: 19, nullable: false),
                     Username = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Password = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    Ports = table.Column<int>(type: "integer", nullable: false),
+                    SShPort = table.Column<int>(type: "integer", nullable: false),
+                    ApiPort = table.Column<int>(type: "integer", nullable: false),
                     Description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     LastModifiedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
@@ -428,6 +477,45 @@ namespace NRAdmanWebApplicationNet10.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "mikrotik_queue_config",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    RouterId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PolicyId = table.Column<Guid>(type: "uuid", nullable: true),
+                    MikrotikQueueId = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    QueueName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    TargetAddress = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    DeploymentStatus = table.Column<int>(type: "integer", nullable: false),
+                    SyncStatus = table.Column<int>(type: "integer", nullable: true),
+                    LastError = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    DeployedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    LastSyncDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    ConfigVersion = table.Column<int>(type: "integer", nullable: false),
+                    ConfigMetadata = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedBy = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    ModifiedBy = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_mikrotik_queue_config", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_mikrotik_queue_config_mikrotik_radius_policies_PolicyId",
+                        column: x => x.PolicyId,
+                        principalTable: "mikrotik_radius_policies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_mikrotik_queue_config_routers_RouterId",
+                        column: x => x.RouterId,
+                        principalTable: "routers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "mikrotik_simple_queues",
                 columns: table => new
                 {
@@ -504,6 +592,27 @@ namespace NRAdmanWebApplicationNet10.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_mikrotik_queue_config_PolicyId",
+                table: "mikrotik_queue_config",
+                column: "PolicyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_mikrotik_queue_config_RouterId",
+                table: "mikrotik_queue_config",
+                column: "RouterId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_mikrotik_radius_accounting_CreatedDate",
+                table: "mikrotik_radius_accounting",
+                column: "CreatedDate");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_mikrotik_radius_policies_PolicyName",
+                table: "mikrotik_radius_policies",
+                column: "PolicyName",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "idx_router_queue_name",
                 table: "mikrotik_simple_queues",
                 columns: new[] { "RouterId", "QueueName" },
@@ -519,6 +628,18 @@ namespace NRAdmanWebApplicationNet10.Migrations
                 name: "IX_Packages_Code",
                 table: "Packages",
                 column: "Code",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_routers_IpAddress",
+                table: "routers",
+                column: "IpAddress",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_routers_Name",
+                table: "routers",
+                column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -577,6 +698,12 @@ namespace NRAdmanWebApplicationNet10.Migrations
                 name: "LoginAttempts");
 
             migrationBuilder.DropTable(
+                name: "mikrotik_queue_config");
+
+            migrationBuilder.DropTable(
+                name: "mikrotik_radius_accounting");
+
+            migrationBuilder.DropTable(
                 name: "mikrotik_simple_queues");
 
             migrationBuilder.DropTable(
@@ -611,6 +738,9 @@ namespace NRAdmanWebApplicationNet10.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "mikrotik_radius_policies");
 
             migrationBuilder.DropTable(
                 name: "routers");

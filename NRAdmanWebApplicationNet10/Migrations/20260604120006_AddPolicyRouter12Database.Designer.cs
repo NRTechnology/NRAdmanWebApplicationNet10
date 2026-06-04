@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NRAdmanWebApplicationNet10.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260601043017_DeleteMikrotikProfileTable2Database")]
-    partial class DeleteMikrotikProfileTable2Database
+    [Migration("20260604120006_AddPolicyRouter12Database")]
+    partial class AddPolicyRouter12Database
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -236,6 +236,189 @@ namespace NRAdmanWebApplicationNet10.Migrations
                     b.ToTable("LoginAttempts");
                 });
 
+            modelBuilder.Entity("NRAdmanWebApplicationNet10.Models.MikrotikQueueConfig", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ConfigMetadata")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int>("ConfigVersion")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DeployedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("DeploymentStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("LastError")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime?>("LastSyncDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("MikrotikQueueId")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("PolicyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("QueueName")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<Guid>("RouterId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("SyncStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TargetAddress")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PolicyId");
+
+                    b.HasIndex("RouterId");
+
+                    b.ToTable("MikrotikQueueConfigs");
+                });
+
+            modelBuilder.Entity("NRAdmanWebApplicationNet10.Models.MikrotikRadiusAccounting", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<long?>("AcctInputOctets")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("AcctInputPackets")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("AcctOutputOctets")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("AcctOutputPackets")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("AcctSessionId")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<long?>("AcctSessionTime")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("AcctStatusType")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("AcctTerminateCause")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("NasIpAddress")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Username")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MikrotikRadiusAccounting");
+                });
+
+            modelBuilder.Entity("NRAdmanWebApplicationNet10.Models.MikrotikRadiusPolicy", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("BurstLimitDown")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("BurstLimitUp")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("BurstThresholdDown")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("BurstThresholdUp")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("BurstTime")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<decimal>("DownloadLimit")
+                        .HasColumnType("numeric");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PolicyName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("UploadLimit")
+                        .HasColumnType("numeric");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PolicyName")
+                        .IsUnique();
+
+                    b.ToTable("MikrotikRadiusPolicies");
+                });
+
             modelBuilder.Entity("NRAdmanWebApplicationNet10.Models.MikrotikSimpleQueue", b =>
                 {
                     b.Property<Guid>("Id")
@@ -301,10 +484,9 @@ namespace NRAdmanWebApplicationNet10.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex(new[] { "RouterId", "QueueName" }, "idx_router_queue_name")
-                        .IsUnique();
+                    b.HasIndex("RouterId");
 
-                    b.ToTable("mikrotik_simple_queues", (string)null);
+                    b.ToTable("MikrotikSimpleQueues");
                 });
 
             modelBuilder.Entity("NRAdmanWebApplicationNet10.Models.Nas", b =>
@@ -361,10 +543,63 @@ namespace NRAdmanWebApplicationNet10.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex(new[] { "NasName" }, "NasName_index_unique")
+                    b.ToTable("nas");
+                });
+
+            modelBuilder.Entity("NRAdmanWebApplicationNet10.Models.NetworkRouter", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("ApiPort")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasMaxLength(19)
+                        .HasColumnType("character varying(19)");
+
+                    b.Property<DateTime?>("LastModifiedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("RouterType")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SShPort")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IpAddress")
                         .IsUnique();
 
-                    b.ToTable("nas", (string)null);
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Routers");
                 });
 
             modelBuilder.Entity("NRAdmanWebApplicationNet10.Models.Package", b =>
@@ -728,65 +963,6 @@ namespace NRAdmanWebApplicationNet10.Migrations
                     b.ToTable("radusergroup");
                 });
 
-            modelBuilder.Entity("NRAdmanWebApplicationNet10.Models.Router", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("ApiPort")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<string>("IpAddress")
-                        .IsRequired()
-                        .HasMaxLength(19)
-                        .HasColumnType("character varying(19)");
-
-                    b.Property<DateTime?>("LastModifiedDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<int>("RouterType")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("SShPort")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IpAddress")
-                        .IsUnique();
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.HasIndex(new[] { "Id" }, "RouterId_index_unique")
-                        .IsUnique();
-
-                    b.ToTable("routers", (string)null);
-                });
-
             modelBuilder.Entity("NRAdmanWebApplicationNet10.Models.Transaction", b =>
                 {
                     b.Property<Guid>("Id")
@@ -828,6 +1004,8 @@ namespace NRAdmanWebApplicationNet10.Migrations
                     b.HasIndex("CustomerId");
 
                     b.HasIndex("PackageId");
+
+                    b.HasIndex("Status");
 
                     b.HasIndex("TransactionCode")
                         .IsUnique();
@@ -1000,9 +1178,28 @@ namespace NRAdmanWebApplicationNet10.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("NRAdmanWebApplicationNet10.Models.MikrotikQueueConfig", b =>
+                {
+                    b.HasOne("NRAdmanWebApplicationNet10.Models.MikrotikRadiusPolicy", "Policy")
+                        .WithMany()
+                        .HasForeignKey("PolicyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NRAdmanWebApplicationNet10.Models.NetworkRouter", "Router")
+                        .WithMany()
+                        .HasForeignKey("RouterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Policy");
+
+                    b.Navigation("Router");
+                });
+
             modelBuilder.Entity("NRAdmanWebApplicationNet10.Models.MikrotikSimpleQueue", b =>
                 {
-                    b.HasOne("NRAdmanWebApplicationNet10.Models.Router", "Router")
+                    b.HasOne("NRAdmanWebApplicationNet10.Models.NetworkRouter", "Router")
                         .WithMany()
                         .HasForeignKey("RouterId")
                         .OnDelete(DeleteBehavior.Cascade)

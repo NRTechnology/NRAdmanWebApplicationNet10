@@ -10,21 +10,14 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
 {
     [Area("Administrator")]
     [Authorize(Roles = "Administrator")]
-    public class MikrotikRadiusDeploymentController : Controller
+    public class MikrotikRadiusDeploymentController(
+        ApplicationDbContext applicationDbContext,
+        MikrotikSyncService syncService,
+        ILogger<MikrotikRadiusDeploymentController> logger) : Controller
     {
-        private readonly ApplicationDbContext _db;
-        private readonly MikrotikSyncService _syncService;
-        private readonly ILogger<MikrotikRadiusDeploymentController> _logger;
-
-        public MikrotikRadiusDeploymentController(
-            ApplicationDbContext db,
-            MikrotikSyncService syncService,
-            ILogger<MikrotikRadiusDeploymentController> logger)
-        {
-            _db = db;
-            _syncService = syncService;
-            _logger = logger;
-        }
+        /*private readonly ApplicationDbContext _db = db;
+        private readonly MikrotikSyncService _syncService = syncService;
+        private readonly ILogger<MikrotikRadiusDeploymentController> _logger = logger;*/
 
         /// <summary>
         /// Halaman manajemen deployment
@@ -42,7 +35,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
         {
             try
             {
-                var data = _db.MikrotikQueueConfigs
+                var data = applicationDbContext.MikrotikQueueConfigs
                     .Include(c => c.Router)
                     .Include(c => c.Policy)
                     .Select(c => new
@@ -63,7 +56,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting deployment data");
+                logger.LogError(ex, "Error getting deployment data");
                 return Json(new { error = "Error loading data" });
             }
         }
@@ -73,8 +66,8 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
         /// </summary>
         public IActionResult Deploy()
         {
-            var policies = _db.MikrotikRadiusPolicies.Where(p => p.IsActive).ToList();
-            var routers = _db.Routers.ToList();
+            var policies = applicationDbContext.MikrotikRadiusPolicies.Where(p => p.IsActive).ToList();
+            var routers = applicationDbContext.NetworkRouters.ToList();
 
             ViewBag.Policies = policies;
             ViewBag.Routers = routers;
@@ -86,7 +79,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
         /// Execute deploy policy
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> ExecuteDeploy(int policyId, List<string> selectedRouters, List<string> targetAddresses)
+        public async Task<IActionResult> ExecuteDeploy(Guid policyId, List<string> selectedRouters, List<string> targetAddresses)
         {
             try
             {
@@ -95,7 +88,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                     return Json(new { success = false, message = "Pilih minimal satu router" });
                 }
 
-                var policy = _db.MikrotikRadiusPolicies.FirstOrDefault(p => p.Id == policyId);
+                var policy = applicationDbContext.MikrotikRadiusPolicies.FirstOrDefault(p => p.Id == policyId);
                 if (policy == null)
                 {
                     return Json(new { success = false, message = "Policy tidak ditemukan" });
@@ -110,7 +103,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                     }
                 }
 
-                var result = await _syncService.DeployPolicyToMultipleRoutersAsync(policyId, deployments);
+                var result = await syncService.DeployPolicyToMultipleRoutersAsync(policyId, deployments);
 
                 return Json(new
                 {
@@ -123,7 +116,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error executing deploy");
+                logger.LogError(ex, "Error executing deploy");
                 return Json(new { success = false, message = ex.Message });
             }
         }
@@ -136,7 +129,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
         {
             try
             {
-                var result = await _syncService.SyncQueueStatusAsync();
+                var result = await syncService.SyncQueueStatusAsync();
 
                 return Json(new
                 {
@@ -149,7 +142,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error sync status");
+                logger.LogError(ex, "Error sync status");
                 return Json(new { success = false, message = ex.Message });
             }
         }
@@ -162,7 +155,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
         {
             try
             {
-                var result = await _syncService.PullAccountingDataAsync(routerId);
+                var result = await syncService.PullAccountingDataAsync(routerId);
 
                 return Json(new
                 {
@@ -175,7 +168,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error pull accounting");
+                logger.LogError(ex, "Error pull accounting");
                 return Json(new { success = false, message = ex.Message });
             }
         }
@@ -184,7 +177,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
         /// Rollback deployment
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> Rollback(List<int> configIds)
+        public async Task<IActionResult> Rollback(List<Guid> configIds)
         {
             try
             {
@@ -193,7 +186,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                     return Json(new { success = false, message = "Pilih minimal satu queue untuk rollback" });
                 }
 
-                var result = await _syncService.RollbackDeploymentAsync(configIds);
+                var result = await syncService.RollbackDeploymentAsync(configIds);
 
                 return Json(new
                 {
@@ -206,7 +199,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error rollback");
+                logger.LogError(ex, "Error rollback");
                 return Json(new { success = false, message = ex.Message });
             }
         }
@@ -219,12 +212,12 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
         {
             try
             {
-                var status = await _syncService.GetDeploymentStatusAsync();
+                var status = await syncService.GetDeploymentStatusAsync();
                 return Json(status);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting status");
+                logger.LogError(ex, "Error getting status");
                 return Json(new { error = ex.Message });
             }
         }
@@ -233,11 +226,11 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
         /// Get detail queue config
         /// </summary>
         [HttpGet]
-        public IActionResult GetDetail(int id)
+        public IActionResult GetDetail(Guid id)
         {
             try
             {
-                var config = _db.MikrotikQueueConfigs
+                var config = applicationDbContext.MikrotikQueueConfigs
                     .Include(c => c.Router)
                     .Include(c => c.Policy)
                     .FirstOrDefault(c => c.Id == id);
@@ -268,7 +261,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting detail");
+                logger.LogError(ex, "Error getting detail");
                 return Json(new { error = ex.Message });
             }
         }
@@ -281,7 +274,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
         {
             try
             {
-                var router = _db.Routers.FirstOrDefault(r => r.Id == routerId);
+                var router = applicationDbContext.NetworkRouters.FirstOrDefault(r => r.Id == routerId);
                 if (router == null)
                     return NotFound();
 
@@ -296,7 +289,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting router details");
+                logger.LogError(ex, "Error getting router details");
                 return Json(new { error = ex.Message });
             }
         }
@@ -309,7 +302,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
         {
             try
             {
-                var router = _db.Routers.FirstOrDefault(r => r.Id == routerId);
+                var router = applicationDbContext.NetworkRouters.FirstOrDefault(r => r.Id == routerId);
                 if (router == null)
                     return Json(new { success = false, message = "Router tidak ditemukan" });
 
@@ -335,7 +328,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error test connection");
+                logger.LogError(ex, "Error test connection");
                 return Json(new { success = false, message = ex.Message });
             }
         }
@@ -344,16 +337,16 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
         /// Export deployment script
         /// </summary>
         [HttpGet]
-        public IActionResult ExportScript(int policyId)
+        public IActionResult ExportScript(Guid policyId)
         {
             try
             {
-                var policy = _db.MikrotikRadiusPolicies.FirstOrDefault(p => p.Id == policyId);
+                var policy = applicationDbContext.MikrotikRadiusPolicies.FirstOrDefault(p => p.Id == policyId);
                 if (policy == null)
                     return NotFound();
 
                 var policyService = HttpContext.RequestServices.GetRequiredService<MikrotikPolicyApplicationService>();
-                var routers = _db.Routers.ToList();
+                var routers = applicationDbContext.NetworkRouters.ToList();
 
                 var deployments = routers.Select(r => (r, r.IpAddress)).ToList();
                 var script = policyService.GenerateDeploymentScript(policy, deployments);
@@ -366,7 +359,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error export script");
+                logger.LogError(ex, "Error export script");
                 return BadRequest(ex.Message);
             }
         }
@@ -379,24 +372,24 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
         {
             try
             {
-                var totalConfigs = _db.MikrotikQueueConfigs.Count();
-                var byStatus = _db.MikrotikQueueConfigs
+                var totalConfigs = applicationDbContext.MikrotikQueueConfigs.Count();
+                var byStatus = applicationDbContext.MikrotikQueueConfigs
                     .GroupBy(c => c.DeploymentStatus)
                     .Select(g => new { status = g.Key.ToString(), count = g.Count() })
                     .ToList();
 
-                var bySyncStatus = _db.MikrotikQueueConfigs
+                var bySyncStatus = applicationDbContext.MikrotikQueueConfigs
                     .GroupBy(c => c.SyncStatus)
                     .Select(g => new { status = g.Key.ToString(), count = g.Count() })
                     .ToList();
 
-                var byRouter = _db.MikrotikQueueConfigs
+                var byRouter = applicationDbContext.MikrotikQueueConfigs
                     .Include(c => c.Router)
                     .GroupBy(c => c.Router.Name)
                     .Select(g => new { router = g.Key, count = g.Count() })
                     .ToList();
 
-                var byPolicy = _db.MikrotikQueueConfigs
+                var byPolicy = applicationDbContext.MikrotikQueueConfigs
                     .Include(c => c.Policy)
                     .GroupBy(c => c.Policy.PolicyName ?? "Unknown")
                     .Select(g => new { policy = g.Key, count = g.Count() })
@@ -413,7 +406,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting statistics");
+                logger.LogError(ex, "Error getting statistics");
                 return Json(new { error = ex.Message });
             }
         }

@@ -13,8 +13,9 @@ namespace NRAdmanWebApplicationNet10.Models
         [Display(Name = "Router")]
         [ForeignKey(nameof(Router))]
         public Guid RouterId { get; set; }
-        
-        public virtual Router? Router { get; set; }
+
+        [Required]
+        public virtual NetworkRouter? Router { get; set; }
         
         [Required]
         [MaxLength(255)]

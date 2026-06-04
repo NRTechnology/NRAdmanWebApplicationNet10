@@ -9,19 +9,11 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
 {
     [Area("Administrator")]
     [Authorize(Roles = "Administrator")]
-    public class MikrotikRadiusProfileController : Controller
+    public class MikrotikRadiusProfileController(
+        ApplicationDbContext applicationDbContext,
+        ILogger<MikrotikRadiusProfileController> logger)
+        : Controller
     {
-        private readonly ApplicationDbContext _db;
-        private readonly ILogger<MikrotikRadiusProfileController> _logger;
-
-        public MikrotikRadiusProfileController(
-            ApplicationDbContext db,
-            ILogger<MikrotikRadiusProfileController> logger)
-        {
-            _db = db;
-            _logger = logger;
-        }
-
         /// <summary>
         /// Halaman manajemen RADIUS policies
         /// </summary>
@@ -38,17 +30,17 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
         {
             try
             {
-                var data = _db.MikrotikRadiusPolicies
+                var data = applicationDbContext.MikrotikRadiusPolicies
                     .OrderByDescending(p => p.CreatedDate)
                     .Select(p => new
                     {
                         id = p.Id,
                         policyName = p.PolicyName,
                         description = p.Description ?? "-",
-                        downloadLimit = p.DownloadLimit.HasValue ? $"{p.DownloadLimit}M" : "Unlimited",
-                        uploadLimit = p.UploadLimit.HasValue ? $"{p.UploadLimit}M" : "Unlimited",
-                        burstLimitDown = p.BurstLimitDown.HasValue ? $"{p.BurstLimitDown}M" : "-",
-                        burstLimitUp = p.BurstLimitUp.HasValue ? $"{p.BurstLimitUp}M" : "-",
+                        downloadLimit = p.DownloadLimit > 0 ? $"{p.DownloadLimit}M" : "Unlimited",
+                        uploadLimit = p.UploadLimit > 0 ? $"{p.UploadLimit}M" : "Unlimited",
+                        burstLimitDown = p.BurstLimitDown > 0 ? $"{p.BurstLimitDown}M" : "-",
+                        burstLimitUp = p.BurstLimitUp > 0 ? $"{p.BurstLimitUp}M" : "-",
                         priority = p.Priority,
                         isActive = p.IsActive ? "Active" : "Inactive",
                         createdDate = p.CreatedDate.ToString("yyyy-MM-dd HH:mm"),
@@ -59,7 +51,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting policy data");
+                logger.LogError(ex, "Error getting policy data");
                 return Json(new { error = "Error loading data" });
             }
         }
@@ -76,6 +68,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
         /// Create policy
         /// </summary>
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(MikrotikRadiusPolicy model)
         {
             try
@@ -86,7 +79,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 }
 
                 // Check duplicate policy name
-                var existing = await _db.MikrotikRadiusPolicies
+                var existing = await applicationDbContext.MikrotikRadiusPolicies
                     .FirstOrDefaultAsync(p => p.PolicyName == model.PolicyName);
                 if (existing != null)
                 {
@@ -96,16 +89,16 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 model.CreatedDate = DateTime.UtcNow;
                 model.CreatedBy = User.Identity?.Name ?? "System";
 
-                _db.MikrotikRadiusPolicies.Add(model);
-                await _db.SaveChangesAsync();
+                applicationDbContext.MikrotikRadiusPolicies.Add(model);
+                await applicationDbContext.SaveChangesAsync();
 
-                _logger.LogInformation($"Policy '{model.PolicyName}' dibuat oleh {User.Identity?.Name}");
+                logger.LogInformation($"Policy '{model.PolicyName}' dibuat oleh {User.Identity?.Name}");
 
                 return Json(new { success = true, message = "Policy berhasil dibuat", id = model.Id });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error create policy");
+                logger.LogError(ex, "Error create policy");
                 return Json(new { success = false, message = ex.Message });
             }
         }
@@ -117,7 +110,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
         {
             try
             {
-                var policy = await _db.MikrotikRadiusPolicies.FindAsync(id);
+                var policy = await applicationDbContext.MikrotikRadiusPolicies.FindAsync(id);
                 if (policy == null)
                     return NotFound();
 
@@ -125,7 +118,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading edit form");
+                logger.LogError(ex, "Error loading edit form");
                 return BadRequest(ex.Message);
             }
         }
@@ -134,7 +127,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
         /// Update policy
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, MikrotikRadiusPolicy model)
+        public async Task<IActionResult> Edit(Guid id, MikrotikRadiusPolicy model)
         {
             try
             {
@@ -144,7 +137,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 if (!ModelState.IsValid)
                     return Json(new { success = false, message = "Validasi gagal" });
 
-                var existing = await _db.MikrotikRadiusPolicies.FindAsync(id);
+                var existing = await applicationDbContext.MikrotikRadiusPolicies.FindAsync(id);
                 if (existing == null)
                     return NotFound();
 
@@ -163,16 +156,16 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 existing.ModifiedDate = DateTime.UtcNow;
                 existing.ModifiedBy = User.Identity?.Name ?? "System";
 
-                _db.MikrotikRadiusPolicies.Update(existing);
-                await _db.SaveChangesAsync();
+                applicationDbContext.MikrotikRadiusPolicies.Update(existing);
+                await applicationDbContext.SaveChangesAsync();
 
-                _logger.LogInformation($"Policy '{existing.PolicyName}' diupdate oleh {User.Identity?.Name}");
+                logger.LogInformation($"Policy '{existing.PolicyName}' diupdate oleh {User.Identity?.Name}");
 
                 return Json(new { success = true, message = "Policy berhasil diupdate" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error update policy");
+                logger.LogError(ex, "Error update policy");
                 return Json(new { success = false, message = ex.Message });
             }
         }
@@ -185,7 +178,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
         {
             try
             {
-                var policy = await _db.MikrotikRadiusPolicies.FindAsync(id);
+                var policy = await applicationDbContext.MikrotikRadiusPolicies.FindAsync(id);
                 if (policy == null)
                     return NotFound();
 
@@ -209,7 +202,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting policy detail");
+                logger.LogError(ex, "Error getting policy detail");
                 return Json(new { error = ex.Message });
             }
         }
@@ -218,31 +211,31 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
         /// Delete policy
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(Guid id)
         {
             try
             {
-                var policy = await _db.MikrotikRadiusPolicies.FindAsync(id);
+                var policy = await applicationDbContext.MikrotikRadiusPolicies.FindAsync(id);
                 if (policy == null)
                     return Json(new { success = false, message = "Policy tidak ditemukan" });
 
                 // Check if policy is deployed
-                var deployedCount = await _db.MikrotikQueueConfigs
+                var deployedCount = await applicationDbContext.MikrotikQueueConfigs
                     .CountAsync(q => q.PolicyId == id && q.DeploymentStatus == EnumDeploymentStatus.Deployed);
 
                 if (deployedCount > 0)
                     return Json(new { success = false, message = "Policy masih di-deploy. Rollback terlebih dahulu sebelum menghapus." });
 
-                _db.MikrotikRadiusPolicies.Remove(policy);
-                await _db.SaveChangesAsync();
+                applicationDbContext.MikrotikRadiusPolicies.Remove(policy);
+                await applicationDbContext.SaveChangesAsync();
 
-                _logger.LogInformation($"Policy '{policy.PolicyName}' dihapus oleh {User.Identity?.Name}");
+                logger.LogInformation($"Policy '{policy.PolicyName}' dihapus oleh {User.Identity?.Name}");
 
                 return Json(new { success = true, message = "Policy berhasil dihapus" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error delete policy");
+                logger.LogError(ex, "Error delete policy");
                 return Json(new { success = false, message = ex.Message });
             }
         }
@@ -255,9 +248,9 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
         {
             try
             {
-                var totalPolicies = await _db.MikrotikRadiusPolicies.CountAsync();
-                var activePolicies = await _db.MikrotikRadiusPolicies.CountAsync(p => p.IsActive);
-                var deployedPolicies = await _db.MikrotikQueueConfigs
+                var totalPolicies = await applicationDbContext.MikrotikRadiusPolicies.CountAsync();
+                var activePolicies = await applicationDbContext.MikrotikRadiusPolicies.CountAsync(p => p.IsActive);
+                var deployedPolicies = await applicationDbContext.MikrotikQueueConfigs
                     .Where(q => q.DeploymentStatus == EnumDeploymentStatus.Deployed)
                     .Select(q => q.PolicyId)
                     .Distinct()
@@ -273,7 +266,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting statistics");
+                logger.LogError(ex, "Error getting statistics");
                 return Json(new { error = ex.Message });
             }
         }
@@ -286,7 +279,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
         {
             try
             {
-                var policy = await _db.MikrotikRadiusPolicies.FindAsync(id);
+                var policy = await applicationDbContext.MikrotikRadiusPolicies.FindAsync(id);
                 if (policy == null)
                     return Json(new { success = false, message = "Policy tidak ditemukan" });
 
@@ -294,16 +287,16 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 policy.ModifiedDate = DateTime.UtcNow;
                 policy.ModifiedBy = User.Identity?.Name ?? "System";
 
-                _db.MikrotikRadiusPolicies.Update(policy);
-                await _db.SaveChangesAsync();
+                applicationDbContext.MikrotikRadiusPolicies.Update(policy);
+                await applicationDbContext.SaveChangesAsync();
 
-                _logger.LogInformation($"Policy '{policy.PolicyName}' status diubah menjadi {(policy.IsActive ? "Active" : "Inactive")}");
+                logger.LogInformation($"Policy '{policy.PolicyName}' status diubah menjadi {(policy.IsActive ? "Active" : "Inactive")}");
 
                 return Json(new { success = true, message = $"Policy berhasil diubah menjadi {(policy.IsActive ? "Active" : "Inactive")}" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error toggling policy status");
+                logger.LogError(ex, "Error toggling policy status");
                 return Json(new { success = false, message = ex.Message });
             }
         }

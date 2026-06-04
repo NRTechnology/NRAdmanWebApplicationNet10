@@ -22,15 +22,15 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
         {
             try
             {
-                var data = applicationDbContext.Routers.Select(router => new
+                var data = applicationDbContext.NetworkRouters.Select(router => new
                 {
                     id = router.Id.ToString(),
                     routerType = router.RouterType.ToString(),
                     name = router.Name,
                     ipAddress = router.IpAddress,
                     username = router.Username,
-                    sshports = router.SShPort,
-                    apiports = router.ApiPort,
+                    sshport = router.SShPort,
+                    apiport = router.ApiPort,
                     description = router.Description,
                     createdDate = router.CreatedDate.ToString("yyyy-MM-dd HH:mm:ss")
                 }).ToList();
@@ -52,7 +52,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 return Json(new { isUnique = false });
             }
 
-            var router = applicationDbContext.Routers.FirstOrDefault(r => r.IpAddress == ipAddress);
+            var router = applicationDbContext.NetworkRouters.FirstOrDefault(r => r.IpAddress == ipAddress);
             if (router != null && !string.IsNullOrEmpty(excludeId) && router.Id.ToString() == excludeId)
             {
                 return Json(new { isUnique = true });
@@ -76,7 +76,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                 return NotFound();
             }
 
-            var router = applicationDbContext.Routers.FirstOrDefault(r => r.Id == routerId);
+            var router = applicationDbContext.NetworkRouters.FirstOrDefault(r => r.Id == routerId);
             if (router == null)
             {
                 return NotFound();
@@ -111,7 +111,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
             }
 
             // Server-side unique check for IP Address
-            var existingRouter = applicationDbContext.Routers.FirstOrDefault(r => r.IpAddress == model.IpAddress);
+            var existingRouter = applicationDbContext.NetworkRouters.FirstOrDefault(r => r.IpAddress == model.IpAddress);
             if (existingRouter != null)
             {
                 return Json(new { success = false, message = "IP Address sudah digunakan." });
@@ -119,7 +119,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
 
             try
             {
-                var router = new Router
+                var router = new NetworkRouter
                 {
                     RouterType = model.RouterType,
                     Name = model.Name,
@@ -132,7 +132,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                     CreatedDate = DateTime.UtcNow
                 };
 
-                applicationDbContext.Routers.Add(router);
+                applicationDbContext.NetworkRouters.Add(router);
                 applicationDbContext.SaveChanges();
 
                 logger.LogInformation("Router {IpAddress} berhasil ditambahkan oleh {AdminUser}", model.IpAddress, User.Identity?.Name);
@@ -165,14 +165,14 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
 
             try
             {
-                var router = applicationDbContext.Routers.FirstOrDefault(r => r.Id == id);
+                var router = applicationDbContext.NetworkRouters.FirstOrDefault(r => r.Id == id);
                 if (router == null)
                 {
                     return Json(new { success = false, message = "Router tidak ditemukan." });
                 }
 
                 // Check if IP Address is unique (exclude current router)
-                var existingRouter = applicationDbContext.Routers.FirstOrDefault(r => r.IpAddress == model.IpAddress && r.Id != id);
+                var existingRouter = applicationDbContext.NetworkRouters.FirstOrDefault(r => r.IpAddress == model.IpAddress && r.Id != id);
                 if (existingRouter != null)
                 {
                     return Json(new { success = false, message = "IP Address sudah digunakan oleh router lain." });
@@ -216,13 +216,13 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
 
             try
             {
-                var router = applicationDbContext.Routers.FirstOrDefault(r => r.Id == id);
+                var router = applicationDbContext.NetworkRouters.FirstOrDefault(r => r.Id == id);
                 if (router == null)
                 {
                     return Json(new { success = false, message = "Router tidak ditemukan." });
                 }
 
-                applicationDbContext.Routers.Remove(router);
+                applicationDbContext.NetworkRouters.Remove(router);
                 applicationDbContext.SaveChanges();
 
                 logger.LogInformation("Router {IpAddress} berhasil dihapus oleh {AdminUser}", router.IpAddress, User.Identity?.Name);
@@ -239,7 +239,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
         [HttpGet]
         public IActionResult ConnectSshModal(Guid id)
         {
-            var router = applicationDbContext.Routers.FirstOrDefault(n => n.Id == id);
+            var router = applicationDbContext.NetworkRouters.FirstOrDefault(n => n.Id == id);
             if (router == null)
             {
                 return NotFound();
@@ -268,7 +268,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                     return Json(new { success = false, message = "Server, username, dan password tidak boleh kosong." });
                 }
 
-                var router = applicationDbContext.Routers.FirstOrDefault(r => r.Id == request.Id);
+                var router = applicationDbContext.NetworkRouters.FirstOrDefault(r => r.Id == request.Id);
                 if (router == null)
                 {
                     return Json(new { success = false, message = "Router tidak ditemukan." });
@@ -301,7 +301,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
                     return Json(new { success = false, message = "Semua parameter wajib diisi." });
                 }
 
-                var router = applicationDbContext.Routers.FirstOrDefault(r => r.Id == request.Id);
+                var router = applicationDbContext.NetworkRouters.FirstOrDefault(r => r.Id == request.Id);
                 if (router == null)
                 {
                     return Json(new { success = false, message = "Router tidak ditemukan." });

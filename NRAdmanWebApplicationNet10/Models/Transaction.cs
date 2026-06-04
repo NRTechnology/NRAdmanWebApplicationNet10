@@ -5,6 +5,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace NRAdmanWebApplicationNet10.Models
 {
     [Index(nameof(TransactionCode), IsUnique = true)]
+    [Index(nameof(CustomerId))]
+    [Index(nameof(Status))]
     public class Transaction
     {
         [Key]
@@ -19,15 +21,19 @@ namespace NRAdmanWebApplicationNet10.Models
         [ForeignKey(nameof(Customer))]
         public Guid CustomerId { get; set; }
 
+
+        [Required]
         public virtual Customer? Customer { get; set; }
 
         [Required]
         [ForeignKey(nameof(Package))]
         public Guid PackageId { get; set; }
 
+        [Required]
         public virtual Package? Package { get; set; }
 
-        [Required] public decimal Amount { get; set; } = 0;
+        [Required] 
+        public decimal Amount { get; set; } = 0;
 
         [Required]
         [MaxLength(20)]

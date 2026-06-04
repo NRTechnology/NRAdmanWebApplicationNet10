@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -7,77 +8,81 @@ namespace NRAdmanWebApplicationNet10.Models
     /// Model untuk RADIUS Policy di Mikrotik
     /// Menyimpan konfigurasi bandwidth/QoS yang akan diterapkan ke queue
     /// </summary>
-    [Table("mikrotik_radius_policies")]
+    [Index(nameof(PolicyName), IsUnique = true)]
     public class MikrotikRadiusPolicy
     {
         [Key]
-        [Column("id")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
         [MaxLength(255)]
-        [Column("policy_name")]
         [Display(Name = "Policy Name")]
         public string PolicyName { get; set; } = "";
-
-        [Column("description")]
+        
         [MaxLength(500)]
         public string? Description { get; set; }
 
         /// <summary>
         /// Download limit dalam Mbps
         /// </summary>
-        [Column("download_limit")]
+        [Required]
+        [Range(0, double.MaxValue)]
         [Display(Name = "Download Limit (Mbps)")]
-        public decimal? DownloadLimit { get; set; }
+        public decimal DownloadLimit { get; set; } = 0;
 
         /// <summary>
         /// Upload limit dalam Mbps
         /// </summary>
-        [Column("upload_limit")]
+        [Required]
+        [Range(0, double.MaxValue)]
         [Display(Name = "Upload Limit (Mbps)")]
-        public decimal? UploadLimit { get; set; }
+        public decimal UploadLimit { get; set; } = 0;
 
         /// <summary>
         /// Burst limit untuk download dalam Mbps
         /// </summary>
-        [Column("burst_limit_down")]
+        [Required]
+        [Range(0, double.MaxValue)]
         [Display(Name = "Burst Download (Mbps)")]
-        public decimal? BurstLimitDown { get; set; }
+        public decimal BurstLimitDown { get; set; } = 0;
 
         /// <summary>
         /// Burst limit untuk upload dalam Mbps
         /// </summary>
-        [Column("burst_limit_up")]
+        [Required]
+        [Range(0, double.MaxValue)]
         [Display(Name = "Burst Upload (Mbps)")]
-        public decimal? BurstLimitUp { get; set; }
+        public decimal BurstLimitUp { get; set; } = 0;
 
         /// <summary>
         /// Burst threshold untuk download dalam persen
         /// </summary>
-        [Column("burst_threshold_down")]
+        [Required]
+        [Range(0, 100)]
         [Display(Name = "Burst Threshold Down (%)")]
-        public int? BurstThresholdDown { get; set; }
+        public int BurstThresholdDown { get; set; } = 0;
 
         /// <summary>
         /// Burst threshold untuk upload dalam persen
         /// </summary>
-        [Column("burst_threshold_up")]
+        [Required]
+        [Range(0, 100)]
         [Display(Name = "Burst Threshold Up (%)")]
-        public int? BurstThresholdUp { get; set; }
+        public int BurstThresholdUp { get; set; } = 0;
 
         /// <summary>
         /// Burst time dalam detik
         /// </summary>
-        [Column("burst_time")]
+        [Required]
+        [Range(0, int.MaxValue)]
         [Display(Name = "Burst Time (seconds)")]
-        public int? BurstTime { get; set; }
+        public int BurstTime { get; set; } = 0;
 
         /// <summary>
         /// Priority queue (1-16, 1 adalah highest)
         /// </summary>
-        [Column("priority")]
+        [Required]
         [Range(1, 16)]
         [Display(Name = "Priority")]
         public int Priority { get; set; } = 8;
@@ -85,22 +90,17 @@ namespace NRAdmanWebApplicationNet10.Models
         /// <summary>
         /// Status policy (aktif/nonaktif)
         /// </summary>
-        [Column("is_active")]
         [Display(Name = "Active")]
         public bool IsActive { get; set; } = true;
-
-        [Column("created_date")]
+        
         [Display(Name = "Created Date")]
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
-
-        [Column("modified_date")]
+        
         public DateTime? ModifiedDate { get; set; }
-
-        [Column("created_by")]
+        
         [MaxLength(255)]
         public string? CreatedBy { get; set; }
-
-        [Column("modified_by")]
+        
         [MaxLength(255)]
         public string? ModifiedBy { get; set; }
     }

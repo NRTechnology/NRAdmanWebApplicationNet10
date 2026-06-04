@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NRAdmanWebApplicationNet10.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260601050344_AddMikrotikPolicyContext2Database")]
-    partial class AddMikrotikPolicyContext2Database
+    [Migration("20260603020528_InitDB")]
+    partial class InitDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -238,83 +238,64 @@ namespace NRAdmanWebApplicationNet10.Migrations
 
             modelBuilder.Entity("NRAdmanWebApplicationNet10.Models.MikrotikQueueConfig", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<string>("ConfigMetadata")
                         .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)")
-                        .HasColumnName("config_metadata");
+                        .HasColumnType("character varying(2000)");
 
                     b.Property<int>("ConfigVersion")
-                        .HasColumnType("integer")
-                        .HasColumnName("config_version");
+                        .HasColumnType("integer");
 
                     b.Property<string>("CreatedBy")
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("created_by");
+                        .HasColumnType("character varying(255)");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_date");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("DeployedDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deployed_date");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("DeploymentStatus")
-                        .HasColumnType("integer")
-                        .HasColumnName("deployment_status");
+                        .HasColumnType("integer");
 
                     b.Property<string>("LastError")
                         .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("last_error");
+                        .HasColumnType("character varying(500)");
 
                     b.Property<DateTime?>("LastSyncDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("last_sync_date");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("MikrotikQueueId")
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("mikrotik_queue_id");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("modified_by");
+                        .HasColumnType("character varying(255)");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("modified_date");
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("PolicyId")
-                        .HasColumnType("integer")
-                        .HasColumnName("policy_id");
+                    b.Property<Guid?>("PolicyId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("QueueName")
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("queue_name");
+                        .HasColumnType("character varying(255)");
 
-                    b.Property<Guid?>("RouterId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("router_id");
+                    b.Property<Guid>("RouterId")
+                        .HasColumnType("uuid");
 
                     b.Property<int?>("SyncStatus")
-                        .HasColumnType("integer")
-                        .HasColumnName("sync_status");
+                        .HasColumnType("integer");
 
                     b.Property<string>("TargetAddress")
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("target_address");
+                        .HasColumnType("character varying(50)");
 
                     b.HasKey("Id");
 
@@ -327,61 +308,47 @@ namespace NRAdmanWebApplicationNet10.Migrations
 
             modelBuilder.Entity("NRAdmanWebApplicationNet10.Models.MikrotikRadiusAccounting", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<long?>("AcctInputOctets")
-                        .HasColumnType("bigint")
-                        .HasColumnName("acct_input_octets");
+                        .HasColumnType("bigint");
 
                     b.Property<long?>("AcctInputPackets")
-                        .HasColumnType("bigint")
-                        .HasColumnName("acct_input_packets");
+                        .HasColumnType("bigint");
 
                     b.Property<long?>("AcctOutputOctets")
-                        .HasColumnType("bigint")
-                        .HasColumnName("acct_output_octets");
+                        .HasColumnType("bigint");
 
                     b.Property<long?>("AcctOutputPackets")
-                        .HasColumnType("bigint")
-                        .HasColumnName("acct_output_packets");
+                        .HasColumnType("bigint");
 
                     b.Property<string>("AcctSessionId")
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("acct_session_id");
+                        .HasColumnType("character varying(255)");
 
                     b.Property<long?>("AcctSessionTime")
-                        .HasColumnType("bigint")
-                        .HasColumnName("acct_session_time");
+                        .HasColumnType("bigint");
 
                     b.Property<string>("AcctStatusType")
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("acct_status_type");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("AcctTerminateCause")
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("acct_terminate_cause");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_date");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("NasIpAddress")
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("nas_ip_address");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("Username")
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("username");
+                        .HasColumnType("character varying(255)");
 
                     b.HasKey("Id");
 
@@ -392,77 +359,59 @@ namespace NRAdmanWebApplicationNet10.Migrations
 
             modelBuilder.Entity("NRAdmanWebApplicationNet10.Models.MikrotikRadiusPolicy", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<decimal?>("BurstLimitDown")
-                        .HasColumnType("numeric")
-                        .HasColumnName("burst_limit_down");
+                        .HasColumnType("numeric");
 
                     b.Property<decimal?>("BurstLimitUp")
-                        .HasColumnType("numeric")
-                        .HasColumnName("burst_limit_up");
+                        .HasColumnType("numeric");
 
                     b.Property<int?>("BurstThresholdDown")
-                        .HasColumnType("integer")
-                        .HasColumnName("burst_threshold_down");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("BurstThresholdUp")
-                        .HasColumnType("integer")
-                        .HasColumnName("burst_threshold_up");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("BurstTime")
-                        .HasColumnType("integer")
-                        .HasColumnName("burst_time");
+                        .HasColumnType("integer");
 
                     b.Property<string>("CreatedBy")
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("created_by");
+                        .HasColumnType("character varying(255)");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_date");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
                         .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("description");
+                        .HasColumnType("character varying(500)");
 
                     b.Property<decimal?>("DownloadLimit")
-                        .HasColumnType("numeric")
-                        .HasColumnName("download_limit");
+                        .HasColumnType("numeric");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_active");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("modified_by");
+                        .HasColumnType("character varying(255)");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("modified_date");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("PolicyName")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("policy_name");
+                        .HasColumnType("character varying(255)");
 
                     b.Property<int>("Priority")
-                        .HasColumnType("integer")
-                        .HasColumnName("priority");
+                        .HasColumnType("integer");
 
                     b.Property<decimal?>("UploadLimit")
-                        .HasColumnType("numeric")
-                        .HasColumnName("upload_limit");
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
 
@@ -1246,7 +1195,8 @@ namespace NRAdmanWebApplicationNet10.Migrations
                     b.HasOne("NRAdmanWebApplicationNet10.Models.Router", "Router")
                         .WithMany()
                         .HasForeignKey("RouterId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
 
                     b.Navigation("Policy");
 

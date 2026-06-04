@@ -60,7 +60,8 @@
                     { data: 'name', title: 'Name' },
                     { data: 'ipAddress', title: 'IP Address' },
                     { data: 'username', title: 'Username' },
-                    { data: 'ports', title: 'SSH Port' },
+                    { data: 'sshport', title: 'SSH Port' },
+                    { data: 'apiport', title: 'API Port' },
                     { data: 'description', title: 'Description' },                    
                     { data: 'id', title: 'Actions', orderable: false, render: function(data, type, row) {
                                 return `<button class="btn btn-sm btn-success btn-connect-ssh" data-id="${data}" style="margin-right: 5px;" title="Connect via SSH">
@@ -167,6 +168,7 @@
                 <th>IP Address</th>
                 <th>Username</th>
                 <th>SSH Port</th>
+                    <th>API Port</th>
                 <th>Description</th>
                 <th width="180">Actions</th>
             </tr>

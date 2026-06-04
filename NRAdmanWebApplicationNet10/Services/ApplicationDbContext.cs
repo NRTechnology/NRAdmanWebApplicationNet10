@@ -34,7 +34,7 @@ namespace NRAdmanWebApplicationNet10.Services
 
         public DbSet<Customer> Customers => Set<Customer>();
 
-        public DbSet<Router> Routers => Set<Router>();
+        public DbSet<NetworkRouter> NetworkRouters => Set<NetworkRouter>();
 
         public DbSet<MikrotikRadiusPolicy> MikrotikRadiusPolicies => Set<MikrotikRadiusPolicy>();
 
@@ -45,59 +45,7 @@ namespace NRAdmanWebApplicationNet10.Services
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<Nas>(entity =>
-            {
-                entity.ToTable("nas");
-                entity.HasIndex(e => e.NasName, "NasName_index_unique").IsUnique();
-            });
-
-            modelBuilder.Entity<MikrotikSimpleQueue>(entity =>
-            {
-                entity.ToTable("mikrotik_simple_queues");
-                entity.HasOne(e => e.Router)
-                    .WithMany()
-                    .HasForeignKey(e => e.RouterId)
-                    .OnDelete(DeleteBehavior.Cascade);
-                entity.HasIndex(e => new { e.RouterId, e.QueueName }, "idx_router_queue_name").IsUnique();
-            });
-
-            modelBuilder.Entity<Router>(entity =>
-            {
-                entity.ToTable("routers");
-                entity.HasIndex(e => e.Id, "RouterId_index_unique").IsUnique();
-            });
-
-            // Mikrotik Radius entities
-            modelBuilder.Entity<MikrotikRadiusPolicy>(entity =>
-            {
-                entity.ToTable("mikrotik_radius_policies");
-                entity.HasKey(e => e.Id);
-                entity.HasIndex(e => e.PolicyName).IsUnique();
-            });
-
-            modelBuilder.Entity<MikrotikRadiusAccounting>(entity =>
-            {
-                entity.ToTable("mikrotik_radius_accounting");
-                entity.HasKey(e => e.Id);
-                entity.HasIndex(e => e.CreatedDate);
-            });
-
-            modelBuilder.Entity<MikrotikQueueConfig>(entity =>
-            {
-                entity.ToTable("mikrotik_queue_config");
-                entity.HasKey(e => e.Id);
-                entity.HasOne(e => e.Router)
-                    .WithMany()
-                    .HasForeignKey(e => e.RouterId)
-                    .OnDelete(DeleteBehavior.SetNull);
-                entity.HasOne(e => e.Policy)
-                    .WithMany()
-                    .HasForeignKey(e => e.PolicyId)
-                    .OnDelete(DeleteBehavior.SetNull);
-                entity.HasIndex(e => e.RouterId);
-                entity.HasIndex(e => e.PolicyId);
-            });
+            
         }
     }
 }

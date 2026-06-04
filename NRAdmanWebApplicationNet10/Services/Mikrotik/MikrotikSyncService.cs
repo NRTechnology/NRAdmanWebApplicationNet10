@@ -28,7 +28,7 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
         public bool Success { get; set; }
         public string? Message { get; set; }
         public string? MikrotikQueueId { get; set; }
-        public int ConfigId { get; set; }
+        public Guid ConfigId { get; set; }
         public DateTime DeployedAt { get; set; } = DateTime.UtcNow;
         public string? ErrorDetails { get; set; }
     }
@@ -37,30 +37,22 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
     /// Service untuk orchestrasi sinkronisasi data RADIUS pada Mikrotik
     /// Menghandle deployment policy, sinkronisasi status, dan pull accounting data
     /// </summary>
-    public class MikrotikSyncService
+    public class MikrotikSyncService(
+        ApplicationDbContext applicationDbContext,
+        MikrotikApiService apiService,
+        MikrotikPolicyApplicationService policyService,
+        ILogger<MikrotikSyncService> logger)
     {
-        private readonly ApplicationDbContext _db;
-        private readonly MikrotikApiService _apiService;
-        private readonly MikrotikPolicyApplicationService _policyService;
-        private readonly ILogger<MikrotikSyncService> _logger;
-
-        public MikrotikSyncService(
-            ApplicationDbContext db,
-            MikrotikApiService apiService,
-            MikrotikPolicyApplicationService policyService,
-            ILogger<MikrotikSyncService> logger)
-        {
-            _db = db;
-            _apiService = apiService;
-            _policyService = policyService;
-            _logger = logger;
-        }
+        /*private readonly ApplicationDbContext _db = db;
+        private readonly MikrotikApiService _apiService = apiService;
+        private readonly MikrotikPolicyApplicationService _policyService = policyService;
+        private readonly ILogger<MikrotikSyncService> _logger = logger;*/
 
         /// <summary>
         /// Deploy policy ke satu router dengan target address tertentu
         /// </summary>
         public async Task<DeploymentResult> DeployPolicyToRouterAsync(
-            int policyId,
+            Guid policyId,
             Guid routerId,
             string targetAddress,
             string? customQueueName = null)
@@ -68,7 +60,7 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
             try
             {
                 // Get policy
-                var policy = _db.MikrotikRadiusPolicies.FirstOrDefault(p => p.Id == policyId);
+                var policy = applicationDbContext.MikrotikRadiusPolicies.FirstOrDefault(p => p.Id == policyId);
                 if (policy == null)
                 {
                     return new DeploymentResult
@@ -80,7 +72,7 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
                 }
 
                 // Get router
-                var router = _db.Routers.FirstOrDefault(r => r.Id == routerId);
+                var router = applicationDbContext.NetworkRouters.FirstOrDefault(r => r.Id == routerId);
                 if (router == null)
                 {
                     return new DeploymentResult
@@ -92,7 +84,7 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
                 }
 
                 // Validasi policy
-                var (isValid, errors) = _policyService.ValidatePolicyApplication(policy, targetAddress);
+                var (isValid, errors) = policyService.ValidatePolicyApplication(policy, targetAddress);
                 if (!isValid)
                 {
                     return new DeploymentResult
@@ -104,7 +96,7 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
                 }
 
                 // Convert policy to queue command
-                var queueCommand = _policyService.ConvertPolicyToQueueCommand(
+                var queueCommand = policyService.ConvertPolicyToQueueCommand(
                     policy,
                     targetAddress,
                     customQueueName);
@@ -122,7 +114,7 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
                 };
 
                 // Test connection
-                var connTest = await _apiService.TestConnectionAsync(connSettings);
+                var connTest = await apiService.TestConnectionAsync(connSettings);
                 if (!connTest.Success)
                 {
                     return new DeploymentResult
@@ -134,7 +126,7 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
                 }
 
                 // Create queue on Mikrotik
-                var queueResult = await _apiService.CreateSimpleQueueAsync(
+                var queueResult = await apiService.CreateSimpleQueueAsync(
                     connSettings,
                     queueCommand.QueueName,
                     queueCommand.TargetAddress,
@@ -171,10 +163,10 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
                     ConfigMetadata = JsonSerializer.Serialize(queueCommand.ToMikrotikAttributes())
                 };
 
-                _db.MikrotikQueueConfigs.Add(queueConfig);
-                await _db.SaveChangesAsync();
+                applicationDbContext.MikrotikQueueConfigs.Add(queueConfig);
+                await applicationDbContext.SaveChangesAsync();
 
-                _logger.LogInformation($"Policy {policyId} berhasil di-deploy ke router {routerId} dengan queue ID {queueResult.Data?.Id}");
+                logger.LogInformation($"Policy {policyId} berhasil di-deploy ke router {routerId} dengan queue ID {queueResult.Data?.Id}");
 
                 return new DeploymentResult
                 {
@@ -187,7 +179,7 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error deploy policy {policyId} ke router {routerId}");
+                logger.LogError(ex, $"Error deploy policy {policyId} ke router {routerId}");
                 return new DeploymentResult
                 {
                     Success = false,
@@ -201,7 +193,7 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
         /// Deploy policy ke multiple routers
         /// </summary>
         public async Task<MikrotikSyncResult> DeployPolicyToMultipleRoutersAsync(
-            int policyId,
+            Guid policyId,
             List<(Guid RouterId, string TargetAddress)> deployments)
         {
             var result = new MikrotikSyncResult
@@ -250,7 +242,7 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
             try
             {
                 // Get all active queue configs
-                var configs = _db.MikrotikQueueConfigs
+                var configs = applicationDbContext.MikrotikQueueConfigs
                     .Where(c => c.DeploymentStatus == EnumDeploymentStatus.Deployed)
                     .Include(c => c.Router)
                     .Include(c => c.Policy)
@@ -282,7 +274,7 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
                         };
 
                         // Get queues from router
-                        var queuesResult = await _apiService.GetSimpleQueuesAsync(connSettings);
+                        var queuesResult = await apiService.GetSimpleQueuesAsync(connSettings);
                         if (!queuesResult.Success)
                         {
                             result.Errors.Add($"Router {router?.Name}: {queuesResult.ErrorMessage}");
@@ -306,30 +298,30 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
                             }
 
                             config.LastSyncDate = DateTime.UtcNow;
-                            _db.MikrotikQueueConfigs.Update(config);
+                            applicationDbContext.MikrotikQueueConfigs.Update(config);
                             result.QueuesSynced++;
                         }
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, $"Error sinkronisasi router {routerGroup.Key?.Name}");
+                        logger.LogError(ex, $"Error sinkronisasi router {routerGroup.Key?.Name}");
                         result.FailedOperations++;
                     }
                 }
 
-                await _db.SaveChangesAsync();
+                await applicationDbContext.SaveChangesAsync();
 
                 result.Success = result.FailedOperations == 0;
                 result.Message = $"Sinkronisasi selesai. {result.QueuesSynced} queue disinkronisasi, {result.FailedOperations} gagal";
                 result.SyncStats["total-queues"] = configs.Count;
                 result.SyncStats["routers-synced"] = configsByRouter.Count;
 
-                _logger.LogInformation($"Sync status berhasil: {result.QueuesSynced} queues, {result.FailedOperations} failures");
+                logger.LogInformation($"Sync status berhasil: {result.QueuesSynced} queues, {result.FailedOperations} failures");
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error sinkronisasi queue status");
+                logger.LogError(ex, "Error sinkronisasi queue status");
                 result.Success = false;
                 result.Message = "Error saat sinkronisasi";
                 result.Errors.Add(ex.Message);
@@ -352,8 +344,8 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
             try
             {
                 var routers = routerId.HasValue
-                    ? _db.Routers.Where(r => r.Id == routerId).ToList()
-                    : _db.Routers.ToList();
+                    ? applicationDbContext.NetworkRouters.Where(r => r.Id == routerId).ToList()
+                    : applicationDbContext.NetworkRouters.ToList();
 
                 foreach (var router in routers)
                 {
@@ -372,7 +364,7 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
                         };
 
                         // Test connection
-                        var connTest = await _apiService.TestConnectionAsync(connSettings);
+                        var connTest = await apiService.TestConnectionAsync(connSettings);
                         if (!connTest.Success)
                         {
                             result.Errors.Add($"Router {router.Name}: Koneksi gagal");
@@ -381,7 +373,7 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
                         }
 
                         // Simulasi: ambil queue stats sebagai accounting data
-                        var queues = _db.MikrotikQueueConfigs
+                        var queues = applicationDbContext.MikrotikQueueConfigs
                             .Where(q => q.RouterId == router.Id && q.DeploymentStatus == EnumDeploymentStatus.Deployed)
                             .ToList();
 
@@ -391,7 +383,7 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
                                 continue;
 
                             // Get stats
-                            var statsResult = await _apiService.GetQueueStatsAsync(connSettings, queue.MikrotikQueueId);
+                            var statsResult = await apiService.GetQueueStatsAsync(connSettings, queue.MikrotikQueueId);
                             if (statsResult.Success && statsResult.Data != null)
                             {
                                 // Create accounting record
@@ -405,7 +397,7 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
                                     CreatedDate = DateTime.UtcNow
                                 };
 
-                                _db.MikrotikRadiusAccounting.Add(acctRecord);
+                                applicationDbContext.MikrotikRadiusAccounting.Add(acctRecord);
                                 result.QueuesSynced++;
                             }
 
@@ -414,23 +406,23 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, $"Error pull accounting data dari router {router.Name}");
+                        logger.LogError(ex, $"Error pull accounting data dari router {router.Name}");
                         result.FailedOperations++;
                     }
                 }
 
-                await _db.SaveChangesAsync();
+                await applicationDbContext.SaveChangesAsync();
 
                 result.Message = $"Pull accounting selesai. {result.QueuesSynced} records, {result.FailedOperations} gagal";
                 result.SyncStats["records-pulled"] = result.QueuesSynced;
                 result.SyncStats["routers-processed"] = routers.Count;
 
-                _logger.LogInformation($"Pull accounting berhasil: {result.QueuesSynced} records");
+                logger.LogInformation($"Pull accounting berhasil: {result.QueuesSynced} records");
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error pull accounting data");
+                logger.LogError(ex, "Error pull accounting data");
                 result.Success = false;
                 result.Message = "Error saat pull accounting";
                 result.Errors.Add(ex.Message);
@@ -441,7 +433,7 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
         /// <summary>
         /// Rollback deployment dari satu atau multiple queues
         /// </summary>
-        public async Task<MikrotikSyncResult> RollbackDeploymentAsync(List<int> configIds)
+        public async Task<MikrotikSyncResult> RollbackDeploymentAsync(List<Guid> configIds)
         {
             var result = new MikrotikSyncResult
             {
@@ -451,7 +443,7 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
 
             try
             {
-                var configs = _db.MikrotikQueueConfigs
+                var configs = applicationDbContext.MikrotikQueueConfigs
                     .Where(c => configIds.Contains(c.Id))
                     .Include(c => c.Router)
                     .ToList();
@@ -479,12 +471,12 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
                         };
 
                         // Delete queue from Mikrotik
-                        var deleteResult = await _apiService.DeleteSimpleQueueAsync(connSettings, config.MikrotikQueueId);
+                        var deleteResult = await apiService.DeleteSimpleQueueAsync(connSettings, config.MikrotikQueueId);
                         if (deleteResult.Success)
                         {
                             config.DeploymentStatus = EnumDeploymentStatus.RolledBack;
                             config.SyncStatus = EnumSyncStatus.NotSynced;
-                            _db.MikrotikQueueConfigs.Update(config);
+                            applicationDbContext.MikrotikQueueConfigs.Update(config);
                             result.QueuesDeployed++;
                         }
                         else
@@ -495,20 +487,20 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, $"Error rollback config {config.Id}");
+                        logger.LogError(ex, $"Error rollback config {config.Id}");
                         result.Errors.Add($"Config {config.Id}: {ex.Message}");
                         result.FailedOperations++;
                     }
                 }
 
-                await _db.SaveChangesAsync();
+                await applicationDbContext.SaveChangesAsync();
 
                 result.Message = $"Rollback selesai. Berhasil: {result.QueuesDeployed}, Gagal: {result.FailedOperations}";
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error rollback deployment");
+                logger.LogError(ex, "Error rollback deployment");
                 result.Success = false;
                 result.Message = "Error saat rollback";
                 result.Errors.Add(ex.Message);
@@ -525,10 +517,10 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
 
             try
             {
-                var totalConfigs = _db.MikrotikQueueConfigs.Count();
-                var deployedCount = _db.MikrotikQueueConfigs.Count(c => c.DeploymentStatus == EnumDeploymentStatus.Deployed);
-                var inSyncCount = _db.MikrotikQueueConfigs.Count(c => c.SyncStatus == EnumSyncStatus.InSync);
-                var outOfSyncCount = _db.MikrotikQueueConfigs.Count(c => c.SyncStatus == EnumSyncStatus.OutOfSync);
+                var totalConfigs = applicationDbContext.MikrotikQueueConfigs.Count();
+                var deployedCount = applicationDbContext.MikrotikQueueConfigs.Count(c => c.DeploymentStatus == EnumDeploymentStatus.Deployed);
+                var inSyncCount = applicationDbContext.MikrotikQueueConfigs.Count(c => c.SyncStatus == EnumSyncStatus.InSync);
+                var outOfSyncCount = applicationDbContext.MikrotikQueueConfigs.Count(c => c.SyncStatus == EnumSyncStatus.OutOfSync);
 
                 status["total-configs"] = totalConfigs;
                 status["deployed-count"] = deployedCount;
@@ -537,14 +529,14 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
                 status["deployment-success-rate"] = totalConfigs > 0 ? (double)deployedCount / totalConfigs * 100 : 0;
                 status["sync-success-rate"] = totalConfigs > 0 ? (double)inSyncCount / totalConfigs * 100 : 0;
 
-                var lastSync = _db.MikrotikQueueConfigs.OrderByDescending(c => c.LastSyncDate).FirstOrDefault();
+                var lastSync = applicationDbContext.MikrotikQueueConfigs.OrderByDescending(c => c.LastSyncDate).FirstOrDefault();
                 status["last-sync-date"] = lastSync?.LastSyncDate;
 
                 return await Task.FromResult(status);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting deployment status");
+                logger.LogError(ex, "Error getting deployment status");
                 status["error"] = ex.Message;
                 return status;
             }

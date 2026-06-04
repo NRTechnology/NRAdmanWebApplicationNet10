@@ -19,6 +19,7 @@ namespace NRAdmanWebApplicationNet10.Models
         [ForeignKey(nameof(Package))]
         public Guid PackageId { get; set; }
 
+        [Required]
         public virtual Package? Package { get; set; }
 
         [Required] public int ValidityDays { get; set; } = 0;

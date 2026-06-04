@@ -88,10 +88,10 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
                 {
                     QueueName = queueName,
                     TargetAddress = targetAddress,
-                    MaxLimitDown = policy.DownloadLimit?.ToString("F0") + "M",
-                    MaxLimitUp = policy.UploadLimit?.ToString("F0") + "M",
-                    BurstLimitDown = policy.BurstLimitDown?.ToString("F0") + "M",
-                    BurstLimitUp = policy.BurstLimitUp?.ToString("F0") + "M",
+                    MaxLimitDown = policy.DownloadLimit > 0 ? $"{policy.DownloadLimit}M" : "Unlimited",
+                    MaxLimitUp = policy.UploadLimit > 0 ? $"{policy.UploadLimit}M" : "Unlimited",
+                    BurstLimitDown = policy.BurstLimitDown > 0 ? $"{policy.BurstLimitDown}M" : "-",
+                    BurstLimitUp = policy.BurstLimitUp > 0 ? $"{policy.BurstLimitUp}M" : "-",
                     BurstThresholdDown = policy.BurstThresholdDown,
                     BurstThresholdUp = policy.BurstThresholdUp,
                     BurstTime = policy.BurstTime,
@@ -130,17 +130,17 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
                 errors.Add("Target address tidak boleh kosong");
 
             // Validasi bandwidth settings
-            if (policy.DownloadLimit.HasValue && policy.DownloadLimit <= 0)
+            if (policy.DownloadLimit > 0)
                 errors.Add("Download limit harus lebih besar dari 0");
 
-            if (policy.UploadLimit.HasValue && policy.UploadLimit <= 0)
+            if (policy.UploadLimit > 0)
                 errors.Add("Upload limit harus lebih besar dari 0");
 
             // Validasi burst settings jika ada
-            if (policy.BurstLimitDown.HasValue && policy.BurstLimitDown <= 0)
+            if (policy.BurstLimitDown > 0)
                 errors.Add("Burst limit down harus lebih besar dari 0");
 
-            if (policy.BurstLimitUp.HasValue && policy.BurstLimitUp <= 0)
+            if (policy.BurstLimitUp > 0)
                 errors.Add("Burst limit up harus lebih besar dari 0");
 
             // Validasi priority
@@ -155,7 +155,7 @@ namespace NRAdmanWebApplicationNet10.Services.Mikrotik
         /// </summary>
         public string GenerateDeploymentScript(
             MikrotikRadiusPolicy policy,
-            List<(Router Router, string TargetAddress)> deployments)
+            List<(NetworkRouter Router, string TargetAddress)> deployments)
         {
             try
             {

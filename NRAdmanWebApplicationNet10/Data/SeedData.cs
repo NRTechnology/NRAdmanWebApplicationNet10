@@ -7,6 +7,24 @@ namespace NRAdmanWebApplicationNet10.Data
 {
     public class SeedData
     {         
+        private static async Task SetInitData(IServiceProvider serviceProvider)
+        {
+            await using var context = new ApplicationDbContext(serviceProvider.GetRequiredService<DbContextOptions<ApplicationDbContext>>());
+            var defaultRouter = new NetworkRouter()
+            {
+                Name = "Default Router",
+                IpAddress = "15.0.91.6",
+                RouterType = EnumRouterType.Mikrotik,
+                Username = "admin",
+                Password = "eve"
+            };
+            var defaultRouterExist = await context.NetworkRouters.FirstOrDefaultAsync(r => r.Name == "Default Router");
+            if (defaultRouterExist == null)
+            {
+                context.NetworkRouters.Add(defaultRouter);
+                await context.SaveChangesAsync();
+            }
+        }
 
         private static async Task SetUsername(IServiceProvider serviceProvider)
         {
@@ -74,6 +92,7 @@ namespace NRAdmanWebApplicationNet10.Data
         public static async Task Initialize(IServiceProvider serviceProvider)
         {            
             await SetUsername(serviceProvider);
+            await SetInitData(serviceProvider);
         }
     }
 }

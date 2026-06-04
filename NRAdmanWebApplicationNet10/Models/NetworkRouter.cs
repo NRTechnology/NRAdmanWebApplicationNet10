@@ -7,7 +7,7 @@ namespace NRAdmanWebApplicationNet10.Models
 {
     [Index(nameof(Name), IsUnique = true)]
     [Index(nameof(IpAddress), IsUnique = true)]
-    public class Router
+    public class NetworkRouter
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

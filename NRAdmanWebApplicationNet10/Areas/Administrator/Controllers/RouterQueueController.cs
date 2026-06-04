@@ -25,7 +25,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
             try
             {
                 var data = applicationDbContext.MikrotikSimpleQueues
-                    .Join(applicationDbContext.Routers,
+                    .Join(applicationDbContext.NetworkRouters,
                         queue => queue.RouterId,
                         router => router.Id,
                         (queue, router) => new
@@ -97,7 +97,7 @@ namespace NRAdmanWebApplicationNet10.Areas.Administrator.Controllers
             {
                 Id = queue.Id,
                 RouterId = queue.RouterId,
-                RouterName = applicationDbContext.Routers.FirstOrDefault(r => r.Id == queue.RouterId)?.Name,
+                RouterName = applicationDbContext.NetworkRouters.FirstOrDefault(r => r.Id == queue.RouterId)?.Name,
                 QueueName = queue.QueueName,
                 TargetAddress = queue.TargetAddress,
                 Parent = queue.Parent,
